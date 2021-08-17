@@ -1,0 +1,134 @@
+<html>
+
+
+<head>
+  <title>KGBB Use Case: SEARCH TOPIC</title>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/standard.css')}}>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/font-awesome-4.7.0/css/font-awesome.min.css')}}>
+</head>
+<body>
+<div class="header">
+  <h4>Search Topic</h4>
+</div>
+
+
+<div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 70px;">By Ontology Class:</div>
+
+  <div class="list_header" style="margin-top: 0px;">
+    <table id="header_table">
+      <tr>
+        <th width="200" height="30">name</th>
+        <th width="auto" height="30">description</th>
+      </tr>
+    </table>
+  </div>
+  <div class="list_container">
+    {% for onto_class in ontology_class_list  %}
+      <div class="list_item">
+        <form action="/search" method="POST">
+          <input class="entry_row" type="submit" name="onto_class_uri" value="{{ onto_class.get('URI') }}">
+          <table id="entry_table" cellpadding="0" cellspacing="0" >
+            <tr>
+              <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ onto_class.get('name') }}</th>
+              <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ onto_class.get('description') }}</th>
+            </tr>
+          </table>
+        </form>
+      </div>
+    {% endfor %}
+  </div>
+
+
+
+  <div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 70px;">By Assertion Class:</div>
+    <div class="list_header" style="margin-top: 0px;">
+      <table id="header_table">
+        <tr>
+          <th width="200" height="30">name</th>
+          <th width="auto" height="30">description</th>
+        </tr>
+      </table>
+    </div>
+    <div class="list_container">
+      {% for assertion_class in assertion_class_list  %}
+        <div class="list_item">
+          <form action="/search" method="POST">
+            <input class="entry_row" type="submit" name="assertion_class_uri" value="{{ assertion_class.get('URI') }}">
+            <table id="entry_table" cellpadding="0" cellspacing="0" >
+              <tr>
+                <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ assertion_class.get('name') }}</th>
+                <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ assertion_class.get('description') }}</th>
+              </tr>
+            </table>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+
+
+
+
+
+    <div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 70px;">By Topic Class:</div>
+      <div class="list_header" style="margin-top: 0px;">
+        <table id="header_table">
+          <tr>
+            <th width="200" height="30">name</th>
+            <th width="auto" height="30">description</th>
+          </tr>
+        </table>
+      </div>
+      <div class="list_container">
+        {% for topic_class in topic_class_list  %}
+          <div class="list_item">
+            <form action="/search" method="POST">
+              <input class="entry_row" type="submit" name="topic_class_uri" value="{{ topic_class.get('URI') }}">
+              <table id="entry_table" cellpadding="0" cellspacing="0" >
+                <tr>
+                  <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ topic_class.get('name') }}</th>
+                  <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ topic_class.get('description') }}</th>
+                </tr>
+              </table>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+
+
+
+
+      <div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 70px;">By Entry Class:</div>
+        <div class="list_header" style="margin-top: 0px;">
+          <table id="header_table">
+            <tr>
+              <th width="200" height="30">name</th>
+              <th width="auto" height="30">description</th>
+            </tr>
+          </table>
+        </div>
+        <div class="list_container">
+          {% for entry_class in topic_class_list  %}
+            <div class="list_item">
+              <form action="/search" method="POST">
+                <input class="entry_row" type="submit" name="entry_class_uri" value="{{ entry_class.get('URI') }}">
+                <table id="entry_table" cellpadding="0" cellspacing="0" >
+                  <tr>
+                    <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ entry_class.get('name') }}</th>
+                    <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ entry_class.get('description') }}</th>
+                  </tr>
+                </table>
+              </form>
+            </div>
+          {% endfor %}
+        </div>
+
+
+
+
+
+  <form action="/lobby" method="POST">
+    <div class="bottom" style="margin-top: 0px;">
+      <input class="return_button" style="margin-right: 0px; margin-top: 0px" align="center" type="submit" name="button_action" value="Return to Lobby">
+    </div>
+  </form>
+</body>

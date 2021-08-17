@@ -1,0 +1,56 @@
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+
+<div class="data_row">{{ topic_view_tree.get(2).get("assertion_label1") }}
+
+  {% if 'URI' in topic_view_tree.get(2).get('sub_view_tree')[0] %}
+    {% include  topic_view_tree.get(2).get('sub_view_tree')[0].get(0).get('include_html') ignore missing  %}
+  {% endif %}
+
+
+  <div class="datum">
+    <form action="/user_input" accept-charset="UTF-8" style="display:flex; width:600px;" method="POST"><input name="utf8" type="hidden" value="&#x2713;" />
+      <input type="text" style="height: 30px; " name="single_resource_input" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/PATO_0001241" class="bp_form_complete-PATO-name" size="40" placeholder="{{ topic_view_tree.get(2).get('placeholder_text') }}" />
+      <div class='input-group-append'>
+        <input type="hidden" name="single_resource_input_parent_uri" value="{{ topic_view_tree.get('URI') }}">
+        <input type="hidden" name="single_resource_input_parent_item_type" value="{{ topic_view_tree.get('data_item_type') }}">
+        <input type="hidden" name="single_resource_input_entry_uri" value="{{ entry_view_tree.get('URI') }}">
+        <input type="hidden" name="single_resource_input_topic_uri" value="{{ topic_view_tree.get('URI') }}">
+        <input type="hidden" name="single_resource_input_assertion_uri" value=None>
+        <input type="hidden" name="single_resource_input_kgbb_uri" value="{{ topic_view_tree.get(2).get('target_KGBB_URI') }}">
+        <input type="hidden" name="single_resource_input_input_result" value="{{ topic_view_tree.get(2).get('input_results_in') }}">
+        <input type="hidden" name="single_resource_input_query_key" value="{{ topic_view_tree.get(2).get('query_key') }}">
+        <input type="hidden" name="single_resource_input_deleted_item_uri" value=None>
+        <button name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> add
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if 'URI' in topic_view_tree.get(2).get('sub_view_tree')[0] %}
+  {% for m in range (0, topic_view_tree.get(2).get('sub_view_tree_length')) %}
+  <div id="overlay">
+    <div class="datum" style="margin-top: 300px; margin-left: 450px; float:left">
+      <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST"><input name="utf8" type="hidden" value="&#x2713;" />
+        <input type="text" style="height: 30px; " name="single_resource_input_edit" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/PATO_0001241" class="bp_form_complete-PATO-name" size="40" placeholder="{{ topic_view_tree.get(2).get('placeholder_text') }}" />
+        <div class='input-group-append'>
+          <input type="hidden" name="single_resource_input_edit_parent_uri" value="{{ topic_view_tree.get('URI') }}">
+          <input type="hidden" name="single_resource_input_edit_parent_item_type" value="{{ topic_view_tree.get('data_item_type') }}">
+          <input type="hidden" name="single_resource_input_edit_entry_uri" value="{{ entry_view_tree.get('URI') }}">
+          <input type="hidden" name="single_resource_input_edit_topic_uri" value="{{ topic_view_tree.get('URI') }}">
+          <input type="hidden" name="single_resource_input_edit_assertion_uri" value=None>
+          <input type="hidden" name="single_resource_input_edit_kgbb_uri" value="{{ topic_view_tree.get(2).get('target_KGBB_URI') }}">
+          <input type="hidden" name="single_resource_input_edit_input_result" value="{{ topic_view_tree.get(2).get('input_results_in') }}">
+          <input type="hidden" name="single_resource_input_edit_query_key" value="{{ topic_view_tree.get(2).get('query_key') }}">
+          <input type="hidden" name="single_resource_input_edit_deleted_item_uri" value="{{ topic_view_tree.get(2).get('sub_view_tree')[m].get('URI') }}">
+          <button onclick="off()" name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> edit
+          </button>
+        </div>
+      </form>
+    </div>
+    <button onclick="off()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  background: #7F869B; margin-left: 776px; margin-top: -60px; float: left; font-weight: bold; " type="submit" class="btn btn-primary">X</button>
+  </div>
+  {% endfor %}
+{% endif %}

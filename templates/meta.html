@@ -1,0 +1,15 @@
+{% if entry_dict[0].get('version') %}
+  <div class="meta" style="background-color:#239096; ">
+    <h6 style="color: white; margin-top:-2px;">{{ version.get('version_type') }} Version Metadata:   &nbsp; URI: {{ version.get('URI') }};   &nbsp; creator: {{ version.get('created_by') }};  &nbsp;  created on: {{ version.get('created_on') }};  &nbsp;  version number: {{ version.get('version') }}
+    </h6>
+    <form action="/entry" method="POST">
+    <input type="hidden" name="entry_uri" value="{{ version.get('version_of') }}">
+    </form>
+  </div>
+
+{% else %}
+  <div class="meta">
+    <h6>Entry Metadata:   &nbsp; URI: {{ entry_dict[0].get('id') }};   &nbsp; creator: {{ entry_dict[0].get('node').get('created_by') }};  &nbsp;  created on: {{ entry_dict[0].get('node').get('created_on') }};  &nbsp;  last updated on: {{ entry_dict[0].get('node').get('last_updated_on') }}
+    </h6>
+  </div>
+{% endif %}

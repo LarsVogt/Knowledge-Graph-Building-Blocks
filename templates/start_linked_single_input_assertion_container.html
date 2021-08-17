@@ -1,0 +1,45 @@
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{child.get('id')  | replace('-', '_')}}{{start_component}}_2').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/user_input',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{start_component}}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+
+
+
+<div class="data_row">{{ start_label }}
+
+  {% include start_resource_html ignore missing  %}
+
+  <div class="datum">
+    <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST">
+      <input name="utf8" type="hidden" value="&#x2713;" />
+      <input type="text" style="height: 30px; " name="{{start_component}}" id="query" data-bp_include_definitions="true" data-bp_search_branch="{{ start_container_node.get('input_restricted_to_subclasses_of') }}" class="bp_form_complete-{{ start_container_node.get('ontology_ID') }}-name" size="40" placeholder="{{ start_container_node.get('placeholder_text') }}" />
+      <div class='input-group-append'>
+        <input type="hidden" name="{{start_component}}_parent_uri" value="{{ topic_uri }}">
+        <input type="hidden" name="{{start_component}}_parent_item_type" value="{{ child.get('node_type') }}">
+        <input type="hidden" name="{{start_component}}_entry_uri" value="{{ entry_dict[0].get('id') }}">
+        <input type="hidden" name="{{start_component}}_topic_uri" value="{{ topic_uri }}">
+        <input type="hidden" name="{{start_component}}_assertion_uri" value=None>
+        <input type="hidden" name="{{start_component}}_kgbb_uri" value="{{ start_container_node.get('target_KGBB_URI') }}">
+        <input type="hidden" name="{{start_component}}_input_result" value="{{ start_container_node.get('input_results_in') }}">
+        <input type="hidden" name="{{start_component}}_query_key" value="{{ start_container_node.get('query_key') }}">
+        <input type="hidden" name="{{start_component}}_deleted_item_uri" value=None>
+        <button name="button" style="height: 30px; padding-top: 3px" id="{{child.get('id')  | replace('-', '_')}}{{start_component}}_2" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> add
+        </button>
+        <input type="hidden" name="input_name" id="input_name{{start_component}}" value="{{start_component}}"/>
+      </div>
+    </form>
+  </div>
+</div>

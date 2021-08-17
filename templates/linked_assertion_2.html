@@ -1,0 +1,24 @@
+
+{% for m in range (0, topic_view_tree.get(2).get('sub_view_tree_length')) %}
+
+  <div class="datum" style="margin-top:-4px; margin-bottom:16px">
+    <form action="/topic" method="POST">
+      <div class="resource_input" style="position: relative;">
+        <input class="topic_resource" type="submit" name="topic_uri" value="{{ topic_view_tree.get('URI') }}"></input>
+        <img class="item_icon" src="{{url_for('static', filename='Assertion_ICON_small.png')}}" alt="entry icon" style="padding-right: 4px;">
+        <span class="tooltip_assertion" style="color: black; font-style: normal;">{{ topic_view_tree.get(2).get('sub_view_tree')[m].get(0).get('assertion_value1') }}<span class="tooltip-text_assertion">{{ topic_view_tree.get(2).get('sub_view_tree')[m].get(0).get('assertion_value_tooltip1') }}</span></span>
+        <span class="resource_assertion_ontology_id">{{ topic_view_tree.get(2).get('sub_view_tree')[m].get(0).get('assertion_value2') }}</span>
+      </div>
+    </form>
+    <form action="/delete_input"method="POST">
+      <input class="resource_input_delete_btn" type="submit" name="delete_assertion" value="X"></input>
+      <input type="hidden" name="delete_assertion_uri" value="{{[topic_view_tree.get('URI'), topic_view_tree.get(2).get('sub_view_tree')[m].get('URI')] }}"></input>
+    </form>
+    <button onclick="on()" class='fas'>&#xf044;</button>
+  </div>
+  {% for x in topic_view_tree.get(2).get('sub_view_tree')[m].get('input_type_list') %}
+    {% if x == 'http://purl.obolibrary.org/obo/PATO_0000128' %}
+      {% include  topic_view_tree.get(2).get('sub_view_tree')[m].get(1).get('include_html') ignore missing  %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}

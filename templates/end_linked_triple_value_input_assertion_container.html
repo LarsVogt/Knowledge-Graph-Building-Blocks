@@ -1,0 +1,47 @@
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{assertion.get('id')  | replace('-', '_')}}{{end_component2}}_2').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/user_input',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{end_component2}}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+
+
+<div class="data_row" style="margin-left: 0px; margin-top: 4px; position: fixed; "><span style="margin-left: 6px; margin-top: 10px">{{ end_label }}</span>
+  {% for assertion_child in entry_dict if assertion_child.get('component') == end_component2 and assertion_child.get('parent') == assertion2_uri %}
+    {% include end_resource2_html ignore missing  %}
+  {% else %}
+    <div class="datum" style="margin-left: 6px; margin-top: -6px; position: inherit;">
+      <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px; margin-top: 4px;" method="POST">
+        <input name="utf8" type="hidden" value="&#x2713;" />
+        <input type="text" style="height: 30px; margin-right: 4px;" name="{{end_component2}}_value" size="7" placeholder="{{ end_container_node2.get('placeholder_text_1') }}" /><span style="margin-left: 1px; margin-top: 5px">{{ end_label2 }}&nbsp;</span>
+        <input type="text" style="height: 30px; margin-right: 4px;" name="{{end_component2}}_value1" size="7" placeholder="{{ end_container_node2.get('placeholder_text_2') }}" />
+        <input type="text" style="height: 30px; margin-right: 4px;" name="{{end_component2}}_value2" size="7" placeholder="{{ end_container_node2.get('placeholder_text_3') }}" />
+        <div class='input-group-append'>
+          <input type="hidden" name="{{end_component2}}_parent_uri" value="{{ assertion.get('id') }}">
+          <input type="hidden" name="{{end_component2}}_parent_item_type" value="{{ assertion.get('node_type') }}">
+          <input type="hidden" name="{{end_component2}}_entry_uri" value="{{ entry_dict[0].get('id') }}">
+          <input type="hidden" name="{{end_component2}}_topic_uri" value="{{ topic_uri }}">
+          <input type="hidden" name="{{end_component2}}_assertion_uri" value=None>
+          <input type="hidden" name="{{end_component2}}_kgbb_uri" value="{{ end_container_node2.get('target_KGBB_URI') }}">
+          <input type="hidden" name="{{end_component2}}_input_result" value="{{ end_container_node2.get('input_results_in') }}">
+          <input type="hidden" name="{{end_component2}}_query_key" value="{{ end_container_node2.get('query_key') }}">
+          <input type="hidden" name="{{end_component2}}_deleted_item_uri" value=None>
+          <button name="button" style="height: 30px; padding-top: 3px" id="{{assertion.get('id')  | replace('-', '_')}}{{end_component2}}_2" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> add
+          </button>
+          <input type="hidden" name="input_name" id="input_name{{end_component2}}" value="{{end_component2}}"/>
+        </div>
+      </form>
+    </div>
+  {% endfor %}
+</div>

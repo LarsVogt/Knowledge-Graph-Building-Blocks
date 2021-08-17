@@ -1,0 +1,64 @@
+<html>
+
+
+<head>
+  <title>KGBB Use Case: ENTRY LIST</title>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/standard.css')}}>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/font-awesome-4.7.0/css/font-awesome.min.css')}}>
+</head>
+<body>
+<div class="header">
+  <h4>Publication Entry List</h4>
+</div>
+
+
+
+
+  <div class="list_header">
+    <table id="header_table">
+      <tr>
+        <th width="28" height="30"></th>
+        <th width="343" height="30">publication title</th>
+        <th width="343" height="30">authors</th>
+        <th width="343" height="30">publication year</th>
+        <th width="343" height="30">orkg entry URI</th>
+      </tr>
+    </table>
+  </div>
+  <div class="list_container">
+    {% for i in range (0, list_length)  %}
+      <div class="list_item">
+        <form action="/entry" method="POST">
+          <input class="entry_row" type="submit" name="entry_uri" value="{{ entry_list[i].get('n.URI') }}">
+          <table id="entry_table" cellpadding="0" cellspacing="0" >
+            <tr>
+              <th width="30" height="30"><img class="item_icon" src="{{url_for('static', filename='Entry_ICON.jpg')}}" alt="entry icon" width="30" height="30"></th>
+              <th width="343" height="30"><span class="title">{{ entry_list[i].get('n.publication_title') }}</span></th>
+              <th width="343" height="30"><span class="date">{{ entry_list[i].get('m.publication_authors') }}</span></th>
+              <th width="343" height="30"><span class="date">{{ entry_list[i].get('m.publication_year') }}</span></th>
+              <th width="343" height="30" style="font-size: 12px;">{{ entry_list[i].get('n.URI') }}</th>
+            </tr>
+          </table>
+        </form>
+      </div>
+
+    {% endfor %}
+
+
+  </div>
+
+
+
+
+
+
+
+  <form action="/lobby" method="POST">
+    <div class="bottom" style="margin-top: 0px;">
+      <input class="return_button" style="margin-right: 0px; margin-top: 0px" align="center" type="submit" name="button_action" value="Return to Lobby">
+    </div>
+  </form>
+</body>
+
+
+</html>

@@ -1,0 +1,39 @@
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<script type=text/javascript>
+  $(function() {
+      $('button#{{ id | replace('-', '_')}}{{component}}_2').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/user_input',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{component}}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+<div class="data_row" style="float: right; margin: 28px -74px 0px 0px; width: 500px; font-weight:normal">{{ resource_label }}
+  <div class="datum" style="width: auto; margin: -1px -252px 0px 0px; float: right; ">
+    <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST"><input name="utf8" type="hidden" value="&#x2713;" />
+      <input type="text" style="height: 30px; margin-right: 4px;" name="{{component}}_value" size="7" placeholder="{{ resource_input_info.get('placeholder_text_1') }}" /><span style="margin-left: 1px; margin-top: 5px">{{ end_label2 }}&nbsp;</span>
+      <input type="text" style="height: 30px; margin-right: 4px;" name="{{component}}_value1" size="7" placeholder="{{ resource_input_info.get('placeholder_text_2') }}" />
+      <input type="text" style="height: 30px; margin-right: 4px;" name="{{component}}_value2" size="7" placeholder="{{ resource_input_info.get('placeholder_text_3') }}" />
+      <div class='input-group-append'>
+        <input type="hidden" name="{{component}}_parent_uri" value="{{ parent_id }}">
+        <input type="hidden" name="{{component}}_parent_item_type" value="{{ parent_type }}">
+        <input type="hidden" name="{{component}}_entry_uri" value="{{ entry_id }}">
+        <input type="hidden" name="{{component}}_topic_uri" value="{{ TOPIC_uri }}">
+        <input type="hidden" name="{{component}}_assertion_uri" value="{{ assertion_uri }}">
+        <input type="hidden" name="{{component}}_kgbb_uri" value="{{ resource_input_info.get('target_KGBB_URI') }}">
+        <input type="hidden" name="{{component}}_input_result" value="{{ resource_input_info.get('input_results_in') }}">
+        <input type="hidden" name="{{component}}_query_key" value="{{ resource_input_info.get('query_key') }}">
+        <input type="hidden" name="{{component}}_deleted_item_uri" value=None>
+        <button name="button" style="height: 30px; padding-top: 3px" id="{{ id | replace('-', '_')}}{{component}}_2" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> add
+        </button>
+        <input type="hidden" name="input_name" id="input_name{{component}}" value="{{component}}"/>
+      </div>
+    </form>
+  </div>
+</div>

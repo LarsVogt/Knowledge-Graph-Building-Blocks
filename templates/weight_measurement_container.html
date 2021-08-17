@@ -1,0 +1,34 @@
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+
+<div class="data_row" style="margin: -70px 0px 0px 375px; ">{{ topic_view_tree.get(2).get('sub_view_tree')[m].get(1).get("assertion_label1") }}
+
+  {% if 'URI' in topic_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[0] %}
+    {% include  topic_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[0].get(1).get('include_html') ignore missing  %}
+
+  {% else %}
+  <div class="datum" style="margin: 0px 230px 0px 0px; ">
+    <form action="/user_input" accept-charset="UTF-8" style="display:flex; width:600px; margin-top: 4px;" method="POST">
+      <input name="utf8" type="hidden" value="&#x2713;" />
+      <input type="text" style="height: 30px; margin-right: 4px;" name="double_resource_input_value" size="5" placeholder="value" />
+      <input type="text" style="height: 30px; " name="double_resource_input" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/UO_1000021" class="bp_form_complete-UO-name" size="20" placeholder="select a gram-based unit" />
+      <div class='input-group-append'>
+        <input type="hidden" name="double_resource_input_parent_uri" value="{{ topic_view_tree.get(2).get('sub_view_tree')[m].get('URI') }}">
+        <input type="hidden" name="double_resource_input_parent_item_type" value="{{ topic_view_tree.get(2).get('sub_view_tree')[m].get('data_item_type') }}">
+        <input type="hidden" name="double_resource_input_entry_uri" value="{{ entry_view_tree.get('URI') }}">
+        <input type="hidden" name="double_resource_input_topic_uri" value="{{ topic_view_tree.get('URI') }}">
+        <input type="hidden" name="double_resource_input_assertion_uri" value="{{ topic_view_tree.get(2).get('sub_view_tree')[m].get('URI') }}">
+        <input type="hidden" name="double_resource_input_kgbb_uri" value="{{ topic_view_tree.get(2).get('sub_view_tree')[m].get(1).get('target_KGBB_URI') }}">
+        <input type="hidden" name="double_resource_input_input_result" value="{{ topic_view_tree.get(2).get('sub_view_tree')[m].get(1).get('input_results_in') }}">
+        <input type="hidden" name="double_resource_input_query_key" value="{{ topic_view_tree.get(2).get('sub_view_tree')[m].get(1).get('query_key') }}">
+        <input type="hidden" name="double_resource_input_deleted_item_uri" value=None>
+        <button name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> add
+        </button>
+      </div>
+    </form>
+  </div>
+
+
+  {% endif %}
+</div>

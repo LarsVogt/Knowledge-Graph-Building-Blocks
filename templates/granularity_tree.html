@@ -1,0 +1,168 @@
+<script>
+  var cypher;
+  var viz;
+  var config;
+
+  function draw() {
+    var config = {
+        container_id:"viz",
+        server_url:"bolt://localhost:7687",
+        server_user:"python",
+        server_password:"useCaseKGBB",
+        labels: {
+            "orkg_Assertion_IND": {
+                "caption": "assertion_label",
+                "color":"#84FF5C",
+                "image": "{{url_for('static', filename='Assertion_ICON_small.png')}}",
+            },
+            "Literal_IND": {
+                "caption": "value",
+                color:"#FDDA11"
+            },
+            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
+                       "caption": "name",
+                       "size": "defaultPagerank",
+                       "community": "defaultCommunity"
+                       //"sizeCypher": "defaultSizeCypher"
+
+                  }
+        },
+
+        relationships: {
+
+        },
+        initial_cypher: "MATCH (m { {{ gran_tree.get('node').get('URI_property_key') }}:'{{ gran_tree.get('id') }}', current_version:'true'})-[r]->(n { {{ gran_tree.get('node').get('URI_property_key') }}:'{{ gran_tree.get('id') }}', current_version:'true'}) RETURN m, n, r",
+        arrows: true,
+        hierarchical_layout: true,
+        hierarchical_sort_method: "directed",
+
+    }
+
+    var viz = new NeoVis.default(config);
+    viz.render();
+    }
+</script>
+
+
+
+
+
+
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{id  | replace('-', '_')}}_{{ component }}').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/user_input',
+              type: "post",
+              data: {
+                input_name: $('input[name="input_name"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+<script>
+function on{{id  | replace('-', '')}}_Meta() {
+  document.getElementById("{{id  | replace('-', '')}}overlayMeta").style.display = "block";
+}
+
+function off{{id  | replace('-', '')}}_Meta() {
+  document.getElementById("{{id  | replace('-', '')}}overlayMeta").style.display = "none";
+}
+</script>
+
+<script>
+function on{{id  | replace('-', '_')}}_MetaAss() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayMetaAss").style.display = "block";
+}
+
+function off{{id  | replace('-', '_')}}_MetaAss() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayMetaAss").style.display = "none";
+}
+</script>
+
+<script>
+function on{{id  | replace('-', '_')}}_Statements() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayStatements").style.display = "block";
+}
+
+function off{{id  | replace('-', '_')}}_Statements() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayStatements").style.display = "none";
+}
+</script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{id  | replace('-', '_')}}{{component}}_instance_label').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/instance_label',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{ id }}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{id  | replace('-', '_')}}{{component}}_certainty').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/certainty',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{ id }}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+
+<div class="data_row" style="border: 1px solid #eee; border-radius: 7px; width: 800px; padding: 5px 5px 5px 5px;  margin-left: 25px; margin-bottom: 10px; margin-top: 10px; box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.05), 0 1px 1px 0 rgba(0, 0, 0, 0.19)">
+  <span style="position: relative; top: 10px; margin-top: 10px; margin-left: 9px; ">{{ label }}</span>
+  <form action="/topic" method="POST">
+    <img class="item_icon" src="{{url_for('static', filename='GranularityTree_ICON_medium.png')}}" alt="entry icon" style="height: auto; max-width: 100%; margin-top: -33px; margin-left: -16px; float: left;">
+    <input class="topic_resource" type="submit" name="topic_uri" style= "height: 34px; width:30px; position:inherit; margin: -68px 0px 16px -22px;" value="{{ id }}"></input>
+  </form>
+  {% if not entry_dict[0].get('version') %}
+    <button onclick="on{{id  | replace('-', '_')}}_Statements()" style="margin: -35px 43px 0px -44px; padding-right: 20px; padding-left: 5px; background-color: white; float: right; font-size: 18px;" aria-hidden="true" class='far'>&#Xf086;</button>
+  {% endif %}
+  <button onclick="on{{id  | replace('-', '_')}}_MetaAss()" style="margin: -32px 20px 1px 1px; float: right; z-index:6 ;" class='fas'>&#xf02b;</button>
+
+
+  {% include 'data_item_metadata.html' %}
+
+  <div class="datum" style="float: left; margin-top:-4px; margin-bottom: 0px; position:relative; padding-right: 70px; width: auto; ">
+    {% if not entry_dict[0].get('version') %}
+      <form action="/entry" method="POST">
+        <div class="resource_input" style="position: relative; margin-top: -15px; margin-left: 248px; padding: 0px 0px 5px 0px; height: auto; margin-right: 30px; ">
+          {% include input_representation %}
+        </div>
+      </form>
+      <button onclick="on{{id  | replace('-', '')}}_Meta()" style="margin: -39px 12px 1px 1px; z-index:6 ; float: right; " class='fas'>&#xf02b;</button>
+    {% endif %}
+
+    {% if entry_dict[0].get('version') %}
+      <div style="width: auto; height: auto; ">
+        <form action="/entry" method="POST">
+          <div class="resource_input" style="position: relative; margin-top: -15px; margin-left: 250px; margin-right: 5px; padding: 0px 0px 5px 0px; height: auto;">
+            {% include input_representation %}
+          </div>
+        </form>
+        <button onclick="on{{id  | replace('-', '')}}_Meta()" style="margin: -39px -14px 1px 0px; z-index:6 ; float: right; " class='fas'>&#xf02b;</button>
+      </div>
+    {% endif %}
+
+    {% include 'resource_metadata.html' %}
+
+    {% include 'statements.html' %}
+
+  </div>
+</div>

@@ -1,0 +1,17 @@
+{% extends "entry_form.html" %}
+
+{% block content %}
+
+
+<h1 align="center">Information required for adding a new material entity topic:</h1>
+<form action="/topic" method="POST">
+  <div style="text-align: right; position=absolute; align: center; margin: 200px 300px 300px 400px">
+    Ontology term for a material entity: <input type="text" name="type_name">
+    <br/><br/>
+    Ontology class URI: <input type="text" name="type_uri">
+    <br/>
+    <input class="add_topic_btn" align="center" type="submit" value="save" width="100" height="30">
+  </div>
+</form>
+
+{% endblock %}
