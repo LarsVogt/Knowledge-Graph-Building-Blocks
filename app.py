@@ -265,7 +265,7 @@ initiation_query_string = '''
 
 
 
-    //MATERIAL ENTITY GRANULARITY PERSPECTIVE KGBB
+    //MATERIAL ENTITY PARTHOOD GRANULARITY PERSPECTIVE KGBB
 
     CREATE (MatEntparthoodgranperspectiveKGBB:MaterialEntityParthoodGranularityPerspectiveKGBB:ParthoodBasedGranularityPerspectiveKGBB:GranularityPerspectiveKGBB:KGBB:ClassExpression:Entity {{name:"material entity parthood-based granularity perspective Knowledge Graph Building Block", description:"A parthood-based granularity perspective Knowledge Graph Building Block that manages data referring to granularity trees that are based on the parthood relation between material entities.", URI:"MatEntParthoodGranularityPerspectiveKGBB_URI", category:"ClassExpression", operational_KGBB:"true", label_cypher:'MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()
     WITH entry_node
@@ -298,7 +298,7 @@ initiation_query_string = '''
 
     //SCHOLARLY PUBLICATION ENTRY KGBB
 
-    CREATE (scholarlyPublicationEntrykgbb:ScholarlyPublicationEntryKGBB:EntryKGBB:KGBB:ClassExpression:Entity {{name:"scholarly publication entry Knowledge Graph Building Block", description:"An entry Knowledge Graph Building Block that manages data about a scholarly publication.", relevant_classes_URI:["http://orkg???????2", "http://orkg/researchtopic_1"], URI:"ScholarlyPublicationEntryKGBB_URI", category:"ClassExpression", operational_KGBB:"true", storage_model_cypher_code:'MATCH (ORKGEntryClass) WHERE ORKGEntryClass.URI="orkg_entry_class_URI"
+    CREATE (scholarlyPublicationEntrykgbb:ScholarlyPublicationEntryKGBB:EntryKGBB:KGBB:ClassExpression:Entity {{name:"scholarly publication entry Knowledge Graph Building Block", description:"An entry Knowledge Graph Building Block that manages data about a scholarly publication.", relevant_classes_URI:["http://orkg???????2", "http://orkg/researchtopic_1"], URI:"ScholarlyPublicationEntryKGBB_URI", category:"ClassExpression", operational_KGBB:"true",storage_model_cypher_code:'MATCH (ORKGEntryClass) WHERE ORKGEntryClass.URI="orkg_entry_class_URI"
 
     CREATE (entry:orkg_ScholarlyPublicationEntry_IND:orkg_Entry_IND:iao_Document_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{name:"Publication entry unit", URI:"entry_uri", type:"scholarly_publication_entry_URI", entry_doi:"{doiEntry}", publication_doi:"pub_doiX", publication_title:"pub_titleX", entry_URI:"entry_uri", description:"This type of entry models information about a particular research paper.", KGBB_URI:"ScholarlyPublicationEntryKGBB_URI", object_URI:"new_individual_uri1", node_type: "entry", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual"}})-[:HAS_DOI {{category:"DataPropertyExpression", URI:"http://prismstandard.org/namespaces/basic/2.0/doi", entry_URI:"entry_uri"}}]->(doi_entry:EntryDOI_IND:DOI_IND:Literal_IND {{value:"some entry DOI", current_version:"true", entry_doi:"{doiEntry}", entry_URI:"entry_uri", category:"NamedIndividual"}})
 
@@ -308,7 +308,39 @@ initiation_query_string = '''
 
     CREATE (publication)-[:IDENTIFIER {{category:"DataPropertyExpression", URI:"https://dublincore.org/specifications/dublin-core/dcmi-terms/#identifier", entry_URI:"entry_uri"}}]->(doi_publication)
 
-    CREATE (entry)-[:IS_TRANSLATION_OF {{category:"ObjectPropertyExpression", URI:"http://purl.org/vocab/frbr/core#translationOf", entry_URI:"entry_uri", description:"It identifies the original expression of a translated one."}}]->(publication)', search_cypher_code:"cypherQuery", data_item_type:"entry"}})-[:SUBCLASS_OF {{category:"ObjectPropertyExpression", URI:"http://www.w3.org/2000/01/rdf-schema#subClassOf"}}]->(entrykgbb)
+    CREATE (entry)-[:IS_TRANSLATION_OF {{category:"ObjectPropertyExpression", URI:"http://purl.org/vocab/frbr/core#translationOf", entry_URI:"entry_uri", description:"It identifies the original expression of a translated one."}}]->(publication)
+
+    CREATE (publication)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"entry_uri", topic_URI:"new_individual_uri2"}}]->(ResearchActivity:ResearchActivity_ind:orkg_ResearchActivity_IND:obi_Investigation_IND:obi_PlannedProcess_IND:bfo_Process_IND:NamedIndividual:Entity {{name:"research activity", versioned_doi:["NULL"], dataset_doi:["NULL"], description:"A planned process that has been planned and executed by some research agent and that has some research result. The process ends if some specific research objective is achieved.", URI:"new_individual_uri3", ontology_ID:"ORKG", topic_URI:"new_individual_uri2", type:"http://orkg???????5", instance_label:"Research overview", category:"NamedIndividual", entry_URI:"entry_uri", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", data_node_type:["topic_object"]}})
+
+    CREATE (entry)-[:CONTAINS {{category:"ObjectPropertyExpression", URI:"orkg_contains_uri", entry_URI:"entry_uri", topic_URI:"new_individual_uri2"}}]->(ResearchActivityTopic_ind:orkg_ResearchActivityTopic_IND:orkg_Topic_IND:iao_DocumentPart_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{name:"research overview topic unit", description:"This topic unit models all data of a particular research activity as it is documented in a particular research paper.", URI:"new_individual_uri2", topic_URI:"new_individual_uri2", type:"ResearchActivity_topic_class_URI", node_type:"topic", category:"NamedIndividual", entry_URI:"entry_uri", KGBB_URI:"ResearchActivityTopicKGBB_URI", editable:"false", object_URI:"new_individual_uri3", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], topic_label:"Research overview"}})
+
+    CREATE (ResearchActivityTopic_ind)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"entry_uri", topic_URI:"new_individual_uri2"}}]->(ResearchActivity)
+
+    CREATE (entry)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"entry_uri", topic_URI:"new_individual_uri2"}}]->(ResearchActivity)
+
+    CREATE (ResearchActivityTopic_ind)-[:CONTAINS {{category:"ObjectPropertyExpression", URI:"orkg_contains_uri", entry_URI:"entry_uri", topic_URI:"new_individual_uri4"}}]->(ResearchResultTopic_ind:orkg_ResearchResultTopic_IND:orkg_Topic_IND:iao_DocumentPart_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{name:"research result topic unit", description:"This topic unit models a research result documented in a particular research paper.", URI:"new_individual_uri4", topic_URI:"new_individual_uri4", type:"ResearchResult_topic_class_URI", node_type:"topic", category:"NamedIndividual", entry_URI:"entry_uri", KGBB_URI:"ResearchResultTopicKGBB_URI", object_URI:"new_individual_uri5", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], topic_label:"Research result"}})
+
+    CREATE (ResearchActivity)-[:HAS_SPECIFIED_OUTPUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/OBI_0000299", entry_URI:"entry_uri", topic_URI:"new_individual_uri2", description:"A relation between a planned process and a continuant participating in that process. The presence of the continuant at the end of the process is explicitly specified in the objective specification which the process realizes the concretization of."}}]->(researchResult:orkg_ResearchResult_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{URI:"new_individual_uri5", type:"http://orkg???????1", name:"research result", instance_label:"Research result", ontology_ID:"ORKG", description:"An information content entity that is intended to be a truthful statement about something and is the output of some research activity. It is usually acquired by some research method which reliably tends to produce (approximately) truthful statements (cf. iao:data item).", data_node_type:["topic_object"], current_version:"true", entry_URI:"entry_uri", topic_URI:["new_individual_uri2", "new_individual_uri4", "new_individual_uri8"], created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual"}})
+
+    CREATE (ResearchResultTopic_ind)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"entry_uri", topic_URI:"new_individual_uri4"}}]->(researchResult)
+
+    CREATE (researchResult)-[:HAS_PART {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/BFO_0000051", entry_URI:"entry_uri", topic_URI:"new_individual_uri4", description:"a core relation that holds between a whole and its part."}}]->(publication)
+
+    CREATE (ResearchActivityTopic_ind)-[:CONTAINS {{category:"ObjectPropertyExpression", URI:"orkg_contains_uri", entry_URI:"entry_uri", topic_URI:"new_individual_uri6"}}]->(ResearchMethodTopic_ind:orkg_ResearchMethodTopic_IND:orkg_Topic_IND:iao_DocumentPart_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{name:"research method topic unit", description:"This topic unit models a research method documented in a particular research paper.", URI:"new_individual_uri6", topic_URI:"new_individual_uri6", type:"ResearchMethod_topic_class_URI", node_type:"topic", category:"NamedIndividual", entry_URI:"entry_uri", KGBB_URI:"ResearchMethodTopicKGBB_URI", object_URI:"new_individual_uri7", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], topic_label:"Research method"}})
+
+    CREATE (ResearchActivity)-[:REALIZES {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/BFO_0000055", entry_URI:"entry_uri", topic_URI:"new_individual_uri2", description:"to say that b realizes c at t is to assert that there is some material entity d & b is a process which has participant d at t & c is a disposition or role of which d is bearer_of at t& the type instantiated by b is correlated with the type instantiated by c. (axiom label in BFO2 Reference: [059-003])."}}]->(researchMethod:orkg_ResearchMethod_IND:iao_PlanSpecification_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{URI:"new_individual_uri7", type:"http://orkg???????4", name:"research method", instance_label:"Research method", ontology_ID:"ORKG", description:"An information content entity that specifies how to conduct some research activity. It usually has some research objective as its part. It instructs some research agent how to achieve the objectives by taking the actions it specifies.", data_node_type:["topic_object"], current_version:"true", entry_URI:"entry_uri", topic_URI:["new_individual_uri2", "new_individual_uri6"], created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual"}})
+
+    CREATE (ResearchMethodTopic_ind)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"entry_uri", topic_URI:"new_individual_uri6"}}]->(researchMethod)
+
+    CREATE (ResearchActivityTopic_ind)-[:CONTAINS {{category:"ObjectPropertyExpression", URI:"orkg_contains_uri", entry_URI:"entry_uri", topic_URI:"new_individual_uri8"}}]->(ResearchObjectiveTopic_ind:orkg_ResearchObjectiveTopic_IND:orkg_Topic_IND:iao_DocumentPart_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{name:"research objective topic unit", description:"This topic unit models a research objective documented in a particular research paper.", URI:"new_individual_uri8", topic_URI:"new_individual_uri8", type:"ResearchObjective_topic_class_URI", node_type:"topic", category:"NamedIndividual", entry_URI:"entry_uri", KGBB_URI:"ResearchObjectiveTopicKGBB_URI", object_URI:"new_individual_uri9", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], topic_label:"Research objective"}})
+
+    CREATE (ResearchActivity)-[:ACHIEVES_PLANNED_OBJECTIVE {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/OBI_0000417", entry_URI:"entry_uri", topic_URI:"new_individual_uri2", description:"This relation obtains between a planned process and a objective specification when the criteria specified in the objective specification are met at the end of the planned process."}}]->(researchObjective:orkg_ResearchObjective_IND:iao_ObjectiveSpecification_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{URI:"new_individual_uri9", type:"http://orkg???????3", name:"research objective", instance_label:"Research objective", ontology_ID:"ORKG", description:"An information content entity that describes an intended process endpoint for some research activity.", data_node_type:["topic_object"], current_version:"true", entry_URI:"entry_uri", topic_URI:["new_individual_uri2", "new_individual_uri6", "new_individual_uri8"], created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual"}})
+
+    CREATE (ResearchObjectiveTopic_ind)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"entry_uri", topic_URI:"new_individual_uri8"}}]->(researchObjective)
+
+    CREATE (researchObjective)-[:HAS_ACHIEVED_RESULT {{category:"ObjectPropertyExpression", URI:"http://orkg_has_achieved_result", entry_URI:"entry_uri", topic_URI:"new_individual_uri8", description:"This relation obtains between a research objective and a research result when the criteria specified in the objective specification are met at the end of a planned process which has the research result as its output."}}]->(researchResult)
+
+    CREATE (researchMethod)-[:HAS_PART {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/BFO_0000051", entry_URI:"entry_uri", topic_URI:"new_individual_uri6", description:"a core relation that holds between a whole and its part."}}]->(researchObjective)', search_cypher_code:"cypherQuery", data_item_type:"entry"}})-[:SUBCLASS_OF {{category:"ObjectPropertyExpression", URI:"http://www.w3.org/2000/01/rdf-schema#subClassOf"}}]->(entrykgbb)
 
 
 
@@ -486,14 +518,14 @@ initiation_query_string = '''
     )
 
     WITH parent_data_item_node, object_node, ResearchObjectiveTopic_ind
-    MATCH (ResearchObjectiveTopic_ind)-[:IS_ABOUT]->(researchObjective_old:orkg_ResearchObjectiveTopic_IND {{current_version:"true"}})
+    MATCH (ResearchObjectiveTopic_ind)-[:IS_ABOUT]->(researchObjective_old:orkg_ResearchObjective_IND {{current_version:"true"}})
 
     WITH parent_data_item_node, object_node, ResearchObjectiveTopic_ind, researchObjective_old
     CALL apoc.refactor.cloneNodesWithRelationships([researchObjective_old])
     YIELD input, output
     WITH parent_data_item_node, object_node, ResearchObjectiveTopic_ind, researchObjective_old SET researchObjective_old.current_version = "false"
     WITH ResearchObjectiveTopic_ind
-    MATCH (ResearchObjectiveTopic_ind)-[:IS_ABOUT]->(researchObjective_new:orkg_ResearchObjectiveTopic_IND {{current_version:"true"}})
+    MATCH (ResearchObjectiveTopic_ind)-[:IS_ABOUT]->(researchObjective_new:orkg_ResearchObjective_IND {{current_version:"true"}})
     SET researchObjective_new.instance_label = "$_label_name_$", researchObjective_new.URI = "new_individual_uri1", researchObjective_new.created_on = localdatetime(), researchObjective_new.last_updated_on = localdatetime(), researchObjective_new.created_by = "{creator}", researchObjective_new.contributed_by = ["{creator}"]', edit_cypher:'MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()WITH entry_node
     WITH entry_node
     FOREACH (i IN CASE WHEN NOT "{creator}" IN entry_node.contributed_by THEN [1] ELSE [] END |
@@ -613,8 +645,7 @@ initiation_query_string = '''
 
     WITH parent_data_item_node, object_node, researchObjective, researchResult
     FOREACH (i IN CASE WHEN researchObjective IS NOT NULL THEN [1] ELSE [] END |
-    CREATE (researchObjective)-[:HAS_ACHIEVED_RESULT {{category:"ObjectPropertyExpression", URI:"http://orkg_has_achieved_result", entry_URI:"{entryURI}", topic_URI:"{topic_uri}", description:"This relation obtains between a research objective and a research result when the criteria specified in the objective specification are met at the end of a planned process which has the research result as its output."}}]->(researchResult)
-    )', from_results_cypher_code:'MATCH (parent_data_item_node {{URI:"parent_data_item_uri"}})
+    CREATE (researchObjective)-[:HAS_ACHIEVED_RESULT {{category:"ObjectPropertyExpression", URI:"http://orkg_has_achieved_result", entry_URI:"{entryURI}", topic_URI:"{topic_uri}", description:"This relation obtains between a research objective and a research result when the criteria specified in the objective specification are met at the end of a planned process which has the research result as its output."}}]->(researchResult))', from_results_cypher_code:'MATCH (parent_data_item_node {{URI:"parent_data_item_uri"}})
     WITH parent_data_item_node MATCH (object_node) WHERE object_node.URI=parent_data_item_node.object_URI SET object_node.data_node_type=object_node.data_node_type + "topic_object"
     WITH object_node, parent_data_item_node MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()
     WITH object_node, parent_data_item_node, entry_node
@@ -625,7 +656,7 @@ initiation_query_string = '''
 
     CREATE (parent_data_item_node)-[:CONTAINS {{category:"ObjectPropertyExpression", URI:"orkg_contains_uri", entry_URI:"{entryURI}", topic_URI:"{topic_uri}"}}]->(ResearchResultTopic_ind:orkg_ResearchResultTopic_IND:orkg_Topic_IND:iao_DocumentPart_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{name:"research result topic unit", description:"This topic models a research result documented in a particular research paper.", URI:"{topic_uri}", topic_URI:"{topic_uri}", type:"ResearchResult_topic_class_URI", node_type:"topic", category:"NamedIndividual", entry_URI:"{entryURI}", KGBB_URI:"ResearchResultTopicKGBB_URI", object_URI:"new_individual_uri1", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], topic_label:"$_input_name_$ [$_ontology_ID_$]"}})
 
-    CREATE (researchResult:orkg_ResearchResult_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{URI:"new_individual_uri1", type:"$_input_type_$", name:"$_input_name_$", instance_label:"$_input_name_$", ontology_ID:"$_ontology_ID_$", description:"$_input_description_$", data_node_type:["topic_object", "input1"], current_version:"true", entry_URI:"{entryURI}", topic_URI:["{topic_uri}"], created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual", data_view_information:"true", input:"true", input_source:"input1", input_version_ID:0, inputVariable:1, input_info_URI:"InputInfo1ResearchResultTopicIND_URI", user_input:"{topic_uri}"}})-[:HAS_PART {{category:"ObjectPropertyExpression", property_URI:"http://purl.obolibrary.org/obo/BFO_0000051", entry_URI:"{entryURI}", topic_URI:"{topic_uri}"}}]->(object_node)
+    CREATE (object_node)-[:HAS_PART {{category:"ObjectPropertyExpression", property_URI:"http://purl.obolibrary.org/obo/BFO_0000051", entry_URI:"{entryURI}", topic_URI:"{topic_uri}"}}]->(researchResult:orkg_ResearchResult_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity {{URI:"new_individual_uri1", type:"$_input_type_$", name:"$_input_name_$", instance_label:"$_input_name_$", ontology_ID:"$_ontology_ID_$", description:"$_input_description_$", data_node_type:["topic_object", "input1"], current_version:"true", entry_URI:"{entryURI}", topic_URI:["{topic_uri}"], created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", current_version:"true", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual", data_view_information:"true", input:"true", input_source:"input1", input_version_ID:0, inputVariable:1, input_info_URI:"InputInfo1ResearchResultTopicIND_URI", user_input:"{topic_uri}"}})
 
     CREATE (ResearchResultTopic_ind)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"{entryURI}", topic_URI:"{topic_uri}"}}]->(researchResult)', label_cypher:'MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()
     WITH entry_node
@@ -651,7 +682,7 @@ initiation_query_string = '''
     )
 
     WITH parent_data_item_node, object_node, ResearchResultTopic_ind
-    MATCH (ResearchResultTopic_ind)-[:IS_ABOUT]->(researchResult_old:orkg_ResearchActivity_IND {{current_version:"true"}})
+    MATCH (ResearchResultTopic_ind)-[:IS_ABOUT]->(researchResult_old:orkg_ResearchResult_IND {{current_version:"true"}})
 
     WITH parent_data_item_node, object_node, ResearchResultTopic_ind, researchResult_old
     CALL apoc.refactor.cloneNodesWithRelationships([researchResult_old])
@@ -713,6 +744,11 @@ initiation_query_string = '''
 
 
 
+
+
+
+
+
     //RESEARCH METHOD TOPIC KGBB
     CREATE (ResearchMethodTopickgbb:ResearchMethodTopicKGBB:TopicKGBB:KGBB:ClassExpression:Entity {{name:"research method topic Knowledge Graph Building Block", description:"A topic Knowledge Graph Building Block that manages data about the research methods documented in a particular research paper.", relevant_classes_URI:["http://orkg???????4"], URI:"ResearchMethodTopicKGBB_URI", category:"ClassExpression", storage_model_cypher_code:'MATCH (parent_data_item_node:orkg_ResearchActivityTopic_IND {{entry_URI:"{entryURI}"}})
     MATCH (object_node) WHERE object_node.URI=parent_data_item_node.object_URI
@@ -751,14 +787,14 @@ initiation_query_string = '''
     )
 
     WITH parent_data_item_node, object_node, ResearchMethodTopic_ind
-    MATCH (ResearchMethodTopic_ind)-[:IS_ABOUT]->(researchMethod_old:orkg_ResearchMethodTopic_IND {{current_version:"true"}})
+    MATCH (ResearchMethodTopic_ind)-[:IS_ABOUT]->(researchMethod_old:orkg_ResearchMethod_IND {{current_version:"true"}})
 
     WITH parent_data_item_node, object_node, ResearchMethodTopic_ind, researchMethod_old
     CALL apoc.refactor.cloneNodesWithRelationships([researchMethod_old])
     YIELD input, output
     WITH parent_data_item_node, object_node, ResearchMethodTopic_ind, researchMethod_old SET researchMethod_old.current_version = "false"
     WITH ResearchMethodTopic_ind
-    MATCH (ResearchMethodTopic_ind)-[:IS_ABOUT]->(researchMethod_new:orkg_ResearchMethodTopic_IND {{current_version:"true"}})
+    MATCH (ResearchMethodTopic_ind)-[:IS_ABOUT]->(researchMethod_new:orkg_ResearchMethod_IND {{current_version:"true"}})
     SET researchMethod_new.instance_label = "$_label_name_$", researchMethod_new.URI = "new_individual_uri1", researchMethod_new.created_on = localdatetime(), researchMethod_new.last_updated_on = localdatetime(), researchMethod_new.created_by = "{creator}", researchMethod_new.contributed_by = ["{creator}"]', edit_cypher:'MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()WITH entry_node
     WITH entry_node
     FOREACH (i IN CASE WHEN NOT "{creator}" IN entry_node.contributed_by THEN [1] ELSE [] END |
@@ -999,13 +1035,7 @@ initiation_query_string = '''
 
     CREATE (QualityAssertionind)-[:IS_ABOUT {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/IAO_0000136", entry_URI:"{entryURI}", topic_URI:"{topic_uri}", assertion_URI:"{assertionURI}"}}]->(object_node)
 
-    CREATE (object_node)-[:HAS_QUALITY {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/RO_0000086", entry_URI:"{entryURI}", topic_URI:"{topic_uri}", assertion_URI:"{assertionURI}", description:"a relation between an independent continuant (the bearer) and a quality, in which the quality specifically depends on the bearer for its existence."}}]->(quality:pato_PhysicalQuality_IND:pato_Quality_IND:NamedIndividual:Entity {{URI:"new_individual_uri1", type:"$_input_type_$", name:"$_input_name_$", instance_label:"$_input_name_$", ontology_ID:"$_ontology_ID_$", description:"$_input_description_$", data_node_type:["assertion_object", "input1"], current_version:"true", entry_URI:"{entryURI}", topic_URI:["{topic_uri}"], assertion_URI:"{assertionURI}", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual", data_view_information:"true", input:"true", input_source:"input1", input_version_ID:0, inputVariable:1, input_info_URI:"InputInfo1QualityAssertionIND_URI", user_input:"{assertionURI}"}})',
-
-
-
-
-
-    label_cypher:'MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()
+    CREATE (object_node)-[:HAS_QUALITY {{category:"ObjectPropertyExpression", URI:"http://purl.obolibrary.org/obo/RO_0000086", entry_URI:"{entryURI}", topic_URI:"{topic_uri}", assertion_URI:"{assertionURI}", description:"a relation between an independent continuant (the bearer) and a quality, in which the quality specifically depends on the bearer for its existence."}}]->(quality:pato_PhysicalQuality_IND:pato_Quality_IND:NamedIndividual:Entity {{URI:"new_individual_uri1", type:"$_input_type_$", name:"$_input_name_$", instance_label:"$_input_name_$", ontology_ID:"$_ontology_ID_$", description:"$_input_description_$", data_node_type:["assertion_object", "input1"], current_version:"true", entry_URI:"{entryURI}", topic_URI:["{topic_uri}"], assertion_URI:"{assertionURI}", created_on:localdatetime(), last_updated_on:localdatetime(), created_by:"{creator}", contributed_by:["{creator}"], created_with:"{createdWith}", versioned_doi:["NULL"], dataset_doi:["NULL"], category:"NamedIndividual", data_view_information:"true", input:"true", input_source:"input1", input_version_ID:0, inputVariable:1, input_info_URI:"InputInfo1QualityAssertionIND_URI", user_input:"{assertionURI}"}})', label_cypher:'MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()
     WITH entry_node
     FOREACH (i IN CASE WHEN NOT "{creator}" IN entry_node.contributed_by THEN [1] ELSE [] END |
     SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
@@ -1029,14 +1059,14 @@ initiation_query_string = '''
     )
 
     WITH parent_data_item_node, object_node, QualityAssertionind
-    MATCH (object_node)-[:HAS_QUALITY]->(quality_old:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:parent_data_item_node.URI}})
+    MATCH (object_node)-[:HAS_QUALITY]->(quality_old:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:QualityAssertionind.URI}})
 
     WITH parent_data_item_node, object_node, QualityAssertionind, quality_old
     CALL apoc.refactor.cloneNodesWithRelationships([quality_old])
     YIELD input, output
     WITH parent_data_item_node, object_node, QualityAssertionind, quality_old SET quality_old.current_version = "false"
-    WITH object_node, parent_data_item_node
-    MATCH (object_node)-[:HAS_QUALITY]->(quality_new:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:parent_data_item_node.URI}})
+    WITH object_node, parent_data_item_node, QualityAssertionind
+    MATCH (object_node)-[:HAS_QUALITY]->(quality_new:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:QualityAssertionind.URI}})
     SET quality_new.instance_label = "$_label_name_$", quality_new.URI = "new_individual_uri1", quality_new.created_on = localdatetime(), quality_new.last_updated_on = localdatetime(), quality_new.created_by = "{creator}", quality_new.contributed_by = ["{creator}"]', edit_cypher:'MATCH (entry_node {{URI:"{entryURI}"}}) SET entry_node.last_updated_on = localdatetime()
     WITH entry_node
     FOREACH (i IN CASE WHEN NOT "{creator}" IN entry_node.contributed_by THEN [1] ELSE [] END |
@@ -1062,14 +1092,14 @@ initiation_query_string = '''
     )
 
     WITH parent_data_item_node, object_node, QualityAssertionind
-    MATCH (object_node)-[:HAS_QUALITY]->(quality_old:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:parent_data_item_node.URI}})
+    MATCH (object_node)-[:HAS_QUALITY]->(quality_old:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:"{assertionURI}"}})
 
     WITH parent_data_item_node, object_node, QualityAssertionind, quality_old
     CALL apoc.refactor.cloneNodesWithRelationships([quality_old])
     YIELD input, output
     WITH parent_data_item_node, object_node, QualityAssertionind, quality_old SET quality_old.current_version = "false"
     WITH object_node, parent_data_item_node
-    MATCH (object_node)-[:HAS_QUALITY]->(quality_new:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:parent_data_item_node.URI}})
+    MATCH (object_node)-[:HAS_QUALITY]->(quality_new:pato_PhysicalQuality_IND {{current_version:"true", assertion_URI:"{assertionURI}"}})
     SET quality_new.name = "$_input_name_$", quality_new.instance_label = "$_input_name_$", quality_new.ontology_ID = "$_ontology_ID_$", quality_new.description = "$_input_description_$", quality_new.URI = "new_individual_uri1", quality_new.type = "$_input_type_$", quality_new.created_on = localdatetime(), quality_new.last_updated_on = localdatetime(), quality_new.created_by = "{creator}", quality_new.contributed_by = ["{creator}"]', search_cypher_code:"cypherQuery", data_item_type:"assertion"}})-[:SUBCLASS_OF {{category:"ObjectPropertyExpression", URI:"http://www.w3.org/2000/01/rdf-schema#subClassOf"}}]->(assertionKGBB)
 
 
@@ -1133,7 +1163,7 @@ initiation_query_string = '''
     WITH parent_data_item_node MATCH (object_node) WHERE object_node.URI=parent_data_item_node.object_URI SET object_node.data_node_type=object_node.data_node_type + "assertion_object"
 
     WITH parent_data_item_node, object_node
-    MATCH (parent_data_item_node)-[:CONTAINS]->(WeightMeasurementAssertionind:orkg_WeightMeasurementAssertion_IND {{URI:"{assertionURI}", current_version:"true"}}) SET WeightMeasurementAssertionind.last_updated_on = localdatetime(), WeightMeasurementAssertionind.assertion_label = "$_input_name_$ [$_ontology_ID_$]"
+    MATCH (WeightMeasurementAssertionind:orkg_WeightMeasurementAssertion_IND {{URI:"{assertionURI}", current_version:"true"}}) SET WeightMeasurementAssertionind.last_updated_on = localdatetime(), WeightMeasurementAssertionind.assertion_label = "$_input_name_$ [$_ontology_ID_$]"
 
     WITH parent_data_item_node, object_node, WeightMeasurementAssertionind
     FOREACH (i IN CASE WHEN NOT "{creator}" IN WeightMeasurementAssertionind.contributed_by THEN [1] ELSE [] END |
@@ -1141,25 +1171,25 @@ initiation_query_string = '''
     )
 
     WITH parent_data_item_node, object_node, WeightMeasurementAssertionind
-    MATCH (scalarValueDatum:aio_ScalarMeasurementDatum_IND {{current_version:"true", assertion_URI:WeightMeasurementAssertionind.URI}})-[:HAS_VALUE_SPECIFICATION]->()-[:HAS_MEASUREMENT_UNIT_LABEL]->(weightUnit_old:uo_GramBasedUnit_IND {{current_version:"true"}})
+    MATCH (scalarValueSpecification:obi_ScalarValueSpecification_IND {{current_version:"true", assertion_URI:WeightMeasurementAssertionind.URI}})-[:HAS_MEASUREMENT_UNIT_LABEL {{assertion_URI:WeightMeasurementAssertionind.URI}}]->(weightUnit_old:uo_GramBasedUnit_IND {{current_version:"true", assertion_URI:WeightMeasurementAssertionind.URI}})
 
-    WITH scalarValueDatum, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightUnit_old
+    WITH scalarValueSpecification, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightUnit_old
     CALL apoc.refactor.cloneNodesWithRelationships([weightUnit_old])
     YIELD input, output
-    WITH scalarValueDatum, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightUnit_old SET weightUnit_old.current_version = "false"
-    WITH scalarValueDatum, parent_data_item_node, object_node, WeightMeasurementAssertionind
-    MATCH (scalarValueDatum)-[:HAS_VALUE_SPECIFICATION]->()-[:HAS_MEASUREMENT_UNIT_LABEL]->(weightUnit_new:uo_GramBasedUnit_IND {{current_version:"true"}})
+    WITH scalarValueSpecification, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightUnit_old SET weightUnit_old.current_version = "false"
+    WITH scalarValueSpecification, parent_data_item_node, object_node, WeightMeasurementAssertionind
+    MATCH (scalarValueSpecification)-[:HAS_MEASUREMENT_UNIT_LABEL {{assertion_URI:WeightMeasurementAssertionind.URI}}]->(weightUnit_new:uo_GramBasedUnit_IND {{current_version:"true", assertion_URI:WeightMeasurementAssertionind.URI}})
     SET weightUnit_new.name = "$_input_name_$", weightUnit_new.instance_label = "$_input_name_$", weightUnit_new.ontology_ID = "$_ontology_ID_$", weightUnit_new.description = "$_input_description_$", weightUnit_new.URI = "new_individual_uri1", weightUnit_new.type = "$_input_type_$", weightUnit_new.created_on = localdatetime(), weightUnit_new.last_updated_on = localdatetime(), weightUnit_new.created_by = "{creator}", weightUnit_new.contributed_by = ["{creator}"]
 
-    WITH scalarValueDatum, parent_data_item_node, object_node, WeightMeasurementAssertionind
-    MATCH (scalarValueDatum)-[:HAS_VALUE_SPECIFICATION]->()-[:HAS_MEASUREMENT_VALUE]->(weightValue_old:Value_IND {{current_version:"true"}})
+    WITH scalarValueSpecification, parent_data_item_node, object_node, WeightMeasurementAssertionind
+    MATCH (scalarValueSpecification)-[:HAS_MEASUREMENT_VALUE {{assertion_URI:WeightMeasurementAssertionind.URI}}]->(weightValue_old:Value_IND {{current_version:"true",assertion_URI:WeightMeasurementAssertionind.URI}})
 
-    WITH scalarValueDatum, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightValue_old
+    WITH scalarValueSpecification, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightValue_old
     CALL apoc.refactor.cloneNodesWithRelationships([weightValue_old])
     YIELD input, output
-    WITH scalarValueDatum, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightValue_old SET weightValue_old.current_version = "false"
-    WITH scalarValueDatum
-    MATCH (scalarValueDatum)-[:HAS_VALUE_SPECIFICATION]->()-[:HAS_MEASUREMENT_VALUE]->(weightValue_new:Value_IND {{current_version:"true"}})
+    WITH scalarValueSpecification, parent_data_item_node, object_node, WeightMeasurementAssertionind, weightValue_old SET weightValue_old.current_version = "false"
+    WITH scalarValueSpecification, WeightMeasurementAssertionind
+    MATCH (scalarValueSpecification)-[:HAS_MEASUREMENT_VALUE {{assertion_URI:WeightMeasurementAssertionind.URI}}]->(weightValue_new:Value_IND {{current_version:"true", assertion_URI:WeightMeasurementAssertionind.URI}})
     SET weightValue_new.name = "$_input_value_$", weightValue_new.value = "$_input_value_$", weightValue_new.URI = "new_individual_uri2", weightValue_new.created_on = localdatetime(), weightValue_new.last_updated_on = localdatetime(), weightValue_new.created_by = "{creator}", weightValue_new.contributed_by = ["{creator}"]', search_cypher_code:"cypherQuery", data_item_type:"assertion"}})-[:SUBCLASS_OF {{category:"ObjectPropertyExpression", URI:"http://www.w3.org/2000/01/rdf-schema#subClassOf"}}]->(measurementkgbb)
 
 
@@ -1240,7 +1270,7 @@ initiation_query_string = '''
     WITH parent_data_item_node MATCH (object_node) WHERE object_node.URI=parent_data_item_node.object_URI SET object_node.data_node_type=object_node.data_node_type + "assertion_object"
 
     WITH parent_data_item_node, object_node
-    MATCH (parent_data_item_node)-[:CONTAINS]->(r0MeasurementAssertionind:orkg_BasicReproductionNumberMeasurementAssertion_IND {{URI:"{assertionURI}", current_version:"true"}}) SET r0MeasurementAssertionind.last_updated_on = localdatetime(), r0MeasurementAssertionind.assertion_label = "R0: $_input_value_$ ($_input_value1_$ - $_input_value2_$)"
+    MATCH (r0MeasurementAssertionind:orkg_BasicReproductionNumberMeasurementAssertion_IND {{URI:"{assertionURI}", current_version:"true"}}) SET r0MeasurementAssertionind.last_updated_on = localdatetime(), r0MeasurementAssertionind.assertion_label = "R0: $_input_value_$ ($_input_value1_$ - $_input_value2_$)"
 
     WITH parent_data_item_node, object_node, r0MeasurementAssertionind
     FOREACH (i IN CASE WHEN NOT "{creator}" IN r0MeasurementAssertionind.contributed_by THEN [1] ELSE [] END |
@@ -1248,39 +1278,39 @@ initiation_query_string = '''
     )
 
     WITH parent_data_item_node, object_node, r0MeasurementAssertionind
-    MATCH (scalarValueDatum:aio_ScalarMeasurementDatum_IND {{current_version:"true", assertion_URI:r0MeasurementAssertionind.URI}})-[:HAS_VALUE_SPECIFICATION]->(:obi_ScalarValueSpecification_IND {{current_version:"true"}})-[:HAS_MEASUREMENT_VALUE]->(r0Value_old:Value_IND {{current_version:"true"}})
+    MATCH (r0Value_old:Value_IND {{current_version:"true", assertion_URI:r0MeasurementAssertionind.URI, input_source:"input1"}})
 
-    WITH scalarValueDatum, parent_data_item_node, object_node, r0MeasurementAssertionind, r0Value_old
+    WITH parent_data_item_node, object_node, r0MeasurementAssertionind, r0Value_old
     CALL apoc.refactor.cloneNodesWithRelationships([r0Value_old])
     YIELD input, output
-    WITH scalarValueDatum, parent_data_item_node, object_node, r0MeasurementAssertionind, r0Value_old SET r0Value_old.current_version = "false"
+    WITH parent_data_item_node, object_node, r0MeasurementAssertionind, r0Value_old SET r0Value_old.current_version = "false"
 
-    WITH scalarValueDatum, parent_data_item_node, object_node, r0MeasurementAssertionind
-    MATCH (scalarValueDatum)-[:HAS_VALUE_SPECIFICATION]->(:obi_ScalarValueSpecification_IND {{current_version:"true"}})-[:HAS_MEASUREMENT_VALUE]->(r0Value_new:Value_IND {{current_version:"true"}})
+    WITH parent_data_item_node, object_node, r0MeasurementAssertionind
+    MATCH (r0Value_new:Value_IND {{current_version:"true", assertion_URI:r0MeasurementAssertionind.URI, input_source:"input1"}})
     SET r0Value_new.value = "$_input_value_$", r0Value_new.name = "$_input_value_$", r0Value_new.URI = "new_individual_uri1", r0Value_new.created_on = localdatetime(), r0Value_new.last_updated_on = localdatetime(), r0Value_new.created_by = "{creator}", r0Value_new.contributed_by = ["{creator}"]
 
-    WITH scalarValueDatum, parent_data_item_node, object_node, r0MeasurementAssertionind
-    MATCH (scalarValueDatum)-[:HAS_VALUE_SPECIFICATION]->(confint:stato_ConfidenceInterval_IND {{current_version:"true"}})-[:HAS_PART]->(:stato_UpperConfidenceLimit_IND {{current_version:"true"}})-[:HAS_VALUE_SPECIFICATION]->({{current_version:"true"}})-[:HAS_MEASUREMENT_VALUE]->(upperValue_old:Value_IND {{current_version:"true"}})
+    WITH parent_data_item_node, object_node, r0MeasurementAssertionind
+    MATCH (upperValue_old:Value_IND {{current_version:"true", assertion_URI:r0MeasurementAssertionind.URI, input_source:"input2"}})
 
-    WITH scalarValueDatum, parent_data_item_node, object_node, confint, upperValue_old
+    WITH parent_data_item_node, object_node, upperValue_old, r0MeasurementAssertionind
     CALL apoc.refactor.cloneNodesWithRelationships([upperValue_old])
     YIELD input, output
-    WITH scalarValueDatum, parent_data_item_node, object_node, confint, upperValue_old SET upperValue_old.current_version = "false"
+    WITH r0MeasurementAssertionind, parent_data_item_node, object_node, upperValue_old SET upperValue_old.current_version = "false"
 
-    WITH parent_data_item_node, object_node, confint
-    MATCH (confint)-[:HAS_PART]->(:stato_UpperConfidenceLimit_IND {{current_version:"true"}})-[:HAS_VALUE_SPECIFICATION]->({{current_version:"true"}})-[:HAS_MEASUREMENT_VALUE]->(upperValue_new:Value_IND {{current_version:"true"}})
+    WITH parent_data_item_node, object_node, r0MeasurementAssertionind
+    MATCH (upperValue_new:Value_IND {{current_version:"true", assertion_URI:r0MeasurementAssertionind.URI, input_source:"input2"}})
     SET upperValue_new.value = "$_input_value2_$", upperValue_new.name = "$_input_value2_$", upperValue_new.URI = "new_individual_uri2", upperValue_new.created_on = localdatetime(), upperValue_new.last_updated_on = localdatetime(), upperValue_new.created_by = "{creator}", upperValue_new.contributed_by = ["{creator}"]
 
-    WITH parent_data_item_node, object_node, confint
-    MATCH (confint)-[:HAS_PART]->(:stato_LowerConfidenceLimit_IND {{current_version:"true"}})-[:HAS_VALUE_SPECIFICATION]->({{current_version:"true"}})-[:HAS_MEASUREMENT_VALUE]->(lowerValue_old:Value_IND {{current_version:"true"}})
+    WITH parent_data_item_node, object_node, r0MeasurementAssertionind
+    MATCH (lowerValue_old:Value_IND {{current_version:"true", assertion_URI:r0MeasurementAssertionind.URI, input_source:"input3"}})
 
-    WITH parent_data_item_node, object_node, confint, lowerValue_old
+    WITH parent_data_item_node, object_node, lowerValue_old, r0MeasurementAssertionind
     CALL apoc.refactor.cloneNodesWithRelationships([lowerValue_old])
     YIELD input, output
-    WITH parent_data_item_node, object_node, confint, lowerValue_old SET lowerValue_old.current_version = "false"
+    WITH parent_data_item_node, r0MeasurementAssertionind, object_node, lowerValue_old SET lowerValue_old.current_version = "false"
 
-    WITH parent_data_item_node, object_node, confint
-    MATCH (confint)-[:HAS_PART]->(:stato_LowerConfidenceLimit_IND {{current_version:"true"}})-[:HAS_VALUE_SPECIFICATION]->({{current_version:"true"}})-[:HAS_MEASUREMENT_VALUE]->(lowerValue_new:Value_IND {{current_version:"true"}})
+    WITH parent_data_item_node, r0MeasurementAssertionind, object_node
+    MATCH (lowerValue_new:Value_IND {{current_version:"true", assertion_URI:r0MeasurementAssertionind.URI, input_source:"input3"}})
     SET lowerValue_new.value = "$_input_value1_$", lowerValue_new.name = "$_input_value1_$", lowerValue_new.URI = "new_individual_uri3", lowerValue_new.created_on = localdatetime(), lowerValue_new.last_updated_on = localdatetime(), lowerValue_new.created_by = "{creator}", lowerValue_new.contributed_by = ["{creator}"]', search_cypher_code:"cypherQuery", data_item_type:"assertion"}})-[:SUBCLASS_OF {{category:"ObjectPropertyExpression", URI:"http://www.w3.org/2000/01/rdf-schema#subClassOf"}}]->(measurementkgbb)
 
 
@@ -3104,7 +3134,15 @@ def lobby():
             else:
                 print(str(y) + " entries in the graph")
                 flash(str(y) + ' entries in the graph', 'good')
-                return render_template("lobby_form.html", initiated="True", pubEntry="True")
+
+                entry_dict = getEntryDict(entry_uri, data_view_name)
+
+                return render_template("/entry.html", naviJSON=getJSON(entry_dict), entry_dict=entry_dict)
+
+
+
+
+                #return render_template("lobby_form.html", initiated="True", pubEntry="True")
 
 
 
