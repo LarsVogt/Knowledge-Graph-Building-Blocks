@@ -142,7 +142,8 @@ function off{{id  | replace('-', '_')}}_Statements() {
   <div class="datum" style="margin-top: 300px; margin-left: 450px; float:left">
     <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST">
       <input name="utf8" type="hidden" value="&#x2713;" />
-      <input type="text" style="height: 30px; " name="{{id  | replace('-', '_')}}" id="query" data-bp_include_definitions="true" data-bp_search_branch="{{ resource_input_info.get('input_restricted_to_subclasses_of') }}" class="bp_form_complete-{{ resource_input_info.get('ontology_ID') }}-name" size="40" placeholder="{{ resource_input_info.get('placeholder_text') }}" />
+      <input type="text" style="height: 30px; margin-right: 4px;" name="{{id  | replace('-', '_')}}_value" size="5" placeholder="{{ resource_input_info.get('placeholder_text_1') }}" />
+      <input type="text" style="height: 30px; " name="{{id  | replace('-', '_')}}" id="query" data-bp_include_definitions="true" data-bp_search_branch="{{ resource_input_info.get('input_restricted_to_subclasses_of') }}" class="bp_form_complete-{{ resource_input_info.get('ontology_ID') }}-name" size="30" placeholder="{{ resource_input_info.get('placeholder_text_2') }}" />
       <div class='input-group-append'>
         <input type="hidden" name="{{id  | replace('-', '_')}}_parent_uri" value="{{ parent_id }}">
         <input type="hidden" name="{{id  | replace('-', '_')}}_parent_item_type" value="{{ parent_type }}">
