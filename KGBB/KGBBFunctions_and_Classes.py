@@ -537,10 +537,6 @@ def addEntry(entry_kgbb_uri, publication_DOI):
     # query that creates the new entry
     connection.query(add_scholarly_publication_entry_query_string, db='neo4j')
 
-
-    # check for required topics
-    addRequiredTopics(entry_kgbb_uri, entry_uri)
-
     print("--------------------------------------------------------------------")
     print("---------------------------ADD ENTRY RETURNS ENTRY URI--------------")
     print(entry_uri)
@@ -707,7 +703,7 @@ def deleteAssertion(assertion_uri, creator):
     SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
     )
 
-    WITH assertion OPTIONAL MATCH (assertion)-[:CONTAINS*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
+    WITH assertion OPTIONAL MATCH (assertion)-[:CONTAINS|DESCRIBED_BY*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
     WITH assertion, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.topic_URI) OR (o.topic_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
     WITH assertion MATCH (parent_data_item_node {{URI:assertion.topic_URI}}) SET parent_data_item_node.last_updated_on = localdatetime()
     WITH assertion, parent_data_item_node
@@ -743,7 +739,10 @@ def deleteTopic(topic_uri, creator):
     SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
     )
     WITH topic OPTIONAL MATCH (topic)-[:CONTAINS*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
-    WITH topic, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.topic_URI) OR (o.topic_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()'''.format(topic_uri=topic_uri, creator=creator)
+    WITH topic, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.topic_URI) OR (o.topic_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
+    
+    WITH topic OPTIONAL MATCH (child2 {{current_version:"true"}})-[:DESCRIBED_BY]->(topic) SET child2.current_version="false", child2.last_updated_on=localdatetime()
+    WITH topic, child2 OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child2.URI IN o.topic_URI) OR (o.topic_URI=child2.URI) OR (child2.URI IN o.assertion_URI) OR (o.assertion_URI = child2.URI) SET o.current_version="false", o.last_updated_on=localdatetime()'''.format(topic_uri=topic_uri, creator=creator)
 
     # execute query
     connection.query(delete_topic_query_string, db='neo4j')
