@@ -4,6 +4,7 @@
 {% set resource_node = child.get('object') %}
 {% set resource_input_info = child.get('research_method_topic_input_info') %}
 {% set parent_id = child.get('parent') %}
+{% set instance_label_edit =  True %}
 {% set TOPIC_uri =  child.get('id') %}
 {% set input_representation = "single_resource.html" %}
 {% for parent in entry_dict if parent.get('id') == parent_id %}
@@ -27,6 +28,7 @@
     {% set parent_uri_label = "topic_uri" %}
     {% set TOPIC_uri =  child.get('id') %}
     {% set assertion_uri =  None %}
+    {% set instance_label_edit =  True %}
     {% set entry_id = entry_dict[0].get('id') %}
     {% set resource_input_info = child.get('research_method_topic_input_info') %}
     {% set node = child.get('node') %}
@@ -63,6 +65,7 @@
     {% set parent_id = topic_uri %}
     {% set parent_type = child.get('node_type') %}
     {% set parent_uri = topic_uri %}
+    {% set instance_label_edit =  True %}
     {% set parent_uri_label = "topic_uri" %}
     {% set TOPIC_uri =  child.get('id') %}
     {% set assertion_uri =  None %}
@@ -99,6 +102,7 @@
     {% set label = "method realized in research step:" %}
     {% set statement = "Method realized in research step:" %}
     {% set id = child.get('id') %}
+    {% set instance_label_edit =  True %}
     {% set parent_id = topic_uri %}
     {% set parent_type = child.get('node_type') %}
     {% set parent_uri = topic_uri %}

@@ -1,6 +1,7 @@
 {% set id = child.get('id') %}
 {% set entry_id = entry_dict[0].get('id') %}
 {% set assertion_uri =  None %}
+{% set instance_label_edit =  True %}
 {% set resource_node = child.get('object') %}
 {% set resource_input_info = child.get('research_step_topic_input_info') %}
 {% set parent_id = child.get('parent') %}
@@ -32,6 +33,7 @@
     {% set resource_input_info = child.get('research_step_topic_input_info') %}
     {% set node = child.get('node') %}
     {% set resource_node = child.get('object') %}
+    {% set instance_label_edit =  True %}
     {% set input_representation = "single_resource.html" %}
     {% include  "single_resource_input_topic.html" %}
   {% endif %}
@@ -67,6 +69,7 @@
     {% set assertion_uri =  None %}
     {% set entry_id = entry_dict[0].get('id') %}
     {% set resource_input_info = child.get('research_method_topic_input_info') %}
+    {% set instance_label_edit =  True %}
     {% set node = child.get('node') %}
     {% set resource_node = child.get('object') %}
     {% set input_representation = "single_resource.html" %}
@@ -103,6 +106,7 @@
     {% set TOPIC_uri =  child.get('id') %}
     {% set assertion_uri =  None %}
     {% set entry_id = entry_dict[0].get('id') %}
+    {% set instance_label_edit =  True %}
     {% set resource_input_info = child.get('research_objective_topic_input_info') %}
     {% set node = child.get('node') %}
     {% set resource_node = child.get('object') %}
@@ -144,6 +148,7 @@
     {% set resource_input_info = child.get('research_result_topic_input_info') %}
     {% set node = child.get('node') %}
     {% set resource_node = child.get('object') %}
+    {% set instance_label_edit =  True %}
     {% set input_representation = "single_resource.html" %}
     {% include  "single_resource_input_topic.html" %}
   {% endif %}

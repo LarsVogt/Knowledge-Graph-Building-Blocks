@@ -5,6 +5,7 @@
 {% set resource_input_info = child.get('material_entity_topic_input_info') %}
 {% set parent_id = child.get('parent') %}
 {% set TOPIC_uri =  child.get('id') %}
+{% set instance_label_edit =  True %}
 {% set input_representation = "single_resource.html" %}
 {% for parent in entry_dict if parent.get('id') == parent_id %}
   {% set parent_type = parent.get('node_type') %}
@@ -48,6 +49,7 @@
     {% set parent_uri_label = "topic_uri" %}
     {% set TOPIC_uri =  child.get('id') %}
     {% set assertion_uri =  None %}
+    {% set instance_label_edit =  True %}
     {% set entry_id = entry_dict[0].get('id') %}
     {% set resource_input_info = child.get('material_entity_topic_input_info') %}
     {% set node = child.get('node') %}
@@ -91,6 +93,7 @@
     {% set parent_uri = topic_uri %}
     {% set parent_uri_label = "topic_uri" %}
     {% set TOPIC_uri =  None %}
+    {% set instance_label_edit =  False %}
     {% set assertion_uri = child.get('id') %}
     {% set entry_id = entry_dict[0].get('id') %}
     {% set resource_input_info = child.get('quality_assertion_relation_identification_input_info') %}
@@ -109,6 +112,7 @@
       {% set parent_uri = topic_uri %}
       {% set parent_uri_label = "topic_uri" %}
       {% set TOPIC_uri =  None %}
+      {% set instance_label_edit =  False %}
       {% set assertion_uri = assertion_child.get('id') %}
       {% set entry_id = entry_dict[0].get('id') %}
       {% set resource_input_info = assertion_child.get('weight_measurement_assertion_input_info') %}
@@ -149,6 +153,7 @@
       {% set parent_uri = topic_uri %}
       {% set parent_uri_label = "topic_uri" %}
       {% set TOPIC_uri =  None %}
+      {% set instance_label_edit =  False %}
       {% set assertion_uri = assertion_child.get('id') %}
       {% set entry_id = entry_dict[0].get('id') %}
       {% set resource_input_info = assertion_child.get('R0_measurement_assertion_input_info') %}

@@ -2,16 +2,16 @@
   <div id="meta">
     <button onclick="off{{id  | replace('-', '')}}_Meta()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  cursor: pointer; background: #7F869B; margin-top: 0px; float: right; font-weight: bold; " class="btn btn-primary">X</button>
     <form action="/instance_label" method="POST">
-      <div style="display: inline-block; float:left; margin-top: 26px; margin-left: 30px; ">
-        current resource label: <span style="font-weight: bold; margin-left: 70px; ">{{ resource_node.get('instance_label') }}</span>
+      <div style="display: inline-block; float:left; margin-top: 26px; margin-left: 30px;">
+        current resource label: <span style="font-weight: bold; margin-left: 70px; padding-right:140px; ">{{ resource_node.get('instance_label') }}</span>
         <br>
         <br>
-
-        change resource label to:
-        {% if not entry_dict[0].get('version') %}
-          <input type="text"  name="{{ id }}_instance_label" style="height: 30px; margin-left: 53px; " size="30" placeholder="specify new resource label here" ></input>
-          <button onclick="off{{id  | replace('-', '')}}_Meta()" id="{{id  | replace('-', '_')}}_instance_label" href="#" name="button" style="height: 30px; padding-top: 3px; margin-right: 20px; float: right; margin-top: 0px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> save
-          </button>
+        {% if instance_label_edit %}
+          {% if not entry_dict[0].get('version') %}
+            <input type="text"  name="{{ id }}_instance_label" style="height: 30px; margin-left: 210px; " size="30" placeholder="specify new resource label here" ></input>
+            <button onclick="off{{id  | replace('-', '')}}_Meta()" id="{{id  | replace('-', '_')}}_instance_label" href="#" name="button" style="height: 30px; padding-top: 3px; margin-right: 51px; float: right; margin-top: 0px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> save
+            </button>
+          {% endif %}
         {% endif %}
 
         {% if entry_dict[0].get('version') %}

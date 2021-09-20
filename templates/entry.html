@@ -200,6 +200,7 @@ $(function() {
         {% set parent_uri_label = "entry_uri" %}
         {% set resource_input_info = entry_dict[0].get('research_topic_assertion_input_info') %}
         {% set node = child.get('node') %}
+        {% set instance_label_edit =  False %}
         {% set resource_node = child.get('research_topic_input').get('input_nodes')[0] %}
         {% include  "single_resource_input_assertion.html" %}
       {% endif %}
