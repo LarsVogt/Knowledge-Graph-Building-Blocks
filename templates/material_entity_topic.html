@@ -22,13 +22,16 @@
     {% set id = gran_tree.get('id') %}
     {% set parent_id = topic_uri %}
     {% set parent_type = child.get('node_type') %}
+    {% set instance_label_edit =  False %}
     {% set parent_uri = topic_uri %}
     {% set parent_uri_label = "topic_uri" %}
     {% set TOPIC_uri =  child.get('id') %}
+    {% set property_key =  gran_tree.get('node').get('URI_property_key') %}
     {% set assertion_uri =  None %}
     {% set entry_id = entry_dict[0].get('id') %}
     {% set node = gran_tree.get('node') %}
     {% set resource_node = gran_tree.get('node') %}
+    {% set node = gran_tree.get('node') %}
     {% set resource_input_info = gran_tree.get('node') %}
     {% set input_representation = "single_resource.html" %}
     {% include  "granularity_tree.html" %}
