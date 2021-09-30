@@ -740,7 +740,7 @@ def deleteTopic(topic_uri, creator):
     )
     WITH topic OPTIONAL MATCH (topic)-[:CONTAINS*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
     WITH topic, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.topic_URI) OR (o.topic_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
-    
+
     WITH topic OPTIONAL MATCH (child2 {{current_version:"true"}})-[:DESCRIBED_BY]->(topic) SET child2.current_version="false", child2.last_updated_on=localdatetime()
     WITH topic, child2 OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child2.URI IN o.topic_URI) OR (o.topic_URI=child2.URI) OR (child2.URI IN o.assertion_URI) OR (o.assertion_URI = child2.URI) SET o.current_version="false", o.last_updated_on=localdatetime()'''.format(topic_uri=topic_uri, creator=creator)
 
@@ -3829,7 +3829,7 @@ def getTopicRepresentation(topic_uri, data_view_name):
     OPTIONAL MATCH (topic_input_info:InputInfoKGBBElement_IND {{KGBB_URI:topic.KGBB_URI}})
     OPTIONAL MATCH (topic_input_node {{topic_URI:"{topic_uri}", current_version:"true", input_info_URI:topic_input_info.URI}})
 
-    OPTIONAL MATCH (topic)-[:CONTAINS*1..2]-> (child_item {{current_version:"true"}})
+    OPTIONAL MATCH (topic)-[:CONTAINS*1..2]-> (child_item {{current_version:"true"}}) WHERE NOT child_item.name="material entity parthood assertion unit"
     OPTIONAL MATCH (child_item)<-[:CONTAINS]-(parent_item {{current_version:"true"}})
     OPTIONAL MATCH (child_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_topics:HAS_TOPIC_ELEMENT]->()
@@ -3841,7 +3841,7 @@ def getTopicRepresentation(topic_uri, data_view_name):
 
     WITH [topic, topic_rep, topic_obj, topic_input_info, topic_input_node, PROPERTIES(topic_topics), PROPERTIES(topic_assertions), PROPERTIES(topic_granularity_trees)] AS topic_info, [parent_item.URI, child_item, child_item_rep, child_item_obj, child_item_input_info, child_item_input_node, PROPERTIES(child_item_topics), PROPERTIES(child_item_assertions), PROPERTIES(child_item_granularity_trees)] AS child_info, topic_parent.URI AS parent_URI, entry.publication_title AS entry_title
 
-    RETURN DISTINCT topic_info, child_info, parent_URI, entry_title'''.format(topic_uri=topic_uri, data_view_name=data_view_name)
+    RETURN topic_info, child_info, parent_URI, entry_title'''.format(topic_uri=topic_uri, data_view_name=data_view_name)
     results = connection.query(get_topic_dict_information_query_string, db='neo4j')
     print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     print("+++++++++++++++++++++ INITIAL QUERY RESULT +++++++++++++++++++++++++++")
