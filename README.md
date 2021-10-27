@@ -6,7 +6,7 @@ If you want to run this application on your local machine, you must copy all fil
 
 # Knowledge-Graph-Building-Blocks
 
-The basis of the concept of Knowledge Graph Building Blocks is the organization and structuring of the overall data graph of a knowledge graph into semantically meaningful subgraphs, i.e. semantic units, each of which is represented in the graph by its own resource (i.e. node). Currently, 6 basic categories of such semantic units are distinguished: entry, topic, assertion, dataset, list, and granularity tree units. The partitioning of the data graph into smaller manageable semantic units provides solutions to seven problems that many knowledge graph applications must face and help to enforce machine-actionability and human-readability and thus FAIRness of data and metadata in a knowledge graph.
+The basis of the concept of Knowledge Graph Building Blocks is the organization and structuring of the overall data graph of a knowledge graph into semantically meaningful subgraphs, i.e. semantic units, each of which is represented in the graph by its own resource (i.e. node). Currently, 7 basic categories of such semantic units are distinguished: entry, topic, assertion, dataset, list, text-resource hybrid, and granularity tree units. The partitioning of the data graph into smaller manageable semantic units provides solutions to seven problems that many knowledge graph applications must face and help to enforce machine-actionability and human-readability and thus FAIRness of data and metadata in a knowledge graph.
 
 1) Machines need more information than human readers and human readers don't want to look at complex graphs
 2) Many software developers do not know SPARQL/Cypher query language and do not want to learn it
