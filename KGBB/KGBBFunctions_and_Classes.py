@@ -371,9 +371,9 @@ def addContainerAndInputInfoDictToReprNode(data_item_kgbb_uri, data_item_type, d
 def getContDictForRootTopic(entry_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    get_ContDict_for_RootTopic_query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:CONTAINS]->(topic {{root_topic:"true"}})
+    get_ContDict_for_RootTopic_query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(topic {{root_topic:"true"}})
     MATCH (entry_rep:RepresentationKGBBElement_IND {{KGBB_URI:topic.KGBB_URI, data_view_name:"{data_view_name}"}})
-    MATCH (topic)-[:CONTAINS*]->(ass {{current_version="true"}})
+    MATCH (topic)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]->(ass {{current_version="true"}})
     MATCH (ass_rep:RepresentationKGBBElement_IND {{KGBB_URI:ass.KGBB_URI, data_view_name:"{data_view_name}"}})
     RETURN DISTINCT topic.URI as root_topic_uri, entry_rep.container_nodes_dict as root_topic_container_dict, ass.URI as ass_uri, ass_rep.container_nodes_dict as ass_container_dict'''.format(entry_uri=entry_uri, data_view_name=data_view_name)
 
@@ -690,7 +690,7 @@ def deleteAssertion(assertion_uri, creator):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # cypher query to get the assertion node, all its input nodes and set them to current_version:"false"
-    delete_assertion_query_string = '''MATCH (n)-[:CONTAINS]->(assertion {{URI:"{assertion_uri}"}}) SET n.last_updated_on=localdatetime(), assertion.current_version="false", assertion.last_updated_on=localdatetime()
+    delete_assertion_query_string = '''MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(assertion {{URI:"{assertion_uri}"}}) SET n.last_updated_on=localdatetime(), assertion.current_version="false", assertion.last_updated_on=localdatetime()
     WITH n, assertion
     FOREACH (i IN CASE WHEN NOT "{creator}" IN n.contributed_by THEN [1] ELSE [] END |
     SET n.contributed_by = n.contributed_by + "{creator}"
@@ -703,7 +703,7 @@ def deleteAssertion(assertion_uri, creator):
     SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
     )
 
-    WITH assertion OPTIONAL MATCH (assertion)-[:CONTAINS|DESCRIBED_BY*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
+    WITH assertion OPTIONAL MATCH (assertion)-[:HAS_ASSOCIATED_SEMANTIC_UNIT|DESCRIBED_BY*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
     WITH assertion, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.topic_URI) OR (o.topic_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
     WITH assertion MATCH (parent_data_item_node {{URI:assertion.topic_URI}}) SET parent_data_item_node.last_updated_on = localdatetime()
     WITH assertion, parent_data_item_node
@@ -726,7 +726,7 @@ def deleteTopic(topic_uri, creator):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # cypher query to get the topic node, all its input nodes and all data that it contains and set them to current_version:"false"
-    delete_topic_query_string = '''MATCH (n)-[:CONTAINS]->(topic {{URI:"{topic_uri}"}}) SET n.last_updated_on=localdatetime(), topic.current_version="false", topic.last_updated_on=localdatetime()
+    delete_topic_query_string = '''MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(topic {{URI:"{topic_uri}"}}) SET n.last_updated_on=localdatetime(), topic.current_version="false", topic.last_updated_on=localdatetime()
     WITH n, topic
     FOREACH (i IN CASE WHEN NOT "{creator}" IN n.contributed_by THEN [1] ELSE [] END |
     SET n.contributed_by = n.contributed_by + "{creator}"
@@ -738,7 +738,7 @@ def deleteTopic(topic_uri, creator):
     FOREACH (i IN CASE WHEN NOT "{creator}" IN entry_node.contributed_by THEN [1] ELSE [] END |
     SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
     )
-    WITH topic OPTIONAL MATCH (topic)-[:CONTAINS*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
+    WITH topic OPTIONAL MATCH (topic)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
     WITH topic, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.topic_URI) OR (o.topic_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
 
     WITH topic OPTIONAL MATCH (child2 {{current_version:"true"}})-[:DESCRIBED_BY]->(topic) SET child2.current_version="false", child2.last_updated_on=localdatetime()
@@ -1606,7 +1606,7 @@ def getUniqueList(list):
 # INPUT: entry_uri, data_view_name (e.g. "orkg")
 
 # OUTPUT:
-# getEntryViewData[0] = navi_dict   ->  a dict of all topics and assertions linked to an entry node via :CONTAINS relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
+# getEntryViewData[0] = navi_dict   ->  a dict of all topics and assertions linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
 # getEntryViewData[1] = entry_view_tree     ->  a dict of all information required for representing data from an entry in the UI. It follows the syntax:  {order[integer]: {entry_label1:string, entry_value1:string, entry_label_tooltip1:string, entry_value_tooltip1:string...
 # getEntryViewData[2] = root_topic_view_tree     ->    a dict of all information required for representing data from the root_topic (i.e. landing topic) of an entry in the UI. It follows the syntax:  {order[integer]: {topic_label1:string, topic_value1:string, topic_label_tooltip1:string, topic_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [assertion_uri, {assertion_view_tree}], etc.}, etc.
 def getEntryViewData(entry_uri, data_view_name):
@@ -1616,16 +1616,16 @@ def getEntryViewData(entry_uri, data_view_name):
     navi_dict = getNaviDict(entry_uri)
 
     # query string definition for getting all information relevant for viewing the root topic of the entry
-    query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:CONTAINS]->(topics:orkg_Topic_IND {{current_version:"true", root_topic:"true"}})
+    query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(topics:orkg_Topic_IND {{current_version:"true", root_topic:"true"}})
     OPTIONAL MATCH (entry_object {{URI:entry.object_URI, current_version:"true"}})
     MATCH (entry_rep:RepresentationKGBBElement_IND {{KGBB_URI:entry.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (topics_object {{URI:topics.object_URI, current_version:"true"}})
     MATCH (topics_rep:RepresentationKGBBElement_IND {{KGBB_URI:topics.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (topics)-[:CONTAINS]->(assertion:orkg_Assertion_IND {{current_version:"true"}})
+    OPTIONAL MATCH (topics)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(assertion:orkg_Assertion_IND {{current_version:"true"}})
     OPTIONAL MATCH (assertion_object {{URI:assertion.object_URI, current_version:"true"}})
     OPTIONAL MATCH (assertion_rep:RepresentationKGBBElement_IND {{KGBB_URI:assertion.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (assertion_input_node) WHERE assertion.URI IN assertion_input_node.user_input AND assertion_input_node.input="true"
-    OPTIONAL MATCH (topics)-[:CONTAINS]->(topics2:orkg_Topic_IND {{current_version:"true"}})
+    OPTIONAL MATCH (topics)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(topics2:orkg_Topic_IND {{current_version:"true"}})
     OPTIONAL MATCH (topics2_object {{URI:topics2.object_URI, current_version:"true"}})
     OPTIONAL MATCH (topics2_rep:RepresentationKGBBElement_IND {{KGBB_URI:topics2.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (topics2_input_node) WHERE topics2.URI IN topics2_input_node.user_input AND topics2_input_node.input="true"
@@ -1920,7 +1920,7 @@ def getEntryViewData(entry_uri, data_view_name):
 # INPUT: entry_uri, topic_uri, data_view_name (e.g. "orkg")
 
 # OUTPUT:
-# getTopicViewData[0] = navi_dict   ->  a dict of all topics and assertions linked to an entry node via :CONTAINS relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
+# getTopicViewData[0] = navi_dict   ->  a dict of all topics and assertions linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
 # getTopicViewData[1] = topic_view_tree     ->    a dict of all information required for representing data from the input topic of an entry in the UI. It follows the syntax:  {order[integer]: {topic_label1:string, topic_value1:string, topic_label_tooltip1:string, topic_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [assertion_uri, {assertion_view_tree}], etc.}, etc.
 def getTopicViewData(entry_uri, topic_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
@@ -1932,19 +1932,19 @@ def getTopicViewData(entry_uri, topic_uri, data_view_name):
     query_string = '''MATCH (topic {{URI:"{topic_uri}"}})
     OPTIONAL MATCH (topic_object {{URI:topic.object_URI, current_version:"true"}})
     MATCH (topic_rep:RepresentationKGBBElement_IND {{KGBB_URI:topic.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (topic)-[:CONTAINS]->(assertion:orkg_Assertion_IND {{current_version:"true"}})
+    OPTIONAL MATCH (topic)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(assertion:orkg_Assertion_IND {{current_version:"true"}})
     OPTIONAL MATCH (assertion_object {{URI:assertion.object_URI, current_version:"true"}})
     OPTIONAL MATCH (assertion_rep:RepresentationKGBBElement_IND {{KGBB_URI:assertion.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (assertion_input_node) WHERE assertion.URI IN assertion_input_node.user_input AND assertion_input_node.input="true"
-    OPTIONAL MATCH (assertion)-[:CONTAINS]->(assertion2:orkg_Assertion_IND {{current_version:"true"}})
+    OPTIONAL MATCH (assertion)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(assertion2:orkg_Assertion_IND {{current_version:"true"}})
     OPTIONAL MATCH (assertion2_object {{URI:assertion2.object_URI, current_version:"true"}})
     OPTIONAL MATCH (assertion2_rep:RepresentationKGBBElement_IND {{KGBB_URI:assertion2.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (assertion2_input_node) WHERE assertion2.URI IN assertion2_input_node.user_input AND assertion2_input_node.input="true"
-    OPTIONAL MATCH (topic)-[:CONTAINS]->(topics2:orkg_Topic_IND {{current_version:"true"}})
+    OPTIONAL MATCH (topic)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(topics2:orkg_Topic_IND {{current_version:"true"}})
     OPTIONAL MATCH (topics2_object {{URI:topics2.object_URI, current_version:"true"}})
     OPTIONAL MATCH (topics2_rep:RepresentationKGBBElement_IND {{KGBB_URI:topics2.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (topics2_input_node) WHERE topics2.URI IN topics2_input_node.user_input AND topics2_input_node.input="true"
-    OPTIONAL MATCH (topic)-[:CONTAINS]->(granTree:orkg_GranularityTree_IND {{current_version:"true"}})
+    OPTIONAL MATCH (topic)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(granTree:orkg_GranularityTree_IND {{current_version:"true"}})
     OPTIONAL MATCH (granTree_object {{URI:granTree.object_URI, current_version:"true"}})
     OPTIONAL MATCH (granTree_rep:RepresentationKGBBElement_IND {{KGBB_URI:granTree.KGBB_URI, data_view_name:"{data_view_name}"}})
 
@@ -2465,15 +2465,15 @@ def getSubViewTree(data_item_container_dict, data_item_node, data_item_object_no
 # gather dictionary for navigating through topics and assertions of an entry
 # INPUT: entry_uri
 
-# OUTPUT: navi_dict -> a dict of all topics and assertions linked to an entry node via :CONTAINS relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
+# OUTPUT: navi_dict -> a dict of all topics and assertions linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
 def getNaviDict(entry_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # return entry node and all topic nodes that are directly displayed by this entry
     get_displayed_topics_query_string = '''
-    MATCH (n {{URI:"{entry_uri}"}})-[:CONTAINS]-> (root_topic {{root_topic:"true", current_version:"true"}})
-    OPTIONAL MATCH (n)-[:CONTAINS*]-> (m {{current_version:"true"}})
-    OPTIONAL MATCH (m)<-[:CONTAINS]-(x {{current_version:"true"}})
+    MATCH (n {{URI:"{entry_uri}"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-> (root_topic {{root_topic:"true", current_version:"true"}})
+    OPTIONAL MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]-> (m {{current_version:"true"}})
+    OPTIONAL MATCH (m)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(x {{current_version:"true"}})
     WITH [n.URI, n.name, n.KGBB_URI, root_topic.node_type, root_topic.name, root_topic.URI, root_topic.KGBB_URI, n.publication_title] as entry_info,
     [x.URI, m.node_type, m.name, m.URI, m.KGBB_URI, m.assertion_label, m.topic_label] as child_info,
     [root_topic.URI, root_topic.node_type, root_topic.name, root_topic.KGBB_URI] as root_topic_info
@@ -2668,7 +2668,7 @@ def getEditHistory(data_item_uri):
 
     # query string definition for getting all edit steps for this data item uri and all its child items by date, item name, user name, and uri of edited resource
     history_query_string = '''MATCH (n {{URI:"{data_item_uri}"}})
-    OPTIONAL MATCH (n)-[:CONTAINS*]->(m)
+    OPTIONAL MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]->(m)
     OPTIONAL MATCH (x) WHERE (m.URI IN x.topic_URI) OR (m.URI IN x.assertion_URI) OR (x.topic_URI=m.URI) OR (x.assertion_URI=m.URI)
     WITH n, m, x ORDER BY n.last_updated_on, m.last_updated_on, x.last_updated_on DESC
     RETURN [n.last_updated_on, n.name, n.created_by, n.current_version, n.created_on, n.URI] AS n, [m.last_updated_on, m.name, m.created_by, m.current_version, m.created_on, m.URI] AS m, [x.last_updated_on, x.name, x.created_by, x.current_version, x.created_on, x.URI] AS x'''.format(data_item_uri=data_item_uri)
@@ -2898,7 +2898,7 @@ def getGranularityTreeNaviJSON(granularity_tree_uri, kgbb_uri, selected_uri):
 # gather list of dictionaries for navigating through topics and assertions of an entry
 # INPUT: entry_uri, data_view_name
 
-# OUTPUT: a list of dictionaries of all topics, assertions, and granularity trees linked to an entry node via :CONTAINS relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:entry/topic/assertion/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, topics: [{HAS_topic_ELEMENT representation info}], assertions: [{HAS_ASSERTION_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
+# OUTPUT: a list of dictionaries of all topics, assertions, and granularity trees linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:entry/topic/assertion/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, topics: [{HAS_topic_ELEMENT representation info}], assertions: [{HAS_ASSERTION_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
 
 def getEntryDict(entry_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
@@ -2916,8 +2916,8 @@ def getEntryDict(entry_uri, data_view_name):
     OPTIONAL MATCH (entry_input_info:InputInfoKGBBElement_IND {{KGBB_URI:entry.KGBB_URI}})
     OPTIONAL MATCH (entry_input_node {{entry_URI:"{entry_uri}", current_version:"true", input_info_URI:entry_input_info.URI}})
 
-    OPTIONAL MATCH (entry)-[:CONTAINS*]-> (child_item {{current_version:"true"}})
-    OPTIONAL MATCH (child_item)<-[:CONTAINS]-(parent_item {{current_version:"true"}})
+    OPTIONAL MATCH (entry)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]-> (child_item {{current_version:"true"}})
+    OPTIONAL MATCH (child_item)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(parent_item {{current_version:"true"}})
     MATCH (child_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (child_item)-[:HAS_CURRENT_VERSION]->(child_item_current_version)
     OPTIONAL MATCH (child_item)-[:HAS_VERSION]->(child_item_version)
@@ -3288,7 +3288,7 @@ def getEntryDict(entry_uri, data_view_name):
 # gather list of dictionaries for navigating through topics and assertions of an entry
 # INPUT: entry_uri, data_view_name
 
-# OUTPUT: a list of dictionaries of all topics, assertions, and granularity trees linked to an entry node via :CONTAINS relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:entry/topic/assertion/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, topics: [{HAS_topic_ELEMENT representation info}], assertions: [{HAS_ASSERTION_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
+# OUTPUT: a list of dictionaries of all topics, assertions, and granularity trees linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:entry/topic/assertion/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, topics: [{HAS_topic_ELEMENT representation info}], assertions: [{HAS_ASSERTION_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
 
 def getVersDict(entry_uri, data_view_name, version_doi):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
@@ -3306,8 +3306,8 @@ def getVersDict(entry_uri, data_view_name, version_doi):
     OPTIONAL MATCH (entry_input_info:InputInfoKGBBElement_IND {{KGBB_URI:entry.KGBB_URI}})
     OPTIONAL MATCH (entry_input_node {{entry_URI:"{entry_uri}", input_info_URI:entry_input_info.URI}}) WHERE "{version_doi}" IN entry_input_node.versioned_doi
 
-    OPTIONAL MATCH (entry)-[:CONTAINS*]-> (child_item) WHERE "{version_doi}" IN child_item.versioned_doi
-    OPTIONAL MATCH (child_item)<-[:CONTAINS]-(parent_item) WHERE "{version_doi}" IN parent_item.versioned_doi
+    OPTIONAL MATCH (entry)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]-> (child_item) WHERE "{version_doi}" IN child_item.versioned_doi
+    OPTIONAL MATCH (child_item)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(parent_item) WHERE "{version_doi}" IN parent_item.versioned_doi
     MATCH (child_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_topics:HAS_TOPIC_ELEMENT]->()
     OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_assertions:HAS_ASSERTION_ELEMENT]->()
@@ -3810,7 +3810,7 @@ def getInstanceList(type_uri):
 
 # gather subgraph of topic from graph
 # INPUT: URI of topic
-# OUTPUT: a list of dictionaries of all topics, assertions, and granularity trees linked to a particular topic node via :CONTAINS relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:topic/assertion/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, topics: [{HAS_topic_ELEMENT representation info}], assertions: [{HAS_ASSERTION_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
+# OUTPUT: a list of dictionaries of all topics, assertions, and granularity trees linked to a particular topic node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:topic/assertion/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, topics: [{HAS_topic_ELEMENT representation info}], assertions: [{HAS_ASSERTION_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
 def getTopicRepresentation(topic_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
     print("------------------------- TOPIC URI INPUT ----------------------------------------")
@@ -3820,7 +3820,7 @@ def getTopicRepresentation(topic_uri, data_view_name):
     get_topic_dict_information_query_string = '''
     MATCH (topic {{URI:"{topic_uri}"}})
     MATCH (entry {{URI:topic.entry_URI}})
-    OPTIONAL MATCH (topic_parent  {{current_version:"true"}})-[:CONTAINS]->(topic)
+    OPTIONAL MATCH (topic_parent  {{current_version:"true"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(topic)
     MATCH (topic_rep:RepresentationKGBBElement_IND {{KGBB_URI:topic.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (topic_kgbb {{URI:topic.KGBB_URI}})-[topic_topics:HAS_TOPIC_ELEMENT]->()
     OPTIONAL MATCH (topic_kgbb {{URI:topic.KGBB_URI}})-[topic_assertions:HAS_ASSERTION_ELEMENT]->()
@@ -3829,8 +3829,8 @@ def getTopicRepresentation(topic_uri, data_view_name):
     OPTIONAL MATCH (topic_input_info:InputInfoKGBBElement_IND {{KGBB_URI:topic.KGBB_URI}})
     OPTIONAL MATCH (topic_input_node {{topic_URI:"{topic_uri}", current_version:"true", input_info_URI:topic_input_info.URI}})
 
-    OPTIONAL MATCH (topic)-[:CONTAINS*1..2]-> (child_item {{current_version:"true"}}) WHERE NOT child_item.name="material entity parthood assertion unit"
-    OPTIONAL MATCH (child_item)<-[:CONTAINS]-(parent_item {{current_version:"true"}})
+    OPTIONAL MATCH (topic)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*1..2]-> (child_item {{current_version:"true"}}) WHERE NOT child_item.name="material entity parthood assertion unit"
+    OPTIONAL MATCH (child_item)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(parent_item {{current_version:"true"}})
     OPTIONAL MATCH (child_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI, data_view_name:"{data_view_name}"}})
     OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_topics:HAS_TOPIC_ELEMENT]->()
     OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_assertions:HAS_ASSERTION_ELEMENT]->()
