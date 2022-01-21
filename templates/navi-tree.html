@@ -1,0 +1,35 @@
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+<script src={{url_for('static', filename='jstree.min.js')}}></script>
+
+
+
+<div class="navigation">
+  <form id="form1" action="/navi" method="POST" role="form">
+    <div id="navi_tree" class="jstree_demo_div" role="tree" aria-multiselectable="true" tabindex="0" aria-activedescendant="j3_3" aria-busy="false"></div>
+    <input type="hidden" id="simpleDescriptionUnit_uri" name="node_data">
+
+    <script type="text/JavaScript">
+      $(function () {
+        $('#navi_tree')
+          .jstree({ 'core' : {'data' : {{ naviJSON|safe }}} })
+
+          // listen for event
+          .bind('select_node.jstree', function (event, data) {
+            var i, j, r = []
+            for(i = 0, j = data.selected.length; i < j; i++) {
+              r.push(data.instance.get_node(data.selected[i]));
+              console.log(r)
+              $('#simpleDescriptionUnit_uri').val(JSON.stringify({node_data: r}));
+              document.getElementById("form1").submit();
+          }
+          }
+          )
+      });
+
+    </script>
+  </form>
+</div>

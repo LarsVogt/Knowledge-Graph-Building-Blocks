@@ -1,0 +1,233 @@
+{% extends "entry_form.html" %}
+
+{% block content %}
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<script>
+
+  var cypher;
+  var viz;
+  var config;
+
+  function draw() {
+    var config = {
+        container_id:"viz",
+        server_url:"bolt://localhost:7687",
+        server_user:"python",
+        server_password:"useCaseKGBB",
+        labels: {
+            "orkg_BasicUnit_IND": {
+                "caption": "basicUnit_label",
+                "color":"#84FF5C",
+                "image": "{{url_for('static', filename='BasicUnit_ICON_small.png')}}",
+            },
+            "Literal_IND": {
+                "caption": "value",
+                color:"#FDDA11"
+            },
+            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
+                       "caption": "name",
+                       "size": "defaultPagerank",
+                       "community": "defaultCommunity"
+                       //"sizeCypher": "defaultSizeCypher"
+
+                  }
+        },
+
+        relationships: {
+
+        },
+        initial_cypher: "MATCH (n {URI:'{{ entry_dict[0].get('id') }}'}) MATCH (n)-[r*]->(m {entry_URI:'{{ entry_dict[0].get('id') }}', current_version:'true'}) RETURN n, m, r",
+        arrows: true,
+        hierarchical_layout: true,
+        hierarchical_sort_method: "directed",
+    }
+
+    var viz = new NeoVis.default(config);
+    viz.render();
+    }
+</script>
+
+<script>
+function on{{entry_dict[0].get('id')  | replace('-', '')}}_Meta() {
+  document.getElementById("{{entry_dict[0].get('id')  | replace('-', '')}}overlayMeta").style.display = "block";
+}
+
+function off{{entry_dict[0].get('id')  | replace('-', '')}}_Meta() {
+  document.getElementById("{{entry_dict[0].get('id')  | replace('-', '')}}overlayMeta").style.display = "none";
+}
+</script>
+
+<script>
+function on{{entry_dict[0].get('id')  | replace('-', '')}}_Version() {
+  document.getElementById("{{entry_dict[0].get('id')  | replace('-', '')}}_overlayVersion").style.display = "block";
+}
+
+function off{{entry_dict[0].get('id')  | replace('-', '')}}_Version() {
+  document.getElementById("{{entry_dict[0].get('id')  | replace('-', '')}}_overlayVersion").style.display = "none";
+}
+</script>
+
+<script type=text/javascript>
+$(function() {
+    $('button#version_input').bind('click', function() {
+        $.ajax({
+            url: $SCRIPT_ROOT + '/_versioning',
+            type: "get",
+            data: {
+                version_data_item_uri: $('input[name="version_data_item_uri"]').val()
+            },
+            success: function(data) {
+                $("#versions_dict").html(data);
+            }
+
+        });
+    });
+});
+</script>
+
+
+
+
+  <div class="simpleDescriptionUnit_container" style="border: 1px solid #eee; border-radius: 7px; width: auto; padding: 5px 5px 5px 5px; width:auto; height:auto; margin: 20px; box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.05), 0 1px 1px 0 rgba(0, 0, 0, 0.19); ">
+    <img class="item_icon" src="{{url_for('static', filename='Entry_ICON_medium.png')}}" alt="entry icon" style="height:auto; max-width: 100%; margin-top: -12px; margin-left: -12px; float: left;">
+    {% if not entry_dict[0].get('version') %}
+      <form action="/version_safe" method="POST">
+        <button style="float:right; margin: -18px 85px 0px -280px; color: white; border-radius: 5px;
+        background-color: #239096; position: relative; border: solid 1px #239096; cursor: pointer; padding: 3px; font-size: 14px; font-weight:bold; z-index:1 ;">Save snapshot of live version</button>
+        <input type="hidden" name="entry_uri_" value="{{ entry_dict[0].get('id') }}"/>
+      </form>
+    {% endif %}
+
+    {% if entry_dict[0].get('version') %}
+    <div class="datum" style="font-size: 18px; margin-top: 12px; margin-left: 16px; float: left; color: #239096; ">This is a saved {{ version.get('version_type') }} Version (version number {{ version.get('version') }})</div>
+    <form action="/entry" method="POST">
+      <button style="float:right; border-radius: 4px; margin: -30px 15px 0px 0px; color: white; background-color: #239096; border: solid 1px #239096; cursor: pointer; font-size: 14px; font-weight:bold; z-index:6 ;">Return to live version</button>
+      <input type="hidden" name="entry_uri" value="{{ version.get('version_of') }}">
+    </form>
+    {% endif %}
+
+    {% set data_item = entry_dict[0].get('id') %}
+    {% set type = "Entry" %}
+    {% include  "versions.html" ignore missing  %}
+
+    {% if not entry_dict[0].get('version') %}
+      <button onclick="on{{entry_dict[0].get('id')  | replace('-', '')}}_Version()" style="float:left; margin: -16px 70px 0px 10px; color: #239096;  background-color: white; font-weight: bold; padding-left: 3px; padding-right: 3px; z-index:6 ; border: none; cursor:pointer; display: inline-block; " id="version_input">entry versions:</button>
+
+      <input type="hidden" name="version_data_item_uri" value="{{ entry_dict[0].get('id') }}"/>
+
+      <div style="float: left; margin-top: -17px; margin-left: -68px; width: 800px; ">
+        {% if not entry_dict[0].get('version_exists') %}
+          <span style="float: left; background-color: white; font-size: 14px; "> no version saved yet</span>
+        {% endif %}
+
+        {% for version in entry_dict[0].get('versions_info') %}
+          <script type=text/javascript>
+            $(function() {
+                $('span#{{version.get('versioned_doi')  | replace('-', '_')}}_version').bind('click', function() {
+                  $('#form_{{version.get('versioned_doi')  | replace('-', '_')}}').submit();
+                });
+            });
+          </script>
+
+          <span id="{{version.get('versioned_doi')  | replace('-', '_')}}_version" href="#" style="float: left; color: #239096; background-color: white; cursor: pointer; font-size: 14px; ">&nbsp;version {{ version.get('version') }}, </span>
+          <form id="form_{{version.get('versioned_doi')  | replace('-', '_')}}" action="/version" method="POST">
+            <input type="hidden" name="version_uri" id="version_uri{{ version.get('versioned_doi') | replace('-', '_')}}" value="{{ version.get('versioned_doi') }}" />
+          </form>
+
+        {% endfor %}
+      </div>
+
+
+      <button onclick="on{{entry_dict[0].get('id')  | replace('-', '')}}_Meta()" style="float:right; margin: -13px 25px 0px -38px; z-index:6 ;" class='fas'>&#xf02b;</button>
+
+      <button onclick="onhist()" style="float: right; margin-right: 6px; margin-top: -13px; background-color: white; padding-left: 5px; padding-right: 5px; " class='fas' href="#" id=history_input>&#xf1da;</button>
+      <input type="hidden" name="data_item_uri" value="{{ entry_dict[0].get('id') }}"/>
+
+      <div class="graph_button" onclick="ongraph()" style="margin-top: -28px; margin-right: 35px; background-color: white; ">
+        <button style="float: initial; margin-left: 0px;" style="margin-left:20px;" class='fas' href="#" id=graph_input><img src="{{url_for('static', filename='Graph_ICON.png')}}"></button>
+        <input id="graphX" type="hidden" name="graph_uri" value="{{ entry_dict[0].get('id') }}"/>
+      </div>
+    {% endif %}
+
+
+
+
+    <div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 30px;">Title:
+      <div class="datum" style="font-size: 19px;">{{ entry_dict[0].get('text') }}</div>
+    </div>
+
+    <div class="data_row">doi
+      <div class="datum">{{ entry_dict[0].get('object').get('publication_doi') }}</div>
+    </div>
+
+    <div class="data_row">Year:
+      <div class="datum">{{ entry_dict[0].get('object').get('publication_year') }}</div>
+    </div>
+
+    <div class="data_row">Authors:
+      <div class="datum">{{ entry_dict[0].get('object').get('publication_authors') }}</div>
+    </div>
+
+    <div class="data_row">Journal:
+      <div class="datum">{{ entry_dict[0].get('object').get('publication_journal') }}</div>
+    </div>
+
+    <div class="data_row">Publisher:
+      <div class="datum">{{ entry_dict[0].get('object').get('publication_publisher') }}</div>
+    </div>
+
+
+
+
+    {% set simpleDescriptionUnit_uri = entry_dict[0].get('id') %}
+
+
+    {% for child in entry_dict %}
+
+      {% if child.get('component') == "research_topic_basicUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
+        {% set component = "research_topic_basicUnit" %}
+        {% set label = "has research topic:" %}
+        {% set statement = "Paper has research topic:" %}
+        {% set id = child.get('id') %}
+        {% set parent_id = entry_dict[0].get('id') %}
+        {% set parent_type = entry_dict[0].get('node_type') %}
+        {% set entry_id = entry_dict[0].get('id') %}
+        {% set SIMPLE_DESCRIPTION_UNIT_uri = None %}
+        {% set input_representation = "single_resource.html" %}
+        {% set basicUnit_uri = child.get('id') %}
+        {% set parent_uri = entry_dict[0].get('id') %}
+        {% set parent_uri_label = "entry_uri" %}
+        {% set resource_input_info = entry_dict[0].get('research_topic_basicUnit_input_info') %}
+        {% set node = child.get('node') %}
+        {% set instance_label_edit =  False %}
+        {% set resource_node = child.get('research_topic_input').get('input_nodes')[0] %}
+        {% include  "single_resource_input_basicUnit.html" %}
+      {% endif %}
+
+    {% endfor %}
+
+    {% if not entry_dict[0].get('version') %}
+      {% set component = "research_topic_basicUnit" %}
+      {% set resource_label = "has research topic:" %}
+      {% set SIMPLE_DESCRIPTION_UNIT_uri = None %}
+      {% set basicUnit_uri = None %}
+      {% set parent_id = entry_dict[0].get('id') %}
+      {% set parent_type = entry_dict[0].get('node_type') %}
+      {% set entry_id = entry_dict[0].get('id') %}
+      {% set resource_input_info = entry_dict[0].get('research_topic_basicUnit_input_info') %}
+      {% include  "single_resource_input_container.html" %}
+    {% endif %}
+
+    {% include  'history.html'  %}
+
+
+  </div>
+
+
+
+  {% set id = entry_dict[0].get('id') %}
+  {% set node = entry_dict[0].get('node') %}
+  {% set data_item_type = "Entry" %}
+  {% include 'metadata.html' %}
+{% endblock %}

@@ -1,0 +1,82 @@
+{% for child in entry_dict %}
+  {% if child.get('component') == component and child.get('parent') == simpleDescriptionUnit_uri %}
+
+    <script>
+      function on{{child.get('id')  | replace('-', '_')}}_{{component}}_1() {
+        document.getElementById("{{child.get('id')  | replace('-', '_')}}_{{component}}_1").style.display = "block";
+      }
+
+      function off{{child.get('id')  | replace('-', '_')}}_{{component}}_1() {
+        document.getElementById("{{child.get('id')  | replace('-', '_')}}_{{component}}_1").style.display = "none";
+      }
+    </script>
+
+    <script type=text/javascript>
+      $(function() {
+          $('button#{{child.get('id')  | replace('-', '_')}}').bind('click', function() {
+              $.ajax({
+                  url: $SCRIPT_ROOT + '/user_input',
+                  type: "post",
+                  data: {
+                      input_name: $('input[name="input_name"]').val()
+                    }
+              });
+          });
+      });
+    </script>
+
+  {% endif %}
+{% endfor %}
+
+
+{% for child in entry_dict %}
+  {% if child.get('component') == component and child.get('parent') == simpleDescriptionUnit_uri %}
+
+
+    <div class="datum">
+      <form action="/simpleDescriptionUnit" method="POST">
+        <div class="resource_input" style="position: relative;">
+          <input class="simpleDescriptionUnit_resource" type="submit" name="simpleDescriptionUnit_uri" value="{{ child.get('id') }}"></input>
+          <img class="item_icon" src="{{url_for('static', filename='BasicUnit_ICON_small.png')}}" alt="entry icon" style="padding-right: 4px; padding-top: 2px; ">
+          <span class="tooltip_simpleDescriptionUnit" style="color: black; font-style: normal;">{{ child.get('object').get('name') }}<span class="tooltip-text_simpleDescriptionUnit">{{ child.get('object').get('description') }}</span></span>
+          <span class="resource_basicUnit_ontology_id">{{ child.get('object').get('ontology_ID') }}</span>
+        </div>
+      </form>
+      <form action="/delete_input"method="POST">
+        <input class="resource_input_delete_btn" type="submit" name="delete_basicUnit" value="X"></input>
+        <input type="hidden" name="delete_basicUnit_uri" value="{{[simpleDescriptionUnit_uri, child.get('id')] }}"></input>
+      </form>
+      <button onclick="on{{child.get('id')  | replace('-', '_')}}_{{component}}_1()" class='fas'>&#xf044;</button>
+    </div>
+
+
+
+
+
+
+
+    <div id="{{child.get('id')  | replace('-', '_')}}_{{component}}_1" style="position: fixed; display: none; width: 100%; height: 100%; top:0 ; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.7); z-index: 2; cursor: pointer; ">
+      <div class="datum" style="margin-top: 300px; margin-left: 450px; float:left">
+        <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="text" style="height: 30px; " name="{{child.get('id')  | replace('-', '_')}}" id="query"  data-bp_include_definitions="true" data-bp_search_branch="{{ container_node.get('input_restricted_to_subclasses_of') }}" class="bp_form_complete-{{ container_node.get('ontology_ID') }}-name" size="40" placeholder="{{ container_node.get('placeholder_text') }}" />
+          <div class='input-group-append'>
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_parent_uri" value="{{ simpleDescriptionUnit_uri }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_parent_item_type" value="{{ simpleDescriptionUnit_node.get('node_type') }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_entry_uri" value="{{ entry_dict[0].get('id') }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_simpleDescriptionUnit_uri" value="{{ simpleDescriptionUnit_uri }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_basicUnit_uri" value="{{ child.get('id') }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_kgbb_uri" value="{{ container_node.get('target_KGBB_URI') }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_input_result" value="{{ container_node.get('edit_results_in') }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_query_key" value="{{ container_node.get('edit_cypher_key') }}">
+            <input type="hidden" name="{{child.get('id')  | replace('-', '_')}}_deleted_item_uri" value="{{ child.get('id') }}">
+            <button onclick="off{{child.get('id')  | replace('-', '_')}}_{{component}}_1()" id="{{child.get('id')  | replace('-', '_')}}" name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> edit
+            </button>
+            <input type="hidden" name="input_name" value="{{child.get('id')  | replace('-', '_')}}"/>
+          </div>
+        </form>
+      </div>
+      <button onclick="off{{child.get('id')  | replace('-', '_')}}_{{component}}_1()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  background: #7F869B; margin-left: 776px; margin-top: -60px; float: left; font-weight: bold; " type="submit" class="btn btn-primary">X</button>
+    </div>
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,19 @@
+<html>
+
+
+<head>
+  <title>KGBB Use Case: SEARCH RESULT PAGE</title>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/standard.css')}}>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/font-awesome-4.7.0/css/font-awesome.min.css')}}>
+</head>
+<body>
+  <div class="header">
+    <h4>Search Result Page</h4>
+  </div>
+  {% if simpleDescriptionUnit_nodes_list[0][0].get('component') == 'material_entity_simpleDescriptionUnit' %}
+    {% include 'material_entity_simpleDescriptionUnit_search.html' %}
+  {% endif %}
+
+</body>
+
+</html>

@@ -1,0 +1,153 @@
+<html>
+
+<head>
+  <title>KGBB Use Case: ENTRY FORMS</title>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/standard.css')}}>
+  <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/font-awesome-4.7.0/css/font-awesome.min.css')}}>
+  <script type=text/javascript src="{{ url_for('static', filename='jquery-3.6.0.js') }}"></script>
+  <script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  </script>
+
+<script src="https://cdn.neo4jlabs.com/neovis.js/v1.5.0/neovis.js"></script>
+
+  <script>
+  function on() {
+    document.getElementById("overlay").style.display = "block";
+  }
+
+  function off() {
+    document.getElementById("overlay").style.display = "none";
+  }
+  </script>
+  <script>
+  function on1() {
+    document.getElementById("overlay1").style.display = "block";
+  }
+
+  function off1() {
+    document.getElementById("overlay1").style.display = "none";
+  }
+  </script>
+  <script>
+  function on2() {
+    document.getElementById("overlay2").style.display = "block";
+  }
+
+  function off2() {
+    document.getElementById("overlay2").style.display = "none";
+  }
+  </script>
+  <script>
+  function on3() {
+    document.getElementById("overlay3").style.display = "block";
+  }
+
+  function off3() {
+    document.getElementById("overlay3").style.display = "none";
+  }
+  </script>
+  <script>
+  function on4() {
+    document.getElementById("overlay4").style.display = "block";
+  }
+
+  function off4() {
+    document.getElementById("overlay4").style.display = "none";
+  }
+  </script>
+  <script>
+  function onhist() {
+    document.getElementById("history").style.display = "block";
+  }
+
+  function offhist() {
+    document.getElementById("history").style.display = "none";
+  }
+  </script>
+
+  <script type=text/javascript>
+  $(function() {
+      $('button#history_input').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/_edit_history',
+              type: "get",
+              data: {
+                  data_item_uri: $('input[name="data_item_uri"]').val()
+              },
+              success: function(data) {
+                  $("#edit_history").html(data);
+              }
+
+          });
+      });
+  });
+  </script>
+
+
+  <script>
+  function ongraph() {
+    document.getElementById("graph_overlay").style.display = "block";
+  }
+
+    function offgraph() {
+    document.getElementById("graph_overlay").style.display = "none";
+  }
+  </script>
+
+
+
+</head>
+<body onload="draw()">
+{% if entry_dict[0].get('version') %}
+  {% set version = entry_dict[0].get('version_node') %}
+  {% set versionlabel = "Version " + entry_dict[0].get('version_node').get('version')|string + " of: " %}
+{% endif %}
+
+  <div class="header">
+    <img class="item_icon" src="{{url_for('static', filename='Entry_ICON_medium.png')}}" alt="entry icon" style="height:auto; max-width: 100%; margin-top: 3px; margin-left: 3px; float: left;"><h4 style="margin-left:11px; ">{{versionlabel}}Scholarly Publication ORKG Entry: {{ entry_dict[0].get('text') }}</h4>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash_message_container">
+          <div id="hideMe">
+            {% for category, message in messages %}
+              <p class="{{ category  }}">
+                {{ message }}
+              </p>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+
+  {% include  'navi-tree.html' ignore missing  %}
+  {% include  'meta.html' ignore missing  %}
+
+
+  <div class="simpleDescriptionUnit_display">
+    {% block content %}
+
+    {% endblock %}
+  </div>
+
+
+
+  <div class="bottom_bar">
+  </div>
+
+  <form action="/lobby" method="POST">
+    <div class="bottom" style="margin-right: 134px;">
+      <input class="return_button" align="center" type="submit" name="button_action" value="Return to Lobby">
+      <input class="return_button" align="center" type="submit" name="button_action" value="Return to Entry List">
+    </div>
+  </form>
+
+  {% include  'graph_visualization.html'  %}
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 70px;">Material Entity SimpleDescriptionUnit Comparison </div>
+
+
+<div style="overflow: auto; overflow-y: hidden; white-space:nowrap; display: inline-flex; margin-left: 50px; width:1407px; float:left; margin-bottom: 50px; ">
+  <div class="search-result-label-column">
+    <div class="search-result-label-cell">publication title</div>
+    <div class="search-result-label-cell">entry URI</div>
+    <div class="search-result-label-cell">simpleDescriptionUnit resource</div>
+    <div class="search-result-label-cell">quality measurement</div>
+    <div class="search-result-label-cell">has part</div>
+    <div class="search-result-label-cell">has part</div>
+    <div class="search-result-label-cell">has part</div>
+  </div>
+
+
+  {% for simpleDescriptionUnit_dict in simpleDescriptionUnit_nodes_list  %}
+    {% set resource_node = simpleDescriptionUnit_dict[0].get('object') %}
+    {% set simpleDescriptionUnit_uri = simpleDescriptionUnit_dict[0].get('id') %}
+    <div class="search-result-column">
+      <div class="search-result-cell" style="font-size:12px; ">{{ simpleDescriptionUnit_dict[0].get('entry_title') }}</div>
+      <div class="search-result-cell" style="font-size:12px; ">{{ simpleDescriptionUnit_dict[0].get('node').get('entry_URI') }}</div>
+      <div class="search-result-cell"><div class="resource_input" style="position: relative; padding: 0px 0px 5px 0px; height: auto; "> {% include 'single_resource.html' %} </div></div>
+      <div class="search-result-cell">
+        {% for child in simpleDescriptionUnit_dict %}
+          {% if child.get('component') == "quality_relation_identification_basicUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
+            {% set label = "has quality:" %}
+            {% set node = child.get('node') %}
+            {% set resource_node = child.get('object') %}
+            <div class="resource_input" style="position: relative; padding: 0px 0px 5px 0px; height: auto; ">{% include  "single_resource.html" %}</div>
+
+            {% for basicUnit_child in simpleDescriptionUnit_dict if basicUnit_child.get('component') == "weight_measurement_basicUnit" and basicUnit_child.get('parent') == child.get('id') %}
+              {% set label = ":" %}
+              {% set node = basicUnit_child.get('node') %}
+              {% set resource_node = basicUnit_child.get('weight_unit_input').get('input_nodes')[0] %}
+              {% set value_node = basicUnit_child.get('weight_value_input').get('input_nodes')[0] %}
+              <div class="resource_input" style="position: relative; padding: 0px 0px 5px 0px; height: auto; ">{% include  "single_value_with_single_resource.html" %}</div>
+            {% endfor %}
+
+            {% for basicUnit_child in simpleDescriptionUnit_dict if basicUnit_child.get('component') == "R0_measurement_basicUnit" and basicUnit_child.get('parent') == child.get('id') %}
+              {% set label = ":" %}
+              {% set label1 = "95% confidence interval:" %}
+              {% set node = basicUnit_child.get('node') %}
+              {% set value_node1 = basicUnit_child.get('R0_value_input').get('input_nodes')[0] %}
+              {% set value_node2 = basicUnit_child.get('lower_confidence_limit_value_input').get('input_nodes')[0] %}
+              {% set value_node3 = basicUnit_child.get('upper_confidence_limit_value_input').get('input_nodes')[0] %}
+              <div class="resource_input" style="position: relative; height: 25px; padding: 18px 4px 5px 6px; height: auto; ">{% include  "single_value_with_label_and_double_value_input.html" %}</div>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+
+      {% for child in simpleDescriptionUnit_dict %}
+        {% if child.get('component') == "material_entity_simpleDescriptionUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
+          {% set resource_node = child.get('object') %}
+          <div class="search-result-cell">
+            <div class="resource_input" style="position: relative; padding: 0px 0px 5px 0px; height: auto;  ">{% include  "single_resource.html" %}</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+    </div>
+  {% endfor %}
+</div>
+
+
+
+<form action="/lobby" method="POST">
+  <div class="bottom" style="margin-top: 0px; margin-left: 55px; ">
+    <input class="return_button" style="margin-right: 0px; margin-top: 0px" align="center" type="submit" name="button_action" value="Return to Lobby">
+    <input class="btn3" align="right" type="submit" name="button_action" style="float:right; margin-top: 0px; " value="search page">
+  </div>
+</form>

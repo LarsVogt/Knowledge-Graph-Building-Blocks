@@ -1,0 +1,68 @@
+<div id="{{id  | replace('-', '')}}overlayMeta" style="position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.7); z-index: 2; ">
+  <div id="meta">
+    <button onclick="off{{id  | replace('-', '')}}_Meta()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  cursor: pointer; background: #7F869B; margin-top: 0px; float: right; font-weight: bold; " class="btn btn-primary">X</button>
+    <form action="/instance_label" method="POST">
+      <div style="display: inline-block; float:left; margin-top: 26px; margin-left: 30px;">
+        current resource label: <span style="font-weight: bold; margin-left: 70px; padding-right:140px; ">{{ resource_node.get('instance_label') }}</span>
+        <br>
+        <br>
+        {% if instance_label_edit %}
+          {% if not entry_dict[0].get('version') %}
+            <input type="text"  name="{{ id }}_instance_label" style="height: 30px; margin-left: 210px; " size="30" placeholder="specify new resource label here" ></input>
+            <button onclick="off{{id  | replace('-', '')}}_Meta()" id="{{id  | replace('-', '_')}}_instance_label" href="#" name="button" style="height: 30px; padding-top: 3px; margin-right: 51px; float: right; margin-top: 0px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> save
+            </button>
+          {% endif %}
+        {% endif %}
+
+        {% if entry_dict[0].get('version') %}
+          <span style="margin-left: 53px; margin-right:20px; "> disabled in saved versions</span>
+        {% endif %}
+
+      </div>
+      <input type="hidden" name="{{id}}_entry_uri" value="{{ entry_id }}">
+      <input class="simpleDescriptionUnit_resource" type="hidden" name="{{ id }}_basicUnit_uri" value="{{ basicUnit_uri }}"></input>
+      <input type="hidden" name="{{id}}_kgbb_uri" value="{{ resource_input_info.get('target_KGBB_URI') }}">
+      <input type="hidden" name="{{id}}_parent_uri" value="{{ parent_id }}">
+      <input type="hidden" name="{{id}}_parent_item_type" value="{{ parent_type }}">
+      <input type="hidden" name="{{ id }}_simpleDescriptionUnit_uri" value="{{ SIMPLE_DESCRIPTION_UNIT_uri}}" />
+      <input type="hidden" name="{{ id }}_entry_uri" value="{{ entry_id }}"/>
+      <input type="hidden" name="input_name" id="input_name{{ id }}" value="{{ id }}"/>
+    </form>
+    <span style="font-weight: bold; float: left; margin-left: 30px; margin-top: 60px; ">Metadata about resource:</span>
+    <div class="resource_input" style="position: relative; margin-top: 50px; margin-left: 35px; padding: 0px 0px 5px 0px; height: auto;">
+      {% include input_representation %}
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">creator: </div>
+      <div class="value" style="display: inline-block; padding-left: 160px; ">{{resource_node.get('created_by')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">created on: </div>
+      <div class="value" style="display: inline-block; padding-left: 138px; max-width: 34ch;  ">{{resource_node.get('created_on')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">last updated on: </div>
+      <div class="value" style="display: inline-block; padding-left: 107px; max-width: 34ch;  ">{{resource_node.get('last_updated_on')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">instance URI: </div>
+      <div class="value" style="display: inline-block; padding-left: 127px; max-width: 34ch;  ">{{resource_node.get('URI')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">type URI: </div>
+      <div class="value" style="display: inline-block; padding-left: 150px; max-width: 34ch;  ">{{resource_node.get('type')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">ontology ID: </div>
+      <div class="value" style="display: inline-block; padding-left: 130px; max-width: 34ch;  ">{{resource_node.get('ontology_ID')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">type label: </div>
+      <div class="value" style="display: inline-block; padding-left: 144px; max-width: 34ch;  ">{{resource_node.get('name')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top;">type description: </div>
+      <div class="value" style="display: inline-block; padding-left: 105px; max-width: 34ch;  ">{{resource_node.get('description')}} </div>
+    </div>
+  </div>
+</div>

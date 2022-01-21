@@ -1,0 +1,163 @@
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<script>
+  function on{{id  | replace('-', '_')}}_{{ component }}_edit() {
+    document.getElementById("{{id  | replace('-', '_')}}_{{ component }}_edit").style.display = "block";
+  }
+
+  function off{{id  | replace('-', '_')}}_{{ component }}_edit() {
+    document.getElementById("{{id  | replace('-', '_')}}_{{ component }}_edit").style.display = "none";
+  }
+</script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{id  | replace('-', '_')}}_{{ component }}').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/user_input',
+              type: "post",
+              data: {
+                input_name: $('input[name="input_name"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+<script>
+function on{{id  | replace('-', '')}}_Meta() {
+  document.getElementById("{{id  | replace('-', '')}}overlayMeta").style.display = "block";
+}
+
+function off{{id  | replace('-', '')}}_Meta() {
+  document.getElementById("{{id  | replace('-', '')}}overlayMeta").style.display = "none";
+}
+</script>
+
+<script>
+function on{{id  | replace('-', '_')}}_MetaAss() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayMetaAss").style.display = "block";
+}
+
+function off{{id  | replace('-', '_')}}_MetaAss() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayMetaAss").style.display = "none";
+}
+</script>
+
+<script>
+function on{{id  | replace('-', '_')}}_Statements() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayStatements").style.display = "block";
+}
+
+function off{{id  | replace('-', '_')}}_Statements() {
+  document.getElementById("{{id  | replace('-', '_')}}overlayStatements").style.display = "none";
+}
+</script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{id  | replace('-', '_')}}{{component}}_instance_label').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/instance_label',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{ id }}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{id  | replace('-', '_')}}{{component}}_certainty').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/certainty',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{ id }}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+
+<div class="data_row" style="border: 1px solid #eee; border-radius: 7px; width: 555px; padding: 5px 5px 5px 5px;  margin-left: 25px; margin-bottom: 10px; margin-top: 10px; box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.05), 0 1px 1px 0 rgba(0, 0, 0, 0.19); ">
+  <span style="position: relative; top: 10px; margin-top: 10px; margin-right: 40px; ">{{ label }}</span>
+  <img class="item_icon" src="{{url_for('static', filename='BasicUnit_ICON_medium.png')}}" alt="entry icon" style="height: 19px; width: 22px; margin-top: -11px; margin-left: -10px; float: left;">
+
+  {% for child in entry_dict %}
+    {% if child.get('component') == "confidence_level_basicUnit" and child.get('parent') == id %}
+      {% set certainty=child.get('object').get('name') %}
+        <span class='fas' style="font-size: 12px; margin: -15px 0px 0px 8px; float: left; background-color: white; ">{{ certainty }}</span>
+    {% endif %}
+  {% endfor %}
+
+  {% if not entry_dict[0].get('version') %}
+    <button onclick="on{{id  | replace('-', '_')}}_Statements()" style="margin: -16px 43px 0px -44px; padding-right: 20px; padding-left: 5px; background-color: white; float: right; font-size: 18px;" aria-hidden="true" class='far'>&#Xf086;</button>
+  {% endif %}
+  <button onclick="on{{id  | replace('-', '_')}}_MetaAss()" style="margin: -13px 20px 1px 1px; float: right; z-index:6 ;" class='fas'>&#xf02b;</button>
+  {% if not entry_dict[0].get('version') %}
+    <form action="/delete_input"method="POST">
+      <input class="resource_input_delete_btn" type="submit" style="font-size: 15px; margin: -35px 0px 0px 0px; float: right; padding: 0px 5px 0px 0px; " name="delete_basicUnit" value="X"></input>
+      <input type="hidden" name="delete_basicUnit_uri" value="{{[parent_id, id] }}"></input>
+    </form>
+  {% endif %}
+
+  {% include 'data_item_metadata.html' %}
+
+  <div class="datum" style="float: left; margin-top:-4px; margin-bottom: 0px; position:relative; padding-right: 70px; width: auto; ">
+    {% if not entry_dict[0].get('version') %}
+      <form action="/entry" method="POST">
+        <div class="resource_input" style="position: relative; margin-top: -15px; margin-left: 248px; padding: 0px 0px 5px 0px; height: auto; margin-right: 30px; ">
+          {% include input_representation %}
+        </div>
+      </form>
+      <button onclick="on{{id  | replace('-', '')}}_Meta()" style="margin: -39px 12px 1px 1px; float: right; z-index:6 ;" class='fas'>&#xf02b;</button>
+      <button onclick="on{{id  | replace('-', '_')}}_{{ component }}_edit()" style="margin: -19px 11px 0px -15px; float: right; " class='fas'>&#xf044;</button>
+    {% endif %}
+
+    {% if entry_dict[0].get('version') %}
+      <div style="width: auto; height: auto; ">
+        <form action="/entry" method="POST">
+          <div class="resource_input" style="position: relative; margin-top: -15px; margin-left: 250px; margin-right: 5px; padding: 0px 0px 5px 0px; height: auto;">
+            {% include input_representation %}
+          </div>
+        </form>
+        <button onclick="on{{id  | replace('-', '')}}_Meta()" style="margin: -39px -14px 1px 0px; z-index:6 ; float: right; " class='fas'>&#xf02b;</button>
+      </div>
+    {% endif %}
+
+    {% include 'resource_metadata.html' %}
+
+    {% include 'statements.html' %}
+
+  </div>
+</div>
+
+
+
+<div id="{{id  | replace('-', '_')}}_{{ component }}_edit" style="position: fixed; display: none; width: 100%; height: 100%; top:0 ; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.7); z-index: 2; cursor: pointer; ">
+  <div class="datum" style="margin-top: 300px; margin-left: 450px; float:left">
+    <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST">
+      <input name="utf8" type="hidden" value="&#x2713;" />
+      <input type="text" style="height: 30px; " name="{{id  | replace('-', '_')}}" id="query" data-bp_include_definitions="true" data-bp_search_branch="{{ resource_input_info.get('input_restricted_to_subclasses_of') }}" class="bp_form_complete-{{ resource_input_info.get('ontology_ID') }}-name" size="40" placeholder="{{ resource_input_info.get('placeholder_text') }}" />
+      <div class='input-group-append'>
+        <input type="hidden" name="{{id  | replace('-', '_')}}_parent_uri" value="{{ parent_id }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_parent_item_type" value="{{ parent_type }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_entry_uri" value="{{ entry_id }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_simpleDescriptionUnit_uri" value="{{ SIMPLE_DESCRIPTION_UNIT_uri }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_basicUnit_uri" value="{{ basicUnit_uri }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_kgbb_uri" value="{{ resource_input_info.get('target_KGBB_URI') }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_input_result" value="{{ resource_input_info.get('edit_results_in') }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_query_key" value="{{ resource_input_info.get('edit_cypher_key') }}">
+        <input type="hidden" name="{{id  | replace('-', '_')}}_deleted_item_uri" value="{{ id }}">
+        <button onclick="off{{id  | replace('-', '_')}}_{{ component }}_edit()" id="{{id  | replace('-', '_')}}_{{ component }}" href="#" name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> edit
+        </button>
+        <input type="hidden" name="input_name" value="{{id  | replace('-', '_')}}"/>
+      </div>
+    </form>
+  </div>
+  <button onclick="off{{id  | replace('-', '_')}}_{{ component }}_edit()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  background: #7F869B; margin-left: 776px; margin-top: -60px; float: left; font-weight: bold; " type="submit" class="btn btn-primary">X</button>
+</div>

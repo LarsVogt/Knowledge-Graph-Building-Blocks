@@ -1,0 +1,39 @@
+<div id="{{id  | replace('-', '_')}}overlayMetaAss" style="position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.7); z-index: 2; ">
+  <div id="meta" style="font-weight: normal; height: 400px; ">
+    <button onclick="off{{id  | replace('-', '_')}}_MetaAss()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  cursor: pointer; background: #7F869B; margin-top: 0px; float: right; font-weight: bold; " class="btn btn-primary">X</button>
+
+    <div class="metadata" style="font-weight: bold; float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">Metadata about: </div>
+      <div class="value" style="display: inline-block; padding-left: 39px; ">{{node.get('name')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; "> {{node.get('node_type')}} label: </div>
+      <div class="value" style="display: inline-block; padding-left: 59px; ">{% set label_key = node.get('node_type') + '_label' %}{{node.get(label_key)}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">creator: </div>
+      <div class="value" style="display: inline-block; padding-left: 102px; ">{{node.get('created_by')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">created on: </div>
+      <div class="value" style="display: inline-block; padding-left: 80px; max-width: 34ch;  ">{{node.get('created_on')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">last updated on: </div>
+      <div class="value" style="display: inline-block; padding-left: 48px; max-width: 34ch;  ">{{node.get('last_updated_on')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; ">{{node.get('node_type')}} URI: </div>
+      <div class="value" style="display: inline-block; padding-left: 64px; max-width: 34ch;  ">{{node.get('URI')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">type URI: </div>
+      <div class="value" style="display: inline-block; padding-left: 93px; max-width: 34ch;  ">{{node.get('type')}} </div>
+    </div>
+    <div class="metadata" style="float: left; width: 90%; margin-left: 30px; margin-top: 15px; ">
+      <div class="label" style="display: inline-block; vertical-align: top; ">type description: </div>
+      <div class="value" style="display: inline-block; padding-left: 48px; max-width: 34ch;  ">{{node.get('description')}} </div>
+    </div>
+
+  </div>
+</div>

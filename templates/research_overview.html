@@ -1,0 +1,173 @@
+{% set id = child.get('id') %}
+{% set entry_id = entry_dict[0].get('id') %}
+{% set basicUnit_uri =  None %}
+{% set instance_label_edit =  True %}
+{% set resource_node = child.get('object') %}
+{% set resource_input_info = child.get('research_step_simpleDescriptionUnit_input_info') %}
+{% set parent_id = child.get('parent') %}
+{% set SIMPLE_DESCRIPTION_UNIT_uri =  child.get('id') %}
+{% set input_representation = "single_resource.html" %}
+{% for parent in entry_dict if parent.get('id') == parent_id %}
+  {% set parent_type = parent.get('node_type') %}
+  {% include "simpleDescriptionUnit_header_resource.html" %}
+{% endfor %}
+
+<br><br><br><br><br>
+
+
+
+{% for child in entry_dict %}
+
+  {% if child.get('component') == "research_activity_simpleDescriptionUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
+    {% set component = "research_activity_simpleDescriptionUnit" %}
+    {% set label = "has research step:" %}
+    {% set statement = "Research has research step:" %}
+    {% set id = child.get('id') %}
+    {% set parent_id = simpleDescriptionUnit_uri %}
+    {% set parent_type = child.get('node_type') %}
+    {% set parent_uri = simpleDescriptionUnit_uri %}
+    {% set parent_uri_label = "simpleDescriptionUnit_uri" %}
+    {% set SIMPLE_DESCRIPTION_UNIT_uri =  child.get('id') %}
+    {% set basicUnit_uri =  None %}
+    {% set entry_id = entry_dict[0].get('id') %}
+    {% set resource_input_info = child.get('research_step_simpleDescriptionUnit_input_info') %}
+    {% set node = child.get('node') %}
+    {% set resource_node = child.get('object') %}
+    {% set instance_label_edit =  True %}
+    {% set input_representation = "single_resource.html" %}
+    {% include  "single_resource_input_simpleDescriptionUnit.html" %}
+  {% endif %}
+
+{% endfor %}
+
+{% if not entry_dict[0].get('version') %}
+  {% set component = "research_activity_simpleDescriptionUnit" %}
+  {% set resource_label = "has research step:" %}
+  {% set basicUnit_uri = None %}
+  {% set parent_id = simpleDescriptionUnit_uri %}
+  {% set SIMPLE_DESCRIPTION_UNIT_uri =  None %}
+  {% set parent_type = child.get('node_type') %}
+  {% set entry_id = entry_dict[0].get('id') %}
+  {% set resource_input_info = child.get('research_step_simpleDescriptionUnit_input_info') %}
+  {% include  "single_resource_input_container.html" %}
+{% endif %}
+
+
+
+{% for child in entry_dict %}
+
+  {% if child.get('component') == "research_method_simpleDescriptionUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
+    {% set component = "research_method_simpleDescriptionUnit" %}
+    {% set label = "has method:" %}
+    {% set statement = "Research followed method:" %}
+    {% set id = child.get('id') %}
+    {% set parent_id = simpleDescriptionUnit_uri %}
+    {% set parent_type = child.get('node_type') %}
+    {% set parent_uri = simpleDescriptionUnit_uri %}
+    {% set parent_uri_label = "simpleDescriptionUnit_uri" %}
+    {% set SIMPLE_DESCRIPTION_UNIT_uri =  child.get('id') %}
+    {% set basicUnit_uri =  None %}
+    {% set entry_id = entry_dict[0].get('id') %}
+    {% set resource_input_info = child.get('research_method_simpleDescriptionUnit_input_info') %}
+    {% set instance_label_edit =  True %}
+    {% set node = child.get('node') %}
+    {% set resource_node = child.get('object') %}
+    {% set input_representation = "single_resource.html" %}
+    {% include  "single_resource_input_simpleDescriptionUnit.html" %}
+  {% endif %}
+
+{% endfor %}
+
+{% if not entry_dict[0].get('version') %}
+  {% set component = "research_method_simpleDescriptionUnit" %}
+  {% set resource_label = "has method:" %}
+  {% set basicUnit_uri = None %}
+  {% set parent_id = simpleDescriptionUnit_uri %}
+  {% set SIMPLE_DESCRIPTION_UNIT_uri =  None %}
+  {% set parent_type = child.get('node_type') %}
+  {% set entry_id = entry_dict[0].get('id') %}
+  {% set resource_input_info = child.get('research_method_simpleDescriptionUnit_input_info') %}
+  {% include  "single_resource_input_container.html" %}
+{% endif %}
+
+
+
+{% for child in entry_dict %}
+
+  {% if child.get('component') == "research_objective_simpleDescriptionUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
+    {% set component = "research_objective_simpleDescriptionUnit" %}
+    {% set label = "has objective:" %}
+    {% set statement = "Research achieved objective:" %}
+    {% set id = child.get('id') %}
+    {% set parent_id = simpleDescriptionUnit_uri %}
+    {% set parent_type = child.get('node_type') %}
+    {% set parent_uri = simpleDescriptionUnit_uri %}
+    {% set parent_uri_label = "simpleDescriptionUnit_uri" %}
+    {% set SIMPLE_DESCRIPTION_UNIT_uri =  child.get('id') %}
+    {% set basicUnit_uri =  None %}
+    {% set entry_id = entry_dict[0].get('id') %}
+    {% set instance_label_edit =  True %}
+    {% set resource_input_info = child.get('research_objective_simpleDescriptionUnit_input_info') %}
+    {% set node = child.get('node') %}
+    {% set resource_node = child.get('object') %}
+    {% set input_representation = "single_resource.html" %}
+    {% include  "single_resource_input_simpleDescriptionUnit.html" %}
+  {% endif %}
+
+{% endfor %}
+
+{% if not entry_dict[0].get('version') %}
+  {% set component = "research_objective_simpleDescriptionUnit" %}
+  {% set resource_label = "has objective:" %}
+  {% set basicUnit_uri = None %}
+  {% set parent_id = simpleDescriptionUnit_uri %}
+  {% set SIMPLE_DESCRIPTION_UNIT_uri =  None %}
+  {% set parent_type = child.get('node_type') %}
+  {% set entry_id = entry_dict[0].get('id') %}
+  {% set resource_input_info = child.get('research_objective_simpleDescriptionUnit_input_info') %}
+  {% include  "single_resource_input_container.html" %}
+{% endif %}
+
+
+
+
+{% for child in entry_dict %}
+
+  {% if child.get('component') == "research_result_simpleDescriptionUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
+    {% set component = "research_result_simpleDescriptionUnit" %}
+    {% set label = "has research result:" %}
+    {% set statement = "Research has research result:" %}
+    {% set id = child.get('id') %}
+    {% set parent_id = simpleDescriptionUnit_uri %}
+    {% set parent_type = child.get('node_type') %}
+    {% set parent_uri = simpleDescriptionUnit_uri %}
+    {% set parent_uri_label = "simpleDescriptionUnit_uri" %}
+    {% set SIMPLE_DESCRIPTION_UNIT_uri =  child.get('id') %}
+    {% set basicUnit_uri =  None %}
+    {% set entry_id = entry_dict[0].get('id') %}
+    {% set resource_input_info = child.get('research_result_simpleDescriptionUnit_input_info') %}
+    {% set node = child.get('node') %}
+    {% set resource_node = child.get('object') %}
+    {% set instance_label_edit =  True %}
+    {% set input_representation = "single_resource.html" %}
+    {% include  "single_resource_input_simpleDescriptionUnit.html" %}
+  {% endif %}
+
+{% endfor %}
+
+{% if not entry_dict[0].get('version') %}
+  {% set component = "research_result_simpleDescriptionUnit" %}
+  {% set resource_label = "has research result:" %}
+  {% set basicUnit_uri = None %}
+  {% set parent_id = simpleDescriptionUnit_uri %}
+  {% set SIMPLE_DESCRIPTION_UNIT_uri =  None %}
+  {% set parent_type = child.get('node_type') %}
+  {% set entry_id = entry_dict[0].get('id') %}
+  {% set resource_input_info = child.get('research_result_simpleDescriptionUnit_input_info') %}
+  {% include  "single_resource_input_container.html" %}
+{% endif %}
+
+
+
+
+{% include  'history.html'  %}
