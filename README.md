@@ -30,7 +30,7 @@ You can also take a look at the pdf "Vogt_Retreat_2021_extended.pdf" that you ca
 # The general idea
 Knowledge Graph Building Blocks (KGBBs) are knowledge graph processing modules with which knowledge graphs can be managed. Each type of semantic unit that the knowledge graph application must distinguish has its own KGGB that is specified in reference to this semantic unit. The specifications of each KGBB can be used for managing and organizing all data belonging to the corresponding type of semantic unit in a knowledge graph. 
 
-![Fig16](https://user-images.githubusercontent.com/32734975/151023628-fc158759-865e-4e9c-82d2-cc87389b0c98.jpg)
+![Fig19_KGBB_overview](https://user-images.githubusercontent.com/32734975/151023736-e5d60b0f-0945-4ac1-8976-051557d38092.jpg)
 General schema of the overall architecture and workflows of a knowledge graph applications based on KGBBs.
 
 KGBBs together with a KGBB application enginge provide:
