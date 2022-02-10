@@ -72,8 +72,8 @@ class GetPubMeta():
             publisher = pub_meta.get('publisher')
             self.publisher = publisher
 
-            pages = pub_meta.get('page')
-            self.pages = pages
+            simpleDescriptionUnits = pub_meta.get('simpleDescriptionUnit')
+            self.simpleDescriptionUnits = simpleDescriptionUnits
 
             journal = pub_meta.get('publisher')
             try:
@@ -150,107 +150,6 @@ class GetPubMeta():
 
 
 
-# INPUT: entry_uri
-
-# OUTPUT: entry_uri, entry_node, entry_kgbb_uri, entry_object_uri, entry_object_node, entry_dataRep_node, entry_container_dict, entry_input_info_dict, entry_input_nodes_dict, navi_dict, entry_view_tree
-class EntryRepresentation():
-
-    def __init__(self, entry_uri):
-
-        # gather initial information about the entry: [0]:entry_node_uri, [1]:entry_node, [2]:entry_kgbb_uri, [3]:entry_object_uri, [4]:entry_object_node, [5]:entry_Representation_node, [6]:entry_container_dict, [7]: entry_input_info_dict, [8]: input_nodes_dict
-
-        entry_info = getDataItemInfo(entry_uri, "entry")
-
-        self.entry_node = entry_info[1]
-        self.entry_kgbb_uri = entry_info[2]
-        self.entry_object_uri = entry_info[3]
-        self.entry_object_node = entry_info[4]
-        self.entry_dataRep_node = entry_info[5]
-        self.entry_container_dict = entry_info[6]
-        self.entry_input_info_dict = entry_info[7]
-        self.entry_input_nodes_dict = entry_info[8]
-        self.entry_uri = entry_uri
-
-        print("-----------------------------------------------------")
-        print("------------------------- ENTRY NODE ----------------")
-        print(entry_info[1])
-
-        # navi_dict -> a dict of all pages and assertions linked to an entry node via :DISPLAYS relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
-        navi_dict = getNaviDict(entry_uri)
-        print("-----------------------------------------------------")
-        print("------------------------- NAVIGATION DICT -----------")
-        print(navi_dict)
-
-        self.navi_dict = navi_dict
-
-
-        # get all information for representing entry data in UI
-        self.entry_view_tree = getViewTree(entry_uri, "entry", entry_info[6])
-
-
-
-
-
-
-
-
-
-# INPUT: page_uri
-
-# OUTPUT: page_uri, page_node, page_kgbb_uri, page_object_uri, page_object_node, page_dataRep_node, page_container_dict, page_input_info_dict, page_input_nodes_dict, page_view_tree
-class PageRepresentation():
-
-    def __init__(self, page_uri):
-
-        # gather initial information about the page for display in UI
-
-        page_info = getDataItemInfo(page_uri, "page")
-
-        self.page_node = page_info[1]
-        self.kgbb_uri = page_info[2]
-        self.page_object_uri = page_info[3]
-        self.page_object_node = page_info[4]
-        self.page_dataRep_node = page_info[5]
-        self.page_container_dict = page_info[6]
-        self.page_input_info_dict = page_info[7]
-        self.page_input_nodes_dict = page_info[8]
-        self.page_uri = page_uri
-
-
-        # get all information for representing page data in UI
-        self.page_view_tree = getViewTree(page_uri, "page", page_info[6])
-
-
-
-
-
-
-
-# INPUT: assertion_uri
-
-# OUTPUT: assertion_uri, assertion_node, assertion_kgbb_uri, assertion_object_uri, assertion_object_node, assertion_dataRep_node, assertion_container_dict, assertion_input_info_dict, assertion_input_nodes_dict, assertion_view_tree
-class AssertionRepresentation():
-
-    def __init__(self, assertion_uri):
-
-        # gather initial information about the assertion for display in UI
-
-        assertion_info = getDataItemInfo(assertion_uri, "assertion")
-
-        self.assertion_node = assertion_info[1]
-        self.kgbb_uri = assertion_info[2]
-        self.assertion_entry_object_uri = assertion_info[3]
-        self.assertion_object_node = assertion_info[4]
-        self.assertion_dataRep_node = assertion_info[5]
-        self.assertion_container_dict = assertion_info[6]
-        self.assertion_input_info_dict = assertion_info[7]
-        self.assertion_input_nodes_dict = assertion_info[8]
-        self.assertion_uri = assertion_uri
-
-
-        # get all information for representing page data in UI
-        self.assertion_view_tree = getViewTree(assertion_uri, "assertion", assertion_info[6])
-
 
 
 
@@ -287,17 +186,17 @@ def getNode(node_uri):
 
 # INPUT: entry_uri, node_uri
 #
-# OUTPUT: Boolean - true for node_uri == root_page_uri
-def checkRootPage(entry_uri, node_uri):
+# OUTPUT: Boolean - true for node_uri == root_simpleDescriptionUnit_uri
+def checkRootSimpleDescriptionUnit(entry_uri, node_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    get_node_query_string = '''MATCH (n {{entry_URI:"{entry_uri}", root_page:"true"}})
+    get_node_query_string = '''MATCH (n {{entry_URI:"{entry_uri}", root_simpleDescriptionUnit:"true"}})
     RETURN n.URI'''.format(entry_uri=entry_uri)
     node_query = connection.query(get_node_query_string, db='neo4j')
 
-    root_page_uri = node_query[0].get("n.URI")
+    root_simpleDescriptionUnit_uri = node_query[0].get("n.URI")
 
-    if root_page_uri == node_uri:
+    if root_simpleDescriptionUnit_uri == node_uri:
         result = True
     else:
         result = False
@@ -468,30 +367,30 @@ def addContainerAndInputInfoDictToReprNode(data_item_kgbb_uri, data_item_type, d
 
 # INPUT: entry_uri + data_view_name (e.g. "orkg")
 #
-# OUTPUT: root_page_uri, root_page_cont_dict
-def getContDictForRootPage(entry_uri, data_view_name):
+# OUTPUT: root_simpleDescriptionUnit_uri, root_simpleDescriptionUnit_cont_dict
+def getContDictForRootSimpleDescriptionUnit(entry_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    get_ContDict_for_RootPage_query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:DISPLAYS]->(page {{root_page:"true"}})
-    MATCH (entry_rep:RepresentationKGBBElement_IND {{KGBB_URI:page.KGBB_URI, data_view_name:"{data_view_name}"}})
-    MATCH (page)-[:DISPLAYS*]->(ass {{current_version="true"}})
+    get_ContDict_for_RootSimpleDescriptionUnit_query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(simpleDescriptionUnit {{root_simpleDescriptionUnit:"true"}})
+    MATCH (entry_rep:RepresentationKGBBElement_IND {{KGBB_URI:simpleDescriptionUnit.KGBB_URI, data_view_name:"{data_view_name}"}})
+    MATCH (simpleDescriptionUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]->(ass {{current_version="true"}})
     MATCH (ass_rep:RepresentationKGBBElement_IND {{KGBB_URI:ass.KGBB_URI, data_view_name:"{data_view_name}"}})
-    RETURN DISTINCT page.URI as root_page_uri, entry_rep.container_nodes_dict as root_page_container_dict, ass.URI as ass_uri, ass_rep.container_nodes_dict as ass_container_dict'''.format(entry_uri=entry_uri, data_view_name=data_view_name)
+    RETURN DISTINCT simpleDescriptionUnit.URI as root_simpleDescriptionUnit_uri, entry_rep.container_nodes_dict as root_simpleDescriptionUnit_container_dict, ass.URI as ass_uri, ass_rep.container_nodes_dict as ass_container_dict'''.format(entry_uri=entry_uri, data_view_name=data_view_name)
 
-    query_result = connection.query(get_ContDict_for_RootPage_query_string, db='neo4j')
-    root_page_uri = query_result[0].get('root_page_uri')
+    query_result = connection.query(get_ContDict_for_RootSimpleDescriptionUnit_query_string, db='neo4j')
+    root_simpleDescriptionUnit_uri = query_result[0].get('root_simpleDescriptionUnit_uri')
     print("---------------------------------------------------------------------")
-    print("------------------- ROOT PAGE URI -----------------------------------")
-    print(root_page_uri)
+    print("------------------- ROOT SIMPLE_DESCRIPTION_UNIT URI -----------------------------------")
+    print(root_simpleDescriptionUnit_uri)
 
-    root_page_cont_dict = query_result[0].get('root_page_container_dict')
-    root_page_cont_dict = ast.literal_eval(root_page_cont_dict)
+    root_simpleDescriptionUnit_cont_dict = query_result[0].get('root_simpleDescriptionUnit_container_dict')
+    root_simpleDescriptionUnit_cont_dict = ast.literal_eval(root_simpleDescriptionUnit_cont_dict)
     print("---------------------------------------------------------------------")
-    print("------------------- ROOT PAGE CONTAINER DICT ------------------------")
-    print(root_page_cont_dict)
-    print(type(root_page_cont_dict))
+    print("------------------- ROOT SIMPLE_DESCRIPTION_UNIT CONTAINER DICT ------------------------")
+    print(root_simpleDescriptionUnit_cont_dict)
+    print(type(root_simpleDescriptionUnit_cont_dict))
 
-    return root_page_uri, root_page_cont_dict
+    return root_simpleDescriptionUnit_uri, root_simpleDescriptionUnit_cont_dict
 
 
 
@@ -505,15 +404,15 @@ def getContDictForRootPage(entry_uri, data_view_name):
 
 # INPUT: data_item_uri + data_view_name (e.g. "orkg")
 #
-# OUTPUT: page_cont_dict
+# OUTPUT: simpleDescriptionUnit_cont_dict
 def getContDictForDataItem(data_item_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    get_ContDict_and_InputInfoDict_for_Page_query_string = '''MATCH (data_item {{URI:"{data_item_uri}"}})
+    get_ContDict_and_InputInfoDict_for_SimpleDescriptionUnit_query_string = '''MATCH (data_item {{URI:"{data_item_uri}"}})
     MATCH (data_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:data_item.KGBB_URI, data_view_name:"{data_view_name}"}})
     RETURN DISTINCT data_item_rep.container_nodes_dict as data_item_container_dict'''.format(data_item_uri=data_item_uri, data_view_name=data_view_name)
 
-    query_result = connection.query(get_ContDict_and_InputInfoDict_for_Page_query_string, db='neo4j')
+    query_result = connection.query(get_ContDict_and_InputInfoDict_for_SimpleDescriptionUnit_query_string, db='neo4j')
     data_item_uri_cont_dict = query_result[0].get('data_item_container_dict')
     data_item_uri_cont_dict = ast.literal_eval(data_item_uri_cont_dict)
     return data_item_uri_cont_dict
@@ -638,10 +537,6 @@ def addEntry(entry_kgbb_uri, publication_DOI):
     # query that creates the new entry
     connection.query(add_scholarly_publication_entry_query_string, db='neo4j')
 
-
-    # check for required pages
-    addRequiredPages(entry_kgbb_uri, entry_uri)
-
     print("--------------------------------------------------------------------")
     print("---------------------------ADD ENTRY RETURNS ENTRY URI--------------")
     print(entry_uri)
@@ -651,57 +546,60 @@ def addEntry(entry_kgbb_uri, publication_DOI):
 
 
 
-# add a new page to a specific parent_data_item using a specific Page KGBB
-def addTemplatePage(page_kgbb_uri, entry_uri):
+# add a new simpleDescriptionUnit to a specific parent_data_item using a specific SimpleDescriptionUnit KGBB
+def addTemplateSimpleDescriptionUnit(simpleDescriptionUnit_kgbb_uri, entry_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # cypher query to get the storage_model_cypher_code for the kgbb in question
-    search_add_page_query_string = '''MATCH (n {{URI:"{page_kgbb_uri}"}}) RETURN n.storage_model_cypher_code'''.format(page_kgbb_uri=page_kgbb_uri)
+    search_add_simpleDescriptionUnit_query_string = '''MATCH (n {{URI:"{simpleDescriptionUnit_kgbb_uri}"}}) RETURN n.storage_model_cypher_code'''.format(simpleDescriptionUnit_kgbb_uri=simpleDescriptionUnit_kgbb_uri)
 
     # query result
-    result = connection.query(search_add_page_query_string, db='neo4j')
+    result = connection.query(search_add_simpleDescriptionUnit_query_string, db='neo4j')
 
-    # specify uuid for page_uri
-    page_uri = str(uuid.uuid4())
+    # specify uuid for simpleDescriptionUnit_uri
+    simpleDescriptionUnit_uri = str(uuid.uuid4())
 
     # update some query parameters for the result
-    add_page_query_string = result[0].get("n.storage_model_cypher_code")
+    add_simpleDescriptionUnit_query_string = result[0].get("n.storage_model_cypher_code")
 
     print("------------------------------------------------------------------------")
-    print("----------------------------INITIAL PAGE QUERY STRING-------------------")
-    print(add_page_query_string)
+    print("----------------------------INITIAL SIMPLE_DESCRIPTION_UNIT QUERY STRING-------------------")
+    print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("entry_URIX", entry_uri)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("entry_URIX", entry_uri)
 
-    add_page_query_string = add_page_query_string.replace("page_URIX", page_uri)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("simpleDescriptionUnit_URIX", simpleDescriptionUnit_uri)
 
     print("------------------------------------------------------------------------")
-    print("--------------------------------ADD PAGE QUERY STRING-------------------")
-    print(add_page_query_string)
+    print("--------------------------------ADD SIMPLE_DESCRIPTION_UNIT QUERY STRING-------------------")
+    print(add_simpleDescriptionUnit_query_string)
 
     new_uris = True
     i = 1
     while  new_uris:
-        if "new_individual_uri{}".format(str(i)) in add_page_query_string:
-            add_page_query_string = add_page_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
+        if "new_individual_uri{}".format(str(i)) in add_simpleDescriptionUnit_query_string:
+            add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
             i += 1
         else:
             new_uris = False
 
 
     # query that creates the new entry
-    connection.query(add_page_query_string, db='neo4j')
+    connection.query(add_simpleDescriptionUnit_query_string, db='neo4j')
 
 
 
-    # check for required assertions
-    addRequiredAssertions(page_kgbb_uri, page_uri, "page", entry_uri, page_uri)
+    # check for required basicUnits
+    addRequiredBasicUnits(simpleDescriptionUnit_kgbb_uri, simpleDescriptionUnit_uri, "simpleDescriptionUnit", entry_uri, simpleDescriptionUnit_uri)
+
+    # check for required simpleDescriptionUnits
+    addRequiredSimpleDescriptionUnits(simpleDescriptionUnit_kgbb_uri, entry_uri)
 
 
     print("--------------------------------------------------------------------")
-    print("---------------------------ADD PAGE RETURNS PAGE URI----------------")
-    print(page_uri)
-    return page_uri
+    print("---------------------------ADD SIMPLE_DESCRIPTION_UNIT RETURNS SIMPLE_DESCRIPTION_UNIT URI----------------")
+    print(simpleDescriptionUnit_uri)
+    return simpleDescriptionUnit_uri
 
 
 
@@ -710,75 +608,75 @@ def addTemplatePage(page_kgbb_uri, entry_uri):
 
 
 
-# add a new assertion to a specific data item (entry, page, assertion) using a specific Assertion KGBB
+# add a new basicUnit to a specific data item (entry, simpleDescriptionUnit, basicUnit) using a specific BasicUnit KGBB
 
-# INPUT: parent_data_item_uri (the uri for data item that displays the assertion - entry, page, assertion), assertion_kgbb_uri (uri for the relevant assertion KGBB), entry_uri (uri of the entry to which the assertion belongs), page_uri (uri of the page to which the assertion belongs - can be None)
+# INPUT: parent_data_item_uri (the uri for data item that contains the basicUnit - entry, simpleDescriptionUnit, basicUnit), basicUnit_kgbb_uri (uri for the relevant basicUnit KGBB), entry_uri (uri of the entry to which the basicUnit belongs), simpleDescriptionUnit_uri (uri of the simpleDescriptionUnit to which the basicUnit belongs - can be None)
 
-# OUTPUT: assertion graph will be created
-def addTemplateAssertion(parent_data_item_uri, assertion_kgbb_uri, entry_uri, page_uri):
+# OUTPUT: basicUnit graph will be created
+def addTemplateBasicUnit(parent_data_item_uri, basicUnit_kgbb_uri, entry_uri, simpleDescriptionUnit_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # cypher query to get the storage_model_cypher_code for the kgbb in question
-    add_assertion_query_string = '''MATCH (n {{URI:"{assertion_kgbb_uri}"}}) RETURN n.storage_model_cypher_code'''.format(assertion_kgbb_uri=assertion_kgbb_uri)
+    add_basicUnit_query_string = '''MATCH (n {{URI:"{basicUnit_kgbb_uri}"}}) RETURN n.storage_model_cypher_code'''.format(basicUnit_kgbb_uri=basicUnit_kgbb_uri)
 
     # query result
-    result = connection.query(add_assertion_query_string, db='neo4j')
+    result = connection.query(add_basicUnit_query_string, db='neo4j')
     print("---------------------------------------------------------------------------------")
     print("----------------------------INITIAL CYPHER CODE STORAGE QUERY -------------------")
     print(result)
 
 
-    # specify uuid for assertion_uri
-    assertion_uri = str(uuid.uuid4())
+    # specify uuid for basicUnit_uri
+    basicUnit_uri = str(uuid.uuid4())
 
     # update some query parameters for the result
-    add_assertion_query_string = result[0].get("n.storage_model_cypher_code")
+    add_basicUnit_query_string = result[0].get("n.storage_model_cypher_code")
 
     print("---------------------------------------------------------------------------------")
-    print("--------------------------------INITIAL ASSERTION QUERY STRING-------------------")
-    print(add_assertion_query_string)
+    print("--------------------------------INITIAL BASIC_UNIT QUERY STRING-------------------")
+    print(add_basicUnit_query_string)
 
-    add_assertion_query_string = add_assertion_query_string.replace("entry_URIX", entry_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("entry_URIX", entry_uri)
     print("---------------------------------------------------------------------------------")
     print("-------------------------------------- REPLACED entry_URIX ----------------------")
-    print(add_assertion_query_string)
+    print(add_basicUnit_query_string)
 
-    add_assertion_query_string = add_assertion_query_string.replace("page_URIX", page_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("simpleDescriptionUnit_URIX", simpleDescriptionUnit_uri)
     print("---------------------------------------------------------------------------------")
-    print("-------------------------------------- REPLACED page_URIX -----------------------")
-    print(add_assertion_query_string)
+    print("-------------------------------------- REPLACED simpleDescriptionUnit_URIX -----------------------")
+    print(add_basicUnit_query_string)
 
-    add_assertion_query_string = add_assertion_query_string.replace("assertion_URIX", assertion_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("basicUnit_URIX", basicUnit_uri)
 
     print("---------------------------------------------------------------------------------")
-    print("-------------------------------- REPLACED assertion_URIX ------------------------")
-    print(add_assertion_query_string)
+    print("-------------------------------- REPLACED basicUnit_URIX ------------------------")
+    print(add_basicUnit_query_string)
 
 
-    add_assertion_query_string = add_assertion_query_string.replace("parent_data_item_uri", parent_data_item_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("parent_data_item_uri", parent_data_item_uri)
     print("--------------------------------------------------------------------------------")
     print("------------------------------------ FINAL QUERY STRING ------------------------")
-    print(add_assertion_query_string)
+    print(add_basicUnit_query_string)
 
 
     new_uris = True
     i = 1
     while  new_uris:
-        if "new_individual_uri{}".format(str(i)) in add_assertion_query_string:
-            add_assertion_query_string = add_assertion_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
+        if "new_individual_uri{}".format(str(i)) in add_basicUnit_query_string:
+            add_basicUnit_query_string = add_basicUnit_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
             i += 1
         else:
             new_uris = False
 
 
     # query that creates the new entry
-    connection.query(add_assertion_query_string, db='neo4j')
+    connection.query(add_basicUnit_query_string, db='neo4j')
 
 
     print("----------------------------------------------------------------------------")
-    print("---------------------------ADD ASSERTION RETURNS ASSERTION URI--------------")
-    print(assertion_uri)
-    return assertion_uri
+    print("---------------------------ADD BASIC_UNIT RETURNS BASIC_UNIT URI--------------")
+    print(basicUnit_uri)
+    return basicUnit_uri
 
 
 
@@ -787,24 +685,34 @@ def addTemplateAssertion(parent_data_item_uri, assertion_kgbb_uri, entry_uri, pa
 
 
 
-# sets the key "current_version" for the assertion node and all its data input nodes to "false"
-def deleteAssertion(assertion_uri, creator):
+# sets the key "current_version" for the basicUnit node and all its data input nodes to "false"
+def deleteBasicUnit(basicUnit_uri, creator):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    # cypher query to get the assertion node, all its input nodes and set them to current_version:"false"
-    delete_assertion_query_string = '''MATCH (n)-[:DISPLAYS]->(assertion {{URI:"{assertion_uri}"}}) SET n.last_updated_on=localdatetime(), assertion.current_version="false", assertion.last_updated_on=localdatetime()
-    WITH n, assertion OPTIONAL MATCH (n)-[:DISPLAYS]->(assertion {{URI:"{assertion_uri}"}}) WHERE NOT ("{creator}" IN n.contributed_by) SET n.contributed_by=n.contributed_by + "{creator}"
-    WITH assertion OPTIONAL MATCH (m {{assertion_URI:"{assertion_uri}", current_version:"true"}})
+    # cypher query to get the basicUnit node, all its input nodes and set them to current_version:"false"
+    delete_basicUnit_query_string = '''MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(basicUnit {{URI:"{basicUnit_uri}"}}) SET n.last_updated_on=localdatetime(), basicUnit.current_version="false", basicUnit.last_updated_on=localdatetime()
+    WITH n, basicUnit
+    FOREACH (i IN CASE WHEN NOT "{creator}" IN n.contributed_by THEN [1] ELSE [] END |
+    SET n.contributed_by = n.contributed_by + "{creator}"
+    )
+    WITH basicUnit OPTIONAL MATCH (m {{basicUnit_URI:"{basicUnit_uri}", current_version:"true"}})
     SET m.current_version="false", m.last_updated_on = localdatetime()
-    WITH assertion MATCH (entry_node {{URI:assertion.entry_URI}}) SET entry_node.last_updated_on=localdatetime()
-    WITH assertion, entry_node OPTIONAL MATCH (entry_node {{URI:assertion.entry_URI}}) WHERE NOT ("{creator}" IN entry_node.contributed_by) SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
-    WITH assertion OPTIONAL MATCH (assertion)-[:DISPLAYS*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
-    WITH assertion, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.page_URI) OR (o.page_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
-    WITH assertion MATCH (parent_data_item_node {{URI:assertion.page_URI}}) SET parent_data_item_node.last_updated_on = localdatetime()
-    WITH assertion OPTIONAL MATCH (parent_data_item_node {{URI:assertion.page_URI}}) WHERE NOT ("{creator}" IN parent_data_item_node.contributed_by) SET parent_data_item_node.contributed_by = parent_data_item_node.contributed_by + "{creator}"'''.format(assertion_uri=assertion_uri, creator=creator)
+    WITH basicUnit MATCH (entry_node {{URI:basicUnit.entry_URI}}) SET entry_node.last_updated_on=localdatetime()
+    WITH basicUnit, entry_node
+    FOREACH (i IN CASE WHEN NOT "{creator}" IN entry_node.contributed_by THEN [1] ELSE [] END |
+    SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
+    )
+    WITH basicUnit OPTIONAL MATCH (basicUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT|DESCRIBED_BY*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
+    WITH basicUnit, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.simpleDescriptionUnit_URI) OR (o.simpleDescriptionUnit_URI=child.URI) OR (child.URI IN o.basicUnit_URI) OR (o.basicUnit_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
+    WITH basicUnit MATCH (parent_data_item_node {{URI:basicUnit.simpleDescriptionUnit_URI}}) SET parent_data_item_node.last_updated_on = localdatetime()
+    WITH basicUnit, parent_data_item_node
+    FOREACH (i IN CASE WHEN NOT "{creator}" IN parent_data_item_node.contributed_by THEN [1] ELSE [] END |
+    SET parent_data_item_node.contributed_by = parent_data_item_node.contributed_by + "{creator}"
+    )
+    '''.format(basicUnit_uri=basicUnit_uri, creator=creator)
 
     # execute query
-    connection.query(delete_assertion_query_string, db='neo4j')
+    connection.query(delete_basicUnit_query_string, db='neo4j')
     return
 
 
@@ -812,21 +720,29 @@ def deleteAssertion(assertion_uri, creator):
 
 
 
-# sets the key "current_version" for the page node and all data items that it displays together with all of its and their data input nodes to "false"
-def deletePage(page_uri, creator):
+# sets the key "current_version" for the simpleDescriptionUnit node and all data items that it contains together with all of its and their data input nodes to "false"
+def deleteSimpleDescriptionUnit(simpleDescriptionUnit_uri, creator):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    # cypher query to get the page node, all its input nodes and all data that it displays and set them to current_version:"false"
-    delete_page_query_string = '''MATCH (n)-[:DISPLAYS]->(page {{URI:"{page_uri}"}}) SET n.last_updated_on=localdatetime(), page.current_version="false", page.last_updated_on=localdatetime()
-    WITH n, page OPTIONAL MATCH (n)-[:DISPLAYS]->(page {{URI:"{page_uri}"}}) WHERE NOT ("{creator}" IN n.contributed_by) SET n.contributed_by=n.contributed_by + "{creator}"
-    WITH page OPTIONAL MATCH (m {{current_version:"true"}}) WHERE ("{page_uri}" IN m.page_URI) SET m.current_version="false", m.last_updated_on=localdatetime()
-    WITH page MATCH (entry_node {{URI:page.entry_URI}}) SET entry_node.last_updated_on=localdatetime()
-    WITH page, entry_node OPTIONAL MATCH (entry_node {{URI:page.entry_URI}}) WHERE NOT ("{creator}" IN entry_node.contributed_by) SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
-    WITH page OPTIONAL MATCH (page)-[:DISPLAYS*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
-    WITH page, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.page_URI) OR (o.page_URI=child.URI) OR (child.URI IN o.assertion_URI) OR (o.assertion_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()'''.format(page_uri=page_uri, creator=creator)
+    # cypher query to get the simpleDescriptionUnit node, all its input nodes and all data that it contains and set them to current_version:"false"
+    delete_simpleDescriptionUnit_query_string = '''MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(simpleDescriptionUnit {{URI:"{simpleDescriptionUnit_uri}"}}) SET n.last_updated_on=localdatetime(), simpleDescriptionUnit.current_version="false", simpleDescriptionUnit.last_updated_on=localdatetime()
+    WITH n, simpleDescriptionUnit
+    FOREACH (i IN CASE WHEN NOT "{creator}" IN n.contributed_by THEN [1] ELSE [] END |
+    SET n.contributed_by = n.contributed_by + "{creator}"
+    )
+    WITH simpleDescriptionUnit OPTIONAL MATCH (m {{current_version:"true"}}) WHERE ("{simpleDescriptionUnit_uri}" IN m.simpleDescriptionUnit_URI) SET m.current_version="false", m.last_updated_on=localdatetime()
+    WITH simpleDescriptionUnit MATCH (entry_node {{URI:simpleDescriptionUnit.entry_URI}}) SET entry_node.last_updated_on=localdatetime()
+    WITH simpleDescriptionUnit, entry_node
+    FOREACH (i IN CASE WHEN NOT "{creator}" IN entry_node.contributed_by THEN [1] ELSE [] END |
+    SET entry_node.contributed_by = entry_node.contributed_by + "{creator}"
+    )
+    WITH simpleDescriptionUnit OPTIONAL MATCH (simpleDescriptionUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]->(child {{current_version:"true"}}) SET child.current_version="false", child.last_updated_on=localdatetime()
+    WITH simpleDescriptionUnit, child OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child.URI IN o.simpleDescriptionUnit_URI) OR (o.simpleDescriptionUnit_URI=child.URI) OR (child.URI IN o.basicUnit_URI) OR (o.basicUnit_URI = child.URI) SET o.current_version="false", o.last_updated_on=localdatetime()
+    WITH simpleDescriptionUnit OPTIONAL MATCH (child2 {{current_version:"true"}})-[:OBJECT_DESCRIBED_BY_SEMANTIC_UNIT]->(simpleDescriptionUnit) SET child2.current_version="false", child2.last_updated_on=localdatetime()
+    WITH simpleDescriptionUnit, child2 OPTIONAL MATCH (o {{current_version:"true"}}) WHERE (child2.URI IN o.simpleDescriptionUnit_URI) OR (o.simpleDescriptionUnit_URI=child2.URI) OR (child2.URI IN o.basicUnit_URI) OR (o.basicUnit_URI = child2.URI) SET o.current_version="false", o.last_updated_on=localdatetime()'''.format(simpleDescriptionUnit_uri=simpleDescriptionUnit_uri, creator=creator)
 
     # execute query
-    connection.query(delete_page_query_string, db='neo4j')
+    connection.query(delete_simpleDescriptionUnit_query_string, db='neo4j')
     return
 
 
@@ -836,15 +752,15 @@ def deletePage(page_uri, creator):
 
 
 
-# add a single resource to a specific data item (entry, page, assertion) using a specific KGBB
-# INPUT: parent_data_item_uri (the uri for data item that displays the resource - entry, page, assertion), kgbb_uri (uri for the relevant KGBB), entry_uri (uri of the entry to which the resource belongs), page_uri (uri of the page to which the resource belongs - can be None), assertion_uri (uri of the assertion to which the resource belongs - can be None), input_result (specifies what will happen with adding the single resource - either "edit", "added_assertion", or "added_page"), query_key (the key under which the query can be found), input_value input_value1 input_value2 (user input in form of a string or number - can be None),
+# add a single resource to a specific data item (entry, simpleDescriptionUnit, basicUnit) using a specific KGBB
+# INPUT: parent_data_item_uri (the uri for data item that contains the resource - entry, simpleDescriptionUnit, basicUnit), kgbb_uri (uri for the relevant KGBB), entry_uri (uri of the entry to which the resource belongs), simpleDescriptionUnit_uri (uri of the simpleDescriptionUnit to which the resource belongs - can be None), basicUnit_uri (uri of the basicUnit to which the resource belongs - can be None), input_result (specifies what will happen with adding the single resource - either "edit", "added_basicUnit", or "added_simpleDescriptionUnit"), query_key (the key under which the query can be found), input_value input_value1 input_value2 (user input in form of a string or number - can be None),
 # OUTPUT: redirect to the appropriate function and returns their return
-def addResource(parent_data_item_uri, kgbb_uri, entry_uri, page_uri, assertion_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2):
-    if input_result == "added_assertion" or input_result == "edited_assertion":
-        result = addAssertion(parent_data_item_uri, kgbb_uri, entry_uri, page_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2, assertion_uri)
+def addResource(parent_data_item_uri, kgbb_uri, entry_uri, simpleDescriptionUnit_uri, basicUnit_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2):
+    if input_result == "added_basicUnit" or input_result == "edited_basicUnit":
+        result = addBasicUnit(parent_data_item_uri, kgbb_uri, entry_uri, simpleDescriptionUnit_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2, basicUnit_uri)
 
-    elif input_result == "added_page" or input_result == "edited_page":
-        result = addPage(parent_data_item_uri, kgbb_uri, entry_uri, page_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2)
+    elif input_result == "added_simpleDescriptionUnit" or input_result == "edited_simpleDescriptionUnit":
+        result = addSimpleDescriptionUnit(parent_data_item_uri, kgbb_uri, entry_uri, simpleDescriptionUnit_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2)
 
     return result
 
@@ -854,106 +770,106 @@ def addResource(parent_data_item_uri, kgbb_uri, entry_uri, page_uri, assertion_u
 
 
 
-# add a new page to a specific data item (entry, page, assertion) using a specific Page KGBB
-# INPUT: parent_data_item_uri (the uri for data item that displays the assertion - entry, page, assertion), page_kgbb_uri (uri for the relevant page KGBB), entry_uri (uri of the entry to which the page belongs), page_uri (uri of the page to which the page belongs - can be None), input_result = "added_page", query_key (the key under which the query can be found), input_value input_value1 input_value2 (user input in form of a string or number - can be None)
-# OUTPUT: page graph will be created and page_uri + parent_data_item_uri returned + input_result = "added_page" returned
-def addPage(parent_data_item_uri, page_kgbb_uri, entry_uri, page_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2):
+# add a new simpleDescriptionUnit to a specific data item (entry, simpleDescriptionUnit, basicUnit) using a specific SimpleDescriptionUnit KGBB
+# INPUT: parent_data_item_uri (the uri for data item that contains the basicUnit - entry, simpleDescriptionUnit, basicUnit), simpleDescriptionUnit_kgbb_uri (uri for the relevant simpleDescriptionUnit KGBB), entry_uri (uri of the entry to which the simpleDescriptionUnit belongs), simpleDescriptionUnit_uri (uri of the simpleDescriptionUnit to which the simpleDescriptionUnit belongs - can be None), input_result = "added_simpleDescriptionUnit", query_key (the key under which the query can be found), input_value input_value1 input_value2 (user input in form of a string or number - can be None)
+# OUTPUT: simpleDescriptionUnit graph will be created and simpleDescriptionUnit_uri + parent_data_item_uri returned + input_result = "added_simpleDescriptionUnit" returned
+def addSimpleDescriptionUnit(parent_data_item_uri, simpleDescriptionUnit_kgbb_uri, entry_uri, simpleDescriptionUnit_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # cypher query to get the user_input_cypher_code for the kgbb in question
-    add_page_query_string = '''MATCH (n {{URI:"{page_kgbb_uri}"}}) RETURN n.{query_key}'''.format(page_kgbb_uri=page_kgbb_uri, query_key=query_key)
+    add_simpleDescriptionUnit_query_string = '''MATCH (n {{URI:"{simpleDescriptionUnit_kgbb_uri}"}}) RETURN n.{query_key}'''.format(simpleDescriptionUnit_kgbb_uri=simpleDescriptionUnit_kgbb_uri, query_key=query_key)
 
     # query result
-    result = connection.query(add_page_query_string, db='neo4j')
+    result = connection.query(add_simpleDescriptionUnit_query_string, db='neo4j')
     print("---------------------------------------------------------------------------------")
     print("----------------------------INITIAL CYPHER CODE STORAGE QUERY -------------------")
     print(result)
 
-    # check, whether page_uri is None
-    if page_uri == "None":
-        # specify uuid for page_uri
-        page_uri = str(uuid.uuid4())
+    # check, whether simpleDescriptionUnit_uri is None
+    if simpleDescriptionUnit_uri == "None":
+        # specify uuid for simpleDescriptionUnit_uri
+        simpleDescriptionUnit_uri = str(uuid.uuid4())
 
 
     # update some query parameters for the result
-    add_page_query_string = result[0].get("n." + query_key)
+    add_simpleDescriptionUnit_query_string = result[0].get("n." + query_key)
     print("---------------------------------------------------------------------------------")
-    print("-------------------------------- INITIAL PAGE QUERY STRING ----------------------")
-    print(add_page_query_string)
+    print("-------------------------------- INITIAL SIMPLE_DESCRIPTION_UNIT QUERY STRING ----------------------")
+    print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("entry_URIX", entry_uri)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("entry_URIX", entry_uri)
     print("---------------------------------------------------------------------------------")
     print("-------------------------------------- REPLACED entry_URIX ----------------------")
-    print(add_page_query_string)
+    print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("page_URIX", page_uri)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("simpleDescriptionUnit_URIX", simpleDescriptionUnit_uri)
     print("---------------------------------------------------------------------------------")
-    print("-------------------------------------- REPLACED page_URIX -----------------------")
-    print(add_page_query_string)
+    print("-------------------------------------- REPLACED simpleDescriptionUnit_URIX -----------------------")
+    print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("$_input_description_$", input_description)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("$_input_description_$", input_description)
     print("---------------------------------------------------------------------------------")
     print("-------------------------------- REPLACED DESCRIPTION ---------------------------")
-    print(add_page_query_string)
+    print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("$_input_type_$", input_type)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("$_input_type_$", input_type)
     print("---------------------------------------------------------------------------------")
     print("-------------------------------- REPLACED TYPE ----------------------------------")
-    print(add_page_query_string)
+    print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("$_input_name_$", input_name)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("$_input_name_$", input_name)
     print("---------------------------------------------------------------------------------")
     print("-------------------------------- REPLACED NAME ----------------------------------")
-    print(add_page_query_string)
+    print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("$_ontology_ID_$", ontology_id)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("$_ontology_ID_$", ontology_id)
     print("---------------------------------------------------------------------------------")
     print("-------------------------------- REPLACED ONTOLOGY ID ---------------------------")
-    print(add_page_query_string)
+    print(add_simpleDescriptionUnit_query_string)
 
     if input_value != None:
-        add_page_query_string = add_page_query_string.replace("$_input_value_$", input_value)
+        add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("$_input_value_$", input_value)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED INPUT VALUE ---------------------------")
-        print(add_page_query_string)
+        print(add_simpleDescriptionUnit_query_string)
 
     if input_value1 != None:
-        add_page_query_string = add_page_query_string.replace("$_input_value1_$", input_value)
+        add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("$_input_value1_$", input_value)
         print("---------------------------------------------------------------------------------")
         print("------------------------------- REPLACED INPUT1 VALUE ---------------------------")
-        print(add_page_query_string)
+        print(add_simpleDescriptionUnit_query_string)
 
     if input_value2 != None:
-        add_page_query_string = add_page_query_string.replace("$_input_value2_$", input_value)
+        add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("$_input_value2_$", input_value)
         print("---------------------------------------------------------------------------------")
         print("------------------------------- REPLACED INPUT2 VALUE ---------------------------")
-        print(add_page_query_string)
+        print(add_simpleDescriptionUnit_query_string)
 
-    add_page_query_string = add_page_query_string.replace("parent_data_item_uri", parent_data_item_uri)
+    add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("parent_data_item_uri", parent_data_item_uri)
     print("--------------------------------------------------------------------------------")
     print("------------------------------------ FINAL QUERY STRING ------------------------")
-    print(add_page_query_string)
+    print(add_simpleDescriptionUnit_query_string)
 
 
     new_uris = True
     i = 1
     while  new_uris:
-        if "new_individual_uri{}".format(str(i)) in add_page_query_string:
-            add_page_query_string = add_page_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
+        if "new_individual_uri{}".format(str(i)) in add_simpleDescriptionUnit_query_string:
+            add_simpleDescriptionUnit_query_string = add_simpleDescriptionUnit_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
             i += 1
         else:
             new_uris = False
 
 
     # query that creates the new entry
-    connection.query(add_page_query_string, db='neo4j')
+    connection.query(add_simpleDescriptionUnit_query_string, db='neo4j')
 
-    result = "new_page"
+    result = "new_simpleDescriptionUnit"
 
     print("----------------------------------------------------------------------------")
-    print("--------------------------- ADD PAGE RETURNS PAGE URI ----------------------")
-    print(page_uri)
-    return page_uri, parent_data_item_uri, input_result
+    print("--------------------------- ADD SIMPLE_DESCRIPTION_UNIT RETURNS SIMPLE_DESCRIPTION_UNIT URI ----------------------")
+    print(simpleDescriptionUnit_uri)
+    return simpleDescriptionUnit_uri, parent_data_item_uri, input_result
 
 
 
@@ -971,115 +887,206 @@ def addPage(parent_data_item_uri, page_kgbb_uri, entry_uri, page_uri, input_desc
 
 
 
-# add a new assertion to a specific data item (entry, page, assertion) using a specific Assertion KGBB
-# INPUT: parent_data_item_uri (the uri for data item that displays the assertion - entry, page, assertion), assertion_kgbb_uri (uri for the relevant assertion KGBB), entry_uri (uri of the entry to which the assertion belongs), page_uri (uri of the page to which the assertion belongs - can be None), input_result = "added_assertion", query_key (the key under which the query can be found), input_value input_value1 input_value2 (user input in form of a string or number - can be None), assertion_uri (if the parent is an assertion - can be None)
-# OUTPUT: assertion graph will be created and assertion_uri + parent_data_item_uri + input_result = "added_assertion" returned
-def addAssertion(parent_data_item_uri, assertion_kgbb_uri, entry_uri, page_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2, assertion_uri):
+# add a new basicUnit to a specific data item (entry, simpleDescriptionUnit, basicUnit) using a specific BasicUnit KGBB
+# INPUT: parent_data_item_uri (the uri for data item that contains the basicUnit - entry, simpleDescriptionUnit, basicUnit), basicUnit_kgbb_uri (uri for the relevant basicUnit KGBB), entry_uri (uri of the entry to which the basicUnit belongs), simpleDescriptionUnit_uri (uri of the simpleDescriptionUnit to which the basicUnit belongs - can be None), input_result = "added_basicUnit", query_key (the key under which the query can be found), input_value input_value1 input_value2 (user input in form of a string or number - can be None), basicUnit_uri (if the parent is an basicUnit - can be None)
+# OUTPUT: basicUnit graph will be created and basicUnit_uri + parent_data_item_uri + input_result = "added_basicUnit" returned
+def addBasicUnit(parent_data_item_uri, basicUnit_kgbb_uri, entry_uri, simpleDescriptionUnit_uri, input_description, input_type, input_name, ontology_id, input_result, query_key, input_value, input_value1, input_value2, basicUnit_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # cypher query to get the user_input_cypher_code for the kgbb in question
-    add_assertion_query_string = '''MATCH (n {{URI:"{assertion_kgbb_uri}"}}) RETURN n.{query_key}'''.format(assertion_kgbb_uri=assertion_kgbb_uri, query_key=query_key)
+    add_basicUnit_query_string = '''MATCH (n {{URI:"{basicUnit_kgbb_uri}"}}) RETURN n.{query_key}'''.format(basicUnit_kgbb_uri=basicUnit_kgbb_uri, query_key=query_key)
 
     # query result
-    result = connection.query(add_assertion_query_string, db='neo4j')
+    result = connection.query(add_basicUnit_query_string, db='neo4j')
     print("---------------------------------------------------------------------------------")
     print("----------------------------INITIAL CYPHER CODE STORAGE QUERY -------------------")
     print(result)
 
-    # check, whether assertion_uri is None
-    if assertion_uri == "None":
-        # specify uuid for assertion_uri
-        assertion_uri = str(uuid.uuid4())
+    # check, whether basicUnit_uri is None
+    if basicUnit_uri == "None":
+        # specify uuid for basicUnit_uri
+        basicUnit_uri = str(uuid.uuid4())
 
     # update some query parameters for the result
-    add_assertion_query_string = result[0].get("n." + query_key)
+    add_basicUnit_query_string = result[0].get("n." + query_key)
     print("---------------------------------------------------------------------------------")
-    print("--------------------------------INITIAL ASSERTION QUERY STRING-------------------")
-    print(add_assertion_query_string)
+    print("--------------------------------INITIAL BASIC_UNIT QUERY STRING-------------------")
+    print(add_basicUnit_query_string)
 
-    add_assertion_query_string = add_assertion_query_string.replace("entry_URIX", entry_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("entry_URIX", entry_uri)
     print("---------------------------------------------------------------------------------")
     print("-------------------------------------- REPLACED entry_URIX ----------------------")
-    print(add_assertion_query_string)
+    print(add_basicUnit_query_string)
 
-    add_assertion_query_string = add_assertion_query_string.replace("page_URIX", page_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("simpleDescriptionUnit_URIX", simpleDescriptionUnit_uri)
     print("---------------------------------------------------------------------------------")
-    print("-------------------------------------- REPLACED page_URIX -----------------------")
-    print(add_assertion_query_string)
+    print("-------------------------------------- REPLACED simpleDescriptionUnit_URIX -----------------------")
+    print(add_basicUnit_query_string)
 
-    add_assertion_query_string = add_assertion_query_string.replace("assertion_URIX", assertion_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("basicUnit_URIX", basicUnit_uri)
     print("---------------------------------------------------------------------------------")
-    print("-------------------------------- REPLACED assertion_URIX ------------------------")
-    print(add_assertion_query_string)
+    print("-------------------------------- REPLACED basicUnit_URIX ------------------------")
+    print(add_basicUnit_query_string)
 
     if input_description != None:
-        add_assertion_query_string = add_assertion_query_string.replace("$_input_description_$", input_description)
+        add_basicUnit_query_string = add_basicUnit_query_string.replace("$_input_description_$", input_description)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED DESCRIPTION ---------------------------")
-        print(add_assertion_query_string)
+        print(add_basicUnit_query_string)
 
     if input_type != None:
-        add_assertion_query_string = add_assertion_query_string.replace("$_input_type_$", input_type)
+        add_basicUnit_query_string = add_basicUnit_query_string.replace("$_input_type_$", input_type)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED TYPE ----------------------------------")
-        print(add_assertion_query_string)
+        print(add_basicUnit_query_string)
 
     if input_name != None:
-        add_assertion_query_string = add_assertion_query_string.replace("$_input_name_$", input_name)
+        add_basicUnit_query_string = add_basicUnit_query_string.replace("$_input_name_$", input_name)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED NAME ----------------------------------")
-        print(add_assertion_query_string)
+        print(add_basicUnit_query_string)
 
     if ontology_id != None:
-        add_assertion_query_string = add_assertion_query_string.replace("$_ontology_ID_$", ontology_id)
+        add_basicUnit_query_string = add_basicUnit_query_string.replace("$_ontology_ID_$", ontology_id)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED ONTOLOGY ID ---------------------------")
-        print(add_assertion_query_string)
+        print(add_basicUnit_query_string)
 
     if input_value != None:
-        add_assertion_query_string = add_assertion_query_string.replace("$_input_value_$", input_value)
+        add_basicUnit_query_string = add_basicUnit_query_string.replace("$_input_value_$", input_value)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED INPUT VALUE ---------------------------")
-        print(add_assertion_query_string)
+        print(add_basicUnit_query_string)
 
     if input_value1 != None:
-        add_assertion_query_string = add_assertion_query_string.replace("$_input_value1_$", input_value1)
+        add_basicUnit_query_string = add_basicUnit_query_string.replace("$_input_value1_$", input_value1)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED INPUT1 VALUE --------------------------")
-        print(add_assertion_query_string)
+        print(add_basicUnit_query_string)
 
     if input_value2 != None:
-        add_assertion_query_string = add_assertion_query_string.replace("$_input_value2_$", input_value2)
+        add_basicUnit_query_string = add_basicUnit_query_string.replace("$_input_value2_$", input_value2)
         print("---------------------------------------------------------------------------------")
         print("-------------------------------- REPLACED INPUT2 VALUE --------------------------")
-        print(add_assertion_query_string)
+        print(add_basicUnit_query_string)
 
 
 
-    add_assertion_query_string = add_assertion_query_string.replace("parent_data_item_uri", parent_data_item_uri)
+    add_basicUnit_query_string = add_basicUnit_query_string.replace("parent_data_item_uri", parent_data_item_uri)
     print("--------------------------------------------------------------------------------")
     print("------------------------------------ FINAL QUERY STRING ------------------------")
-    print(add_assertion_query_string)
+    print(add_basicUnit_query_string)
 
 
     new_uris = True
     i = 1
     while  new_uris:
-        if "new_individual_uri{}".format(str(i)) in add_assertion_query_string:
-            add_assertion_query_string = add_assertion_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
+        if "new_individual_uri{}".format(str(i)) in add_basicUnit_query_string:
+            add_basicUnit_query_string = add_basicUnit_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
             i += 1
         else:
             new_uris = False
 
 
     # query that creates the new entry
-    connection.query(add_assertion_query_string, db='neo4j')
+    connection.query(add_basicUnit_query_string, db='neo4j')
 
-    result = "new_assertion"
+    result = "new_basicUnit"
     print("----------------------------------------------------------------------------")
-    print("---------------------------ADD ASSERTION RETURNS ASSERTION URI--------------")
-    print(assertion_uri)
-    return assertion_uri, parent_data_item_uri, input_result
+    print("---------------------------ADD BASIC_UNIT RETURNS BASIC_UNIT URI--------------")
+    print(basicUnit_uri)
+    return basicUnit_uri, parent_data_item_uri, input_result
+
+
+
+
+
+
+
+
+# add a new basicUnit to a specific data item (entry, simpleDescriptionUnit, basicUnit) using a specific BasicUnit KGBB
+# INPUT: parent_data_item_uri (the uri for data item that contains the basicUnit - entry, simpleDescriptionUnit, basicUnit), input_kgbb_uri (uri for the KGBB of the resource of which the label must be changed), entry_uri (uri of the entry to which the basicUnit belongs), simpleDescriptionUnit_uri (uri of the simpleDescriptionUnit to which the basicUnit belongs - can be None), query_key (the key under which the query can be found), input_label (the new label provided by the user), input_uri (URI of the resource of which the label must be changed)
+def editInstanceLabel(parent_data_item_uri, input_kgbb_uri, entry_uri, simpleDescriptionUnit_uri, input_label, query_key, input_uri):
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # cypher query to get the label editing cypher code for the kgbb in question
+    edit_label_query_string = '''MATCH (n {{URI:"{input_kgbb_uri}"}}) RETURN n.{query_key}'''.format(input_kgbb_uri=input_kgbb_uri, query_key=query_key)
+
+    # query result
+    result = connection.query(edit_label_query_string, db='neo4j')
+    print("---------------------------------------------------------------------------------")
+    print("----------------------------INITIAL CYPHER CODE EDIT LABEL QUERY ----------------")
+    print(result)
+
+    # update some query parameters for the result
+    edit_query_string = result[0].get("n." + query_key)
+    print("---------------------------------------------------------------------------------")
+    print("------------------------------ INITIAL EDIT LABEL QUERY STRING ------------------")
+    print(edit_query_string)
+
+    edit_query_string = edit_query_string.replace("entry_URIX", entry_uri)
+    print("---------------------------------------------------------------------------------")
+    print("-------------------------------------- REPLACED entry_URIX ----------------------")
+    print(edit_query_string)
+
+    try:
+        edit_query_string = edit_query_string.replace("simpleDescriptionUnit_URIX", simpleDescriptionUnit_uri)
+        print("---------------------------------------------------------------------------------")
+        print("-------------------------------------- REPLACED simpleDescriptionUnit_URIX -----------------------")
+        print(edit_query_string)
+    except:
+        pass
+
+    edit_query_string = edit_query_string.replace("$_input_uri_$", input_uri)
+    print("---------------------------------------------------------------------------------")
+    print("-------------------------------- REPLACED INPUT URI -----------------------------")
+    print(edit_query_string)
+
+
+
+
+    if input_label != None:
+        edit_query_string = edit_query_string.replace("$_label_name_$", input_label)
+        print("---------------------------------------------------------------------------------")
+        print("-------------------------------- REPLACED LABEL ---------------------------------")
+        print(edit_query_string)
+
+
+
+
+    edit_query_string = edit_query_string.replace("parent_data_item_uri", parent_data_item_uri)
+    print("--------------------------------------------------------------------------------")
+    print("------------------------------------ FINAL QUERY STRING ------------------------")
+    print(edit_query_string)
+
+
+    new_uris = True
+    i = 1
+    while  new_uris:
+        if "new_individual_uri{}".format(str(i)) in edit_query_string:
+            edit_query_string = edit_query_string.replace("new_individual_uri{}".format(str(i)), str(uuid.uuid4()))
+            i += 1
+        else:
+            new_uris = False
+
+
+    # query that creates the new entry
+    connection.query(edit_query_string, db='neo4j')
+
+    return
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1133,40 +1140,40 @@ def addClass(full_id, preferred_name, ontology_id, description):
 
 # INPUT: parent_kgbb_uri, parent_uri,
 #
-# OUTPUT: not really an output, but adds any required pages
-# CONDITION: is used during adding a page or an entry
-def addRequiredPages(parent_kgbb_uri, parent_uri):
+# OUTPUT: not really an output, but adds any required simpleDescriptionUnits
+# CONDITION: is used during adding a simpleDescriptionUnit or an entry
+def addRequiredSimpleDescriptionUnits(parent_kgbb_uri, parent_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    search_required_pages_query_string = '''OPTIONAL MATCH (n {{URI:"{parent_kgbb_uri}"}})-[r:HAS_PAGE_ELEMENT {{required:"true"}}]->()
-    WITH PROPERTIES(r) AS required_page
-    RETURN required_page'''.format(parent_kgbb_uri=parent_kgbb_uri)
+    search_required_simpleDescriptionUnits_query_string = '''OPTIONAL MATCH (n {{URI:"{parent_kgbb_uri}"}})-[r:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT {{required:"true"}}]->()
+    WITH PROPERTIES(r) AS required_simpleDescriptionUnit
+    RETURN required_simpleDescriptionUnit'''.format(parent_kgbb_uri=parent_kgbb_uri)
 
-    pages_query = connection.query(search_required_pages_query_string, db='neo4j')
+    simpleDescriptionUnits_query = connection.query(search_required_simpleDescriptionUnits_query_string, db='neo4j')
     print("-------------------------------------------------------------------------------")
-    print("--------------------- INITIAL REQUIRED PAGES QUERY ----------------------------")
-    print(pages_query)
+    print("--------------------- INITIAL REQUIRED SIMPLE_DESCRIPTION_UNITS QUERY ----------------------------")
+    print(simpleDescriptionUnits_query)
 
-    if pages_query[0].get("required_page") == None:
+    if simpleDescriptionUnits_query[0].get("required_simpleDescriptionUnit") == None:
         print("-------------------------------------------------------------------------------")
-        print("---------------------------- NO REQUIRED PAGES FOUND --------------------------")
+        print("---------------------------- NO REQUIRED SIMPLE_DESCRIPTION_UNITS FOUND --------------------------")
         return
 
-    # add any required page
-    pages_query_len = len(pages_query)
+    # add any required simpleDescriptionUnit
+    simpleDescriptionUnits_query_len = len(simpleDescriptionUnits_query)
     print("-------------------------------------------------------------------------------")
-    print("----------------------------- # OF REQUIRED PAGES -----------------------------")
-    print(pages_query_len)
+    print("----------------------------- # OF REQUIRED SIMPLE_DESCRIPTION_UNITS -----------------------------")
+    print(simpleDescriptionUnits_query_len)
 
-    for i in range (0, pages_query_len):
-        subset = pages_query[i].get("required_page")
+    for i in range (0, simpleDescriptionUnits_query_len):
+        subset = simpleDescriptionUnits_query[i].get("required_simpleDescriptionUnit")
         print("-------------------------------------------------------------------------------")
-        print("------------------------- FOUND A REQUIRED PAGE -------------------------------")
-        page_kgbb_uri = subset.get("target_KGBB_URI")
-        page_uri = addTemplatePage(page_kgbb_uri,parent_uri)
+        print("------------------------- FOUND A REQUIRED SIMPLE_DESCRIPTION_UNIT -------------------------------")
+        simpleDescriptionUnit_kgbb_uri = subset.get("target_KGBB_URI")
+        simpleDescriptionUnit_uri = addTemplateSimpleDescriptionUnit(simpleDescriptionUnit_kgbb_uri,parent_uri)
         print("-------------------------------------------------------------------------------")
-        print("---------------------------- URI OF ADDED PAGES -------------------------------")
-        print(page_uri)
+        print("---------------------------- URI OF ADDED SIMPLE_DESCRIPTION_UNITS -------------------------------")
+        print(simpleDescriptionUnit_uri)
 
     return
 
@@ -1177,58 +1184,58 @@ def addRequiredPages(parent_kgbb_uri, parent_uri):
 
 
 
-# INPUT: parent_kgbb_uri, parent_uri, parent_type ("entry", "page", "assertion"), entry_uri, page_uri
+# INPUT: parent_kgbb_uri, parent_uri, parent_type ("entry", "simpleDescriptionUnit", "basicUnit"), entry_uri, simpleDescriptionUnit_uri
 #
-# OUTPUT: not really an output, but adds any required assertions
-# CONDITION: is used during adding a page or an entry
-def addRequiredAssertions(parent_kgbb_uri, parent_uri, parent_type, entry_uri, page_uri):
+# OUTPUT: not really an output, but adds any required basicUnits
+# CONDITION: is used during adding a simpleDescriptionUnit or an entry
+def addRequiredBasicUnits(parent_kgbb_uri, parent_uri, parent_type, entry_uri, simpleDescriptionUnit_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    # check for required assertions
-    search_required_assertions_query_string = '''OPTIONAL MATCH (n {{URI:"{parent_kgbb_uri}"}})-[r:HAS_ASSERTION_ELEMENT {{required:"true"}}]->()
-    WITH PROPERTIES(r) AS required_assertion
-    RETURN required_assertion'''.format(parent_kgbb_uri=parent_kgbb_uri)
+    # check for required basicUnits
+    search_required_basicUnits_query_string = '''OPTIONAL MATCH (n {{URI:"{parent_kgbb_uri}"}})-[r:HAS_BASIC_UNIT_ELEMENT {{required:"true"}}]->()
+    WITH PROPERTIES(r) AS required_basicUnit
+    RETURN required_basicUnit'''.format(parent_kgbb_uri=parent_kgbb_uri)
 
-    assertion_query = connection.query(search_required_assertions_query_string, db='neo4j')
+    basicUnit_query = connection.query(search_required_basicUnits_query_string, db='neo4j')
     print("-------------------------------------------------------------------------------")
-    print("------------------- INITIAL REQUIRED ASSERTIONS QUERY -------------------------")
-    print(assertion_query)
+    print("------------------- INITIAL REQUIRED BASIC_UNITS QUERY -------------------------")
+    print(basicUnit_query)
 
-    if assertion_query[0].get("required_assertion") == None:
+    if basicUnit_query[0].get("required_basicUnit") == None:
         print("-------------------------------------------------------------------------------")
-        print("------------------------ NO REQUIRED ASSERTION FOUND --------------------------")
+        print("------------------------ NO REQUIRED BASIC_UNIT FOUND --------------------------")
         return
 
 
-    # add any required assertion
-    assertion_query_len = len(assertion_query)
+    # add any required basicUnit
+    basicUnit_query_len = len(basicUnit_query)
     print("-------------------------------------------------------------------------------")
-    print("-------------------------- # OF REQUIRED ASSERTIONS ---------------------------")
-    print(assertion_query_len)
+    print("-------------------------- # OF REQUIRED BASIC_UNITS ---------------------------")
+    print(basicUnit_query_len)
 
-    for i in range (0, assertion_query_len):
-        subset = assertion_query[i].get("required_assertion")
+    for i in range (0, basicUnit_query_len):
+        subset = basicUnit_query[i].get("required_basicUnit")
 
         print("-------------------------------------------------------------------------------")
-        print("------------------------- ASSERTION KGBB URI & OBJECT URI ---------------------")
-        assertion_kgbb_uri = subset.get("target_KGBB_URI")
-        print(assertion_kgbb_uri)
-        assertion_object_uri = subset.get("assertion_object_URI")
-        print(assertion_object_uri)
+        print("------------------------- BASIC_UNIT KGBB URI & OBJECT URI ---------------------")
+        basicUnit_kgbb_uri = subset.get("target_KGBB_URI")
+        print(basicUnit_kgbb_uri)
+        basicUnit_object_uri = subset.get("basicUnit_object_URI")
+        print(basicUnit_object_uri)
 
         try:
-            if "$_$" in assertion_object_uri:
-                target_node = assertion_object_uri.partition("$_$")[0]
+            if "$_$" in basicUnit_object_uri:
+                target_node = basicUnit_object_uri.partition("$_$")[0]
                 print("target node: " + target_node)
-                target_key = assertion_object_uri.partition("$_$")[2]
+                target_key = basicUnit_object_uri.partition("$_$")[2]
                 print("target key: " + target_key)
 
                 if target_node == "object":
-                    assertion_uri = addTemplateAssertion(parent_uri, assertion_kgbb_uri, entry_uri, page_uri)
+                    basicUnit_uri = addTemplateBasicUnit(parent_uri, basicUnit_kgbb_uri, entry_uri, simpleDescriptionUnit_uri)
 
                     print("-------------------------------------------------------------------------------")
-                    print("------------------------- URI OF ADDED ASSERTION ------------------------------")
-                    print(assertion_uri)
+                    print("------------------------- URI OF ADDED BASIC_UNIT ------------------------------")
+                    print(basicUnit_uri)
 
         except:
             pass
@@ -1245,9 +1252,9 @@ def addRequiredAssertions(parent_kgbb_uri, parent_uri, parent_type, entry_uri, p
 
 
 # gather initial information about the data item
-# INPUT: data_item_uri (i.e. URI of entry, page, assertion,...) and its data_item_type ("entry", "page", "assertion")
+# INPUT: data_item_uri (i.e. URI of entry, simpleDescriptionUnit, basicUnit,...) and its data_item_type ("entry", "simpleDescriptionUnit", "basicUnit")
 
-# OUTPUT: [0]:data_item_uri, [1]:data_item_node, [2]:data_item_kgbb_uri, [3]:data_item_object_uri, [4]:data_item_object_node (entry/page/assertion object node), [5]:data_item_representation_node (entry/page/assertion representation node)
+# OUTPUT: [0]:data_item_uri, [1]:data_item_node, [2]:data_item_kgbb_uri, [3]:data_item_object_uri, [4]:data_item_object_node (entry/simpleDescriptionUnit/basicUnit object node), [5]:data_item_representation_node (entry/simpleDescriptionUnit/basicUnit representation node)
 def getDataItemInfo(data_item_uri, data_item_type):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
@@ -1288,7 +1295,7 @@ def getDataItemInfo(data_item_uri, data_item_type):
 
 
 
-# INPUT: data_item_uri (uri of entry, page, assertion, etc)
+# INPUT: data_item_uri (uri of entry, simpleDescriptionUnit, basicUnit, etc)
 #
 # OUTPUT: [0]data_item_node, [1]data_item_kgbb_uri, [2]data_item_object_uri
 def getDataItemNode(data_item_uri):
@@ -1327,7 +1334,7 @@ def getDataItemNode(data_item_uri):
 
 
 
-# INPUT: data_item_uri (uri of entry, page, assertion, etc), data_item_type (entr, page, assertion, etc)
+# INPUT: data_item_uri (uri of entry, simpleDescriptionUnit, basicUnit, etc), data_item_type (entr, simpleDescriptionUnit, basicUnit, etc)
 #
 # OUTPUT: data_item_object_node
 def getDataItemObjectNode(data_item_uri, data_item_type):
@@ -1337,12 +1344,12 @@ def getDataItemObjectNode(data_item_uri, data_item_type):
     if data_item_type == "entry":
         label = "entry_URI"
         node_type_label = "entry_object"
-    elif data_item_type == "page":
-        label = "page_URI"
-        node_type_label = "page_object"
-    elif data_item_type == "assertion":
-        label = "assertion_URI"
-        node_type_label = "assertion_object"
+    elif data_item_type == "simpleDescriptionUnit":
+        label = "simpleDescriptionUnit_URI"
+        node_type_label = "simpleDescriptionUnit_object"
+    elif data_item_type == "basicUnit":
+        label = "basicUnit_URI"
+        node_type_label = "basicUnit_object"
 
     get_data_item_object_node_query_string = '''MATCH (n) WHERE ("{data_item_uri}" IN n.{label}) AND ("{node_type_label}" IN n.data_node_type) RETURN n'''.format(data_item_uri=data_item_uri, label=label, node_type_label=node_type_label)
 
@@ -1471,9 +1478,9 @@ def getSpecificInputNode(data_item_uri, input_source):
 
 
 
-# INPUT: data_item_representation_URI, data_item_type ("entry", "page", etc), data_item_node
+# INPUT: data_item_representation_URI, data_item_type ("entry", "simpleDescriptionUnit", etc), data_item_node
 #
-# OUTPUT: container_nodes_dict = a dict of all container nodes belonging to this data_item (i.e. entry, page, assertion)
+# OUTPUT: container_nodes_dict = a dict of all container nodes belonging to this data_item (i.e. entry, simpleDescriptionUnit, basicUnit)
 def getContainerNodes(data_item_representation_URI, data_item_type, data_item_node):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
@@ -1524,7 +1531,7 @@ def getContainerNodes(data_item_representation_URI, data_item_type, data_item_no
 
 
 
-# INPUT: input_node (some container element), data_item_type ("entry", "page", "assertion"), data_item_node, object_node (entry/page/assertion object node), input nodes dict)
+# INPUT: input_node (some container element), data_item_type ("entry", "simpleDescriptionUnit", "basicUnit"), data_item_node, object_node (entry/simpleDescriptionUnit/basicUnit object node), input nodes dict)
 
 # OUTPUT: updates the labels, values, tooltip_labels, and tooltip_values of the input node for UI
 def resolveValueAndLabels(input_node, data_item_type, data_item_node, object_node, input_nodes_dict):
@@ -1596,32 +1603,31 @@ def getUniqueList(list):
 # INPUT: entry_uri, data_view_name (e.g. "orkg")
 
 # OUTPUT:
-# getEntryViewData[0] = navi_dict   ->  a dict of all pages and assertions linked to an entry node via :DISPLAYS relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
+# getEntryViewData[0] = navi_dict   ->  a dict of all simpleDescriptionUnits and basicUnits linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
 # getEntryViewData[1] = entry_view_tree     ->  a dict of all information required for representing data from an entry in the UI. It follows the syntax:  {order[integer]: {entry_label1:string, entry_value1:string, entry_label_tooltip1:string, entry_value_tooltip1:string...
-# getEntryViewData[2] = root_page_view_tree     ->    a dict of all information required for representing data from the root_page (i.e. landing page) of an entry in the UI. It follows the syntax:  {order[integer]: {page_label1:string, page_value1:string, page_label_tooltip1:string, page_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [assertion_uri, {assertion_view_tree}], etc.}, etc.
+# getEntryViewData[2] = root_simpleDescriptionUnit_view_tree     ->    a dict of all information required for representing data from the root_simpleDescriptionUnit (i.e. landing simpleDescriptionUnit) of an entry in the UI. It follows the syntax:  {order[integer]: {simpleDescriptionUnit_label1:string, simpleDescriptionUnit_value1:string, simpleDescriptionUnit_label_tooltip1:string, simpleDescriptionUnit_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [basicUnit_uri, {basicUnit_view_tree}], etc.}, etc.
 def getEntryViewData(entry_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # get navi_dict
     navi_dict = getNaviDict(entry_uri)
 
-    # query string definition for getting all information relevant for viewing the root page of the entry
-    query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:DISPLAYS]->(pages:orkg_Page_IND {{current_version:"true", root_page:"true"}})
+    # query string definition for getting all information relevant for viewing the root simpleDescriptionUnit of the entry
+    query_string = '''MATCH (entry {{URI:"{entry_uri}"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(simpleDescriptionUnits:orkg_SimpleDescriptionUnit_IND {{current_version:"true", root_simpleDescriptionUnit:"true"}})
     OPTIONAL MATCH (entry_object {{URI:entry.object_URI, current_version:"true"}})
     MATCH (entry_rep:RepresentationKGBBElement_IND {{KGBB_URI:entry.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (pages_object {{URI:pages.object_URI, current_version:"true"}})
-    MATCH (pages_rep:RepresentationKGBBElement_IND {{KGBB_URI:pages.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (pages)-[:DISPLAYS]->(assertion:orkg_Assertion_IND {{current_version:"true"}})
-    OPTIONAL MATCH (assertion_object {{URI:assertion.object_URI, current_version:"true"}})
-    OPTIONAL MATCH (assertion_rep:RepresentationKGBBElement_IND {{KGBB_URI:assertion.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (assertion_input_node) WHERE assertion.URI IN assertion_input_node.user_input AND assertion_input_node.input="true"
-    OPTIONAL MATCH (pages)-[:DISPLAYS]->(pages2:orkg_Page_IND {{current_version:"true"}})
-    OPTIONAL MATCH (pages2_object {{URI:pages2.object_URI, current_version:"true"}})
-    OPTIONAL MATCH (pages2_rep:RepresentationKGBBElement_IND {{KGBB_URI:pages2.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (pages2_input_node) WHERE pages2.URI IN pages2_input_node.user_input AND pages2_input_node.input="true"
-
-    WITH DISTINCT [entry, entry_object, entry_rep.container_nodes_dict] AS entry_info, [pages, pages_object, pages_rep.container_nodes_dict] AS pages, [assertion, assertion_object, assertion_rep.container_nodes_dict] AS assertion, [pages2, pages2_object, pages2_rep.container_nodes_dict] AS pages2, pages2_input_node AS pages2_input, assertion_input_node AS assertion_input, [pages.KGBB_URI, assertion.KGBB_URI, pages2.KGBB_URI] AS KGBBs
-    RETURN DISTINCT entry_info, pages, assertion, assertion_input, KGBBs, pages2, pages2_input'''.format(entry_uri=entry_uri, data_view_name=data_view_name)
+    OPTIONAL MATCH (simpleDescriptionUnits_object {{URI:simpleDescriptionUnits.object_URI, current_version:"true"}})
+    MATCH (simpleDescriptionUnits_rep:RepresentationKGBBElement_IND {{KGBB_URI:simpleDescriptionUnits.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (simpleDescriptionUnits)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(basicUnit:orkg_BasicUnit_IND {{current_version:"true"}})
+    OPTIONAL MATCH (basicUnit_object {{URI:basicUnit.object_URI, current_version:"true"}})
+    OPTIONAL MATCH (basicUnit_rep:RepresentationKGBBElement_IND {{KGBB_URI:basicUnit.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (basicUnit_input_node) WHERE basicUnit.URI IN basicUnit_input_node.user_input AND basicUnit_input_node.input="true"
+    OPTIONAL MATCH (simpleDescriptionUnits)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(simpleDescriptionUnits2:orkg_SimpleDescriptionUnit_IND {{current_version:"true"}})
+    OPTIONAL MATCH (simpleDescriptionUnits2_object {{URI:simpleDescriptionUnits2.object_URI, current_version:"true"}})
+    OPTIONAL MATCH (simpleDescriptionUnits2_rep:RepresentationKGBBElement_IND {{KGBB_URI:simpleDescriptionUnits2.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (simpleDescriptionUnits2_input_node) WHERE simpleDescriptionUnits2.URI IN simpleDescriptionUnits2_input_node.user_input AND simpleDescriptionUnits2_input_node.input="true"
+    WITH DISTINCT [entry, entry_object, entry_rep.container_nodes_dict] AS entry_info, [simpleDescriptionUnits, simpleDescriptionUnits_object, simpleDescriptionUnits_rep.container_nodes_dict] AS simpleDescriptionUnits, [basicUnit, basicUnit_object, basicUnit_rep.container_nodes_dict] AS basicUnit, [simpleDescriptionUnits2, simpleDescriptionUnits2_object, simpleDescriptionUnits2_rep.container_nodes_dict] AS simpleDescriptionUnits2, simpleDescriptionUnits2_input_node AS simpleDescriptionUnits2_input, basicUnit_input_node AS basicUnit_input, [simpleDescriptionUnits.KGBB_URI, basicUnit.KGBB_URI, simpleDescriptionUnits2.KGBB_URI] AS KGBBs
+    RETURN DISTINCT entry_info, simpleDescriptionUnits, basicUnit, basicUnit_input, KGBBs, simpleDescriptionUnits2, simpleDescriptionUnits2_input'''.format(entry_uri=entry_uri, data_view_name=data_view_name)
 
     query_result = connection.query(query_string, db='neo4j')
     query_result = query_result
@@ -1656,16 +1662,16 @@ def getEntryViewData(entry_uri, data_view_name):
     print(len(query_result))
 
 
-    init_assertions = []
-    init_pages2 = []
+    init_basicUnits = []
+    init_simpleDescriptionUnits2 = []
     init_kgbb_list = []
-    init_assertion_input = []
-    init_pages2_input = []
+    init_basicUnit_input = []
+    init_simpleDescriptionUnits2_input = []
     for i in range (0, len(query_result)):
-        init_assertions.append(query_result[i].get('assertion'))
+        init_basicUnits.append(query_result[i].get('basicUnit'))
         print("--------------------------------------------------------------------")
-        print("------------------ INIT ASSERTIONS QUERY RESULT --------------------")
-        print(init_assertions)
+        print("------------------ INIT BASIC_UNITS QUERY RESULT --------------------")
+        print(init_basicUnits)
 
         for m in range (0,2):
             init_kgbb_list.append(query_result[i].get('KGBBs')[m])
@@ -1673,34 +1679,34 @@ def getEntryViewData(entry_uri, data_view_name):
         print("-------------------------- INIT KGBB LIST --------------------------")
         print(init_kgbb_list)
 
-        init_assertion_input.append(query_result[i].get('assertion_input'))
+        init_basicUnit_input.append(query_result[i].get('basicUnit_input'))
         print("--------------------------------------------------------------------")
-        print("------------------ INIT ASSERTIONS INPUT QUERY RESULT --------------")
-        print(init_assertion_input)
+        print("------------------ INIT BASIC_UNITS INPUT QUERY RESULT --------------")
+        print(init_basicUnit_input)
 
         try:
-            init_pages2.append(query_result[i].get('pages2'))
+            init_simpleDescriptionUnits2.append(query_result[i].get('simpleDescriptionUnits2'))
             print("--------------------------------------------------------------------")
-            print("------------------ INIT PAGES2 QUERY RESULT ------------------------")
-            print(init_pages2)
+            print("------------------ INIT SIMPLE_DESCRIPTION_UNITS2 QUERY RESULT ------------------------")
+            print(init_simpleDescriptionUnits2)
         except:
             pass
 
         try:
-            init_pages2_input.append(query_result[i].get('pages2_input'))
+            init_simpleDescriptionUnits2_input.append(query_result[i].get('simpleDescriptionUnits2_input'))
             print("--------------------------------------------------------------------")
-            print("------------------ INIT PAGES2 INPUT QUERY RESULT ------------------")
-            print(init_pages2_input)
+            print("------------------ INIT SIMPLE_DESCRIPTION_UNITS2 INPUT QUERY RESULT ------------------")
+            print(init_simpleDescriptionUnits2_input)
         except:
             pass
 
 
     # filter for only unique elements in lists
-    assertions = getUniqueList(init_assertions)
+    basicUnits = getUniqueList(init_basicUnits)
     print("---------------------------------------------------------------")
-    print("---------------- UNIQUE ASSERTIONS RESULT ---------------------")
-    print(assertions)
-    print(len(assertions))
+    print("---------------- UNIQUE BASIC_UNITS RESULT ---------------------")
+    print(basicUnits)
+    print(len(basicUnits))
 
     kgbb_list = getUniqueList(init_kgbb_list)
     print("---------------------------------------------------------------")
@@ -1708,155 +1714,155 @@ def getEntryViewData(entry_uri, data_view_name):
     print(kgbb_list)
     print(len(kgbb_list))
 
-    assertion_input = getUniqueList(init_assertion_input)
+    basicUnit_input = getUniqueList(init_basicUnit_input)
     print("---------------------------------------------------------------")
-    print("--------------- UNIQUE ASSERTION INPUT RESULT -----------------")
-    print(assertion_input)
-    print(len(assertion_input))
+    print("--------------- UNIQUE BASIC_UNIT INPUT RESULT -----------------")
+    print(basicUnit_input)
+    print(len(basicUnit_input))
 
     try:
-        pages2 = getUniqueList(init_pages2)
+        simpleDescriptionUnits2 = getUniqueList(init_simpleDescriptionUnits2)
         print("---------------------------------------------------------------")
-        print("--------------- UNIQUE PAGES2 RESULT --------------------------")
-        print(pages2)
-        print(len(pages2))
+        print("--------------- UNIQUE SIMPLE_DESCRIPTION_UNITS2 RESULT --------------------------")
+        print(simpleDescriptionUnits2)
+        print(len(simpleDescriptionUnits2))
     except:
         pass
 
     try:
-        pages2_input = getUniqueList(init_pages2_input)
+        simpleDescriptionUnits2_input = getUniqueList(init_simpleDescriptionUnits2_input)
         print("---------------------------------------------------------------")
-        print("--------------- UNIQUE PAGES2 INPUT RESULT --------------------")
-        print(pages2_input)
-        print(len(pages2_input))
+        print("--------------- UNIQUE SIMPLE_DESCRIPTION_UNITS2 INPUT RESULT --------------------")
+        print(simpleDescriptionUnits2_input)
+        print(len(simpleDescriptionUnits2_input))
     except:
         pass
 
 
-    assertion_view_tree = []
-    for i in range (0, len(assertions)):
-        if assertions[i][0] != None:
-            assertion_node = assertions[i][0]
+    basicUnit_view_tree = []
+    for i in range (0, len(basicUnits)):
+        if basicUnits[i][0] != None:
+            basicUnit_node = basicUnits[i][0]
             print("---------------------------------------------------------------")
-            print("------------------------ ASSERTION NODE -----------------------")
-            print(assertion_node)
+            print("------------------------ BASIC_UNIT NODE -----------------------")
+            print(basicUnit_node)
 
-            assertion_object = assertions[i][1]
+            basicUnit_object = basicUnits[i][1]
             print("---------------------------------------------------------------")
-            print("----------------------- ASSERTION OBJECT ----------------------")
-            print(assertion_object)
+            print("----------------------- BASIC_UNIT OBJECT ----------------------")
+            print(basicUnit_object)
 
-            assertion_raw_container_nodes_dict = ast.literal_eval(assertions[i][2])
+            basicUnit_raw_container_nodes_dict = ast.literal_eval(basicUnits[i][2])
             print("---------------------------------------------------------------")
-            print("------------------- ASSERTION RAW CONT DICT -------------------")
-            print(assertion_raw_container_nodes_dict)
+            print("------------------- BASIC_UNIT RAW CONT DICT -------------------")
+            print(basicUnit_raw_container_nodes_dict)
 
-            assertion_uri = assertions[i][0].get('URI')
+            basicUnit_uri = basicUnits[i][0].get('URI')
             print("---------------------------------------------------------------")
-            print("------------------- ASSERTION URI -----------------------------")
-            print(assertion_uri)
-            assertion_input_item = []
-            for m in range (0, len(assertion_input)):
-                if assertion_uri == assertion_input[m].get('assertion_URI'):
-                    assertion_input_item.append(assertion_input[m])
+            print("------------------- BASIC_UNIT URI -----------------------------")
+            print(basicUnit_uri)
+            basicUnit_input_item = []
+            for m in range (0, len(basicUnit_input)):
+                if basicUnit_uri == basicUnit_input[m].get('basicUnit_URI'):
+                    basicUnit_input_item.append(basicUnit_input[m])
                     print("---------------------------------------------------------------")
-                    print("------------------- ASSERTION INPUT NODES ---------------------")
-                    print(assertion_input_item)
-            assertion_tree = getSubViewTree(assertion_raw_container_nodes_dict, assertion_node, assertion_object, assertion_input_item)
-            assertion_view_tree.append(assertion_tree)
+                    print("------------------- BASIC_UNIT INPUT NODES ---------------------")
+                    print(basicUnit_input_item)
+            basicUnit_tree = getSubViewTree(basicUnit_raw_container_nodes_dict, basicUnit_node, basicUnit_object, basicUnit_input_item)
+            basicUnit_view_tree.append(basicUnit_tree)
 
     print("---------------------------------------------------------------")
     print("---------------------------------------------------------------")
-    print("------------------- ASSERTION VIEW TREE LIST ------------------")
-    print(assertion_view_tree)
+    print("------------------- BASIC_UNIT VIEW TREE LIST ------------------")
+    print(basicUnit_view_tree)
 
 
-    if pages2:
-        pages2_view_tree = []
-        for i in range (0, len(pages2)):
-            if pages2[i][0] != None:
-                page2_node = pages2[i][0]
+    if simpleDescriptionUnits2:
+        simpleDescriptionUnits2_view_tree = []
+        for i in range (0, len(simpleDescriptionUnits2)):
+            if simpleDescriptionUnits2[i][0] != None:
+                simpleDescriptionUnit2_node = simpleDescriptionUnits2[i][0]
                 print("---------------------------------------------------------------")
-                print("------------------------ PAGE2 NODE ---------------------------")
-                print(page2_node)
+                print("------------------------ SIMPLE_DESCRIPTION_UNIT2 NODE ---------------------------")
+                print(simpleDescriptionUnit2_node)
 
-                page2_object = pages2[i][1]
+                simpleDescriptionUnit2_object = simpleDescriptionUnits2[i][1]
                 print("---------------------------------------------------------------")
-                print("----------------------- PAGE2 OBJECT --------------------------")
-                print(page2_object)
+                print("----------------------- SIMPLE_DESCRIPTION_UNIT2 OBJECT --------------------------")
+                print(simpleDescriptionUnit2_object)
 
-                page2_raw_container_nodes_dict = ast.literal_eval(pages2[i][2])
+                simpleDescriptionUnit2_raw_container_nodes_dict = ast.literal_eval(simpleDescriptionUnits2[i][2])
                 print("---------------------------------------------------------------")
-                print("------------------- PAGE2 RAW CONT DICT -----------------------")
-                print(page2_raw_container_nodes_dict)
+                print("------------------- SIMPLE_DESCRIPTION_UNIT2 RAW CONT DICT -----------------------")
+                print(simpleDescriptionUnit2_raw_container_nodes_dict)
 
-                page2_uri = pages2[i][0].get('URI')
+                simpleDescriptionUnit2_uri = simpleDescriptionUnits2[i][0].get('URI')
                 print("---------------------------------------------------------------")
-                print("------------------- PAGE2 URI ---------------------------------")
-                print(page2_uri)
-                pages2_input_item = []
-                if pages2_input:
-                    for m in range (0, len(pages2_input)):
-                        if page2_uri == pages2_input[m].get('page_URI')[0]:
-                            pages2_input_item.append(pages2_input[m])
+                print("------------------- SIMPLE_DESCRIPTION_UNIT2 URI ---------------------------------")
+                print(simpleDescriptionUnit2_uri)
+                simpleDescriptionUnits2_input_item = []
+                if simpleDescriptionUnits2_input:
+                    for m in range (0, len(simpleDescriptionUnits2_input)):
+                        if simpleDescriptionUnit2_uri == simpleDescriptionUnits2_input[m].get('simpleDescriptionUnit_URI')[0]:
+                            simpleDescriptionUnits2_input_item.append(simpleDescriptionUnits2_input[m])
                             print("---------------------------------------------------------------")
-                            print("------------------- PAGE2 INPUT NODES -------------------------")
-                            print(pages2_input_item)
-                page2_tree = getSubViewTree(page2_raw_container_nodes_dict, page2_node, page2_object, pages2_input_item)
-                pages2_view_tree.append(page2_tree)
+                            print("------------------- SIMPLE_DESCRIPTION_UNIT2 INPUT NODES -------------------------")
+                            print(simpleDescriptionUnits2_input_item)
+                simpleDescriptionUnit2_tree = getSubViewTree(simpleDescriptionUnit2_raw_container_nodes_dict, simpleDescriptionUnit2_node, simpleDescriptionUnit2_object, simpleDescriptionUnits2_input_item)
+                simpleDescriptionUnits2_view_tree.append(simpleDescriptionUnit2_tree)
 
         print("---------------------------------------------------------------")
         print("---------------------------------------------------------------")
-        print("------------------- PAGES2 VIEW TREE LIST ---------------------")
-        print(pages2_view_tree)
+        print("------------------- SIMPLE_DESCRIPTION_UNITS2 VIEW TREE LIST ---------------------")
+        print(simpleDescriptionUnits2_view_tree)
 
 
-    pages = query_result[0].get('pages')
-    page_node = pages[0]
+    simpleDescriptionUnits = query_result[0].get('simpleDescriptionUnits')
+    simpleDescriptionUnit_node = simpleDescriptionUnits[0]
     print("---------------------------------------------------------------")
-    print("------------------------- PAGE NODE ---------------------------")
-    print(page_node)
+    print("------------------------- SIMPLE_DESCRIPTION_UNIT NODE ---------------------------")
+    print(simpleDescriptionUnit_node)
 
-    page_object = pages[1]
+    simpleDescriptionUnit_object = simpleDescriptionUnits[1]
     print("---------------------------------------------------------------")
-    print("------------------------ PAGE OBJECT --------------------------")
-    print(page_object)
+    print("------------------------ SIMPLE_DESCRIPTION_UNIT OBJECT --------------------------")
+    print(simpleDescriptionUnit_object)
 
-    page_raw_container_nodes_dict = ast.literal_eval(pages[2])
+    simpleDescriptionUnit_raw_container_nodes_dict = ast.literal_eval(simpleDescriptionUnits[2])
     print("---------------------------------------------------------------")
-    print("------------------------ PAGE RAW CONT DICT -------------------")
-    print(page_raw_container_nodes_dict)
+    print("------------------------ SIMPLE_DESCRIPTION_UNIT RAW CONT DICT -------------------")
+    print(simpleDescriptionUnit_raw_container_nodes_dict)
 
-    page_view_tree = getSubViewTree(page_raw_container_nodes_dict, page_node, page_object, None)
+    simpleDescriptionUnit_view_tree = getSubViewTree(simpleDescriptionUnit_raw_container_nodes_dict, simpleDescriptionUnit_node, simpleDescriptionUnit_object, None)
 
-    # check for pages and assertions that are displayed by page
-    page_child_list = navi_dict.get(page_node.get('URI')).get('children')
+    # check for simpleDescriptionUnits and basicUnits that are displayed by simpleDescriptionUnit
+    simpleDescriptionUnit_child_list = navi_dict.get(simpleDescriptionUnit_node.get('URI')).get('children')
     print("---------------------------------------------------------------")
-    print("----------------------- PAGE CHILD LIST -----------------------")
-    print(page_child_list)
-    page_child_len = len(page_child_list)
-    print(page_child_len)
+    print("----------------------- SIMPLE_DESCRIPTION_UNIT CHILD LIST -----------------------")
+    print(simpleDescriptionUnit_child_list)
+    simpleDescriptionUnit_child_len = len(simpleDescriptionUnit_child_list)
+    print(simpleDescriptionUnit_child_len)
 
-    for i in range (0, page_child_len):
+    for i in range (0, simpleDescriptionUnit_child_len):
         print("i = " + str(i))
-        child_uri = page_child_list[i]
-        for j in range (0, len(assertion_view_tree)):
-            if assertion_view_tree[j].get('URI') == child_uri:
-                kgbb_uri = assertion_view_tree[j].get('KGBB_URI')
+        child_uri = simpleDescriptionUnit_child_list[i]
+        for j in range (0, len(basicUnit_view_tree)):
+            if basicUnit_view_tree[j].get('URI') == child_uri:
+                kgbb_uri = basicUnit_view_tree[j].get('KGBB_URI')
                 print("---------------------------------------------------------------")
                 print("------------------- FOUND KGBB URI ----------------------------")
                 print(kgbb_uri)
 
                 for m in range (0, 600):
                     try:
-                        page_view_tree_container = page_view_tree.get(m)
-                        target_kgbb_uri = page_view_tree_container.get('target_KGBB_URI')
+                        simpleDescriptionUnit_view_tree_container = simpleDescriptionUnit_view_tree.get(m)
+                        target_kgbb_uri = simpleDescriptionUnit_view_tree_container.get('target_KGBB_URI')
                         if kgbb_uri == target_kgbb_uri:
-                            sub_view_tree = page_view_tree.get(m).get('sub_view_tree')
-                            sub_view_tree.append(assertion_view_tree[j])
+                            sub_view_tree = simpleDescriptionUnit_view_tree.get(m).get('sub_view_tree')
+                            sub_view_tree.append(basicUnit_view_tree[j])
                             sub_view_tree_length = len(sub_view_tree)
-                            page_view_tree.get(m)['sub_view_tree'] = sub_view_tree
-                            page_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
+                            simpleDescriptionUnit_view_tree.get(m)['sub_view_tree'] = sub_view_tree
+                            simpleDescriptionUnit_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
 
                             m = 601
                             print("-----------------------------------------------------------")
@@ -1865,24 +1871,24 @@ def getEntryViewData(entry_uri, data_view_name):
                     except:
                         pass
 
-        if pages2_view_tree:
-            for j in range (0, len(pages2_view_tree)):
-                if pages2_view_tree[j].get('URI') == child_uri:
-                    kgbb_uri = pages2_view_tree[j].get('KGBB_URI')
+        if simpleDescriptionUnits2_view_tree:
+            for j in range (0, len(simpleDescriptionUnits2_view_tree)):
+                if simpleDescriptionUnits2_view_tree[j].get('URI') == child_uri:
+                    kgbb_uri = simpleDescriptionUnits2_view_tree[j].get('KGBB_URI')
                     print("---------------------------------------------------------------")
                     print("------------------- FOUND KGBB URI ----------------------------")
                     print(kgbb_uri)
 
                     for m in range (0, 600):
                         try:
-                            page_view_tree_container = page_view_tree.get(m)
-                            target_kgbb_uri = page_view_tree_container.get('target_KGBB_URI')
+                            simpleDescriptionUnit_view_tree_container = simpleDescriptionUnit_view_tree.get(m)
+                            target_kgbb_uri = simpleDescriptionUnit_view_tree_container.get('target_KGBB_URI')
                             if kgbb_uri == target_kgbb_uri:
-                                sub_view_tree = page_view_tree.get(m).get('sub_view_tree')
-                                sub_view_tree.append(pages2_view_tree[j])
+                                sub_view_tree = simpleDescriptionUnit_view_tree.get(m).get('sub_view_tree')
+                                sub_view_tree.append(simpleDescriptionUnits2_view_tree[j])
                                 sub_view_tree_length = len(sub_view_tree)
-                                page_view_tree.get(m)['sub_view_tree'] = sub_view_tree
-                                page_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
+                                simpleDescriptionUnit_view_tree.get(m)['sub_view_tree'] = sub_view_tree
+                                simpleDescriptionUnit_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
 
                                 m = 601
                                 print("-----------------------------------------------------------")
@@ -1893,53 +1899,52 @@ def getEntryViewData(entry_uri, data_view_name):
 
 
     print("---------------------------------------------------------------")
-    print("-------------------------- PAGE VIEW TREE ---------------------")
-    print(page_view_tree)
+    print("-------------------------- SIMPLE_DESCRIPTION_UNIT VIEW TREE ---------------------")
+    print(simpleDescriptionUnit_view_tree)
 
 
-    return navi_dict, entry_view_tree, page_view_tree
-
-
-
+    return navi_dict, entry_view_tree, simpleDescriptionUnit_view_tree
 
 
 
 
 
 
-# INPUT: entry_uri, page_uri, data_view_name (e.g. "orkg")
+
+
+
+# INPUT: entry_uri, simpleDescriptionUnit_uri, data_view_name (e.g. "orkg")
 
 # OUTPUT:
-# getPageViewData[0] = navi_dict   ->  a dict of all pages and assertions linked to an entry node via :DISPLAYS relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
-# getPageViewData[1] = page_view_tree     ->    a dict of all information required for representing data from the input page of an entry in the UI. It follows the syntax:  {order[integer]: {page_label1:string, page_value1:string, page_label_tooltip1:string, page_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [assertion_uri, {assertion_view_tree}], etc.}, etc.
-def getPageViewData(entry_uri, page_uri, data_view_name):
+# getSimpleDescriptionUnitViewData[0] = navi_dict   ->  a dict of all simpleDescriptionUnits and basicUnits linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
+# getSimpleDescriptionUnitViewData[1] = simpleDescriptionUnit_view_tree     ->    a dict of all information required for representing data from the input simpleDescriptionUnit of an entry in the UI. It follows the syntax:  {order[integer]: {simpleDescriptionUnit_label1:string, simpleDescriptionUnit_value1:string, simpleDescriptionUnit_label_tooltip1:string, simpleDescriptionUnit_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [basicUnit_uri, {basicUnit_view_tree}], etc.}, etc.
+def getSimpleDescriptionUnitViewData(entry_uri, simpleDescriptionUnit_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
     # get navi_dict
     navi_dict = getNaviDict(entry_uri)
 
-    # query string definition for getting all information relevant for viewing the root page of the entry
-    query_string = '''MATCH (page {{URI:"{page_uri}"}})
-    OPTIONAL MATCH (page_object {{URI:page.object_URI, current_version:"true"}})
-    MATCH (page_rep:RepresentationKGBBElement_IND {{KGBB_URI:page.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (page)-[:DISPLAYS]->(assertion:orkg_Assertion_IND {{current_version:"true"}})
-    OPTIONAL MATCH (assertion_object {{URI:assertion.object_URI, current_version:"true"}})
-    OPTIONAL MATCH (assertion_rep:RepresentationKGBBElement_IND {{KGBB_URI:assertion.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (assertion_input_node) WHERE assertion.URI IN assertion_input_node.user_input AND assertion_input_node.input="true"
-    OPTIONAL MATCH (assertion)-[:DISPLAYS]->(assertion2:orkg_Assertion_IND {{current_version:"true"}})
-    OPTIONAL MATCH (assertion2_object {{URI:assertion2.object_URI, current_version:"true"}})
-    OPTIONAL MATCH (assertion2_rep:RepresentationKGBBElement_IND {{KGBB_URI:assertion2.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (assertion2_input_node) WHERE assertion2.URI IN assertion2_input_node.user_input AND assertion2_input_node.input="true"
-    OPTIONAL MATCH (page)-[:DISPLAYS]->(pages2:orkg_Page_IND {{current_version:"true"}})
-    OPTIONAL MATCH (pages2_object {{URI:pages2.object_URI, current_version:"true"}})
-    OPTIONAL MATCH (pages2_rep:RepresentationKGBBElement_IND {{KGBB_URI:pages2.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (pages2_input_node) WHERE pages2.URI IN pages2_input_node.user_input AND pages2_input_node.input="true"
-    OPTIONAL MATCH (page)-[:DISPLAYS]->(granTree:orkg_GranularityTree_IND {{current_version:"true"}})
+    # query string definition for getting all information relevant for viewing the root simpleDescriptionUnit of the entry
+    query_string = '''MATCH (simpleDescriptionUnit {{URI:"{simpleDescriptionUnit_uri}"}})
+    OPTIONAL MATCH (simpleDescriptionUnit_object {{URI:simpleDescriptionUnit.object_URI, current_version:"true"}})
+    MATCH (simpleDescriptionUnit_rep:RepresentationKGBBElement_IND {{KGBB_URI:simpleDescriptionUnit.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (simpleDescriptionUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(basicUnit:orkg_BasicUnit_IND {{current_version:"true"}})
+    OPTIONAL MATCH (basicUnit_object {{URI:basicUnit.object_URI, current_version:"true"}})
+    OPTIONAL MATCH (basicUnit_rep:RepresentationKGBBElement_IND {{KGBB_URI:basicUnit.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (basicUnit_input_node) WHERE basicUnit.URI IN basicUnit_input_node.user_input AND basicUnit_input_node.input="true"
+    OPTIONAL MATCH (basicUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(basicUnit2:orkg_BasicUnit_IND {{current_version:"true"}})
+    OPTIONAL MATCH (basicUnit2_object {{URI:basicUnit2.object_URI, current_version:"true"}})
+    OPTIONAL MATCH (basicUnit2_rep:RepresentationKGBBElement_IND {{KGBB_URI:basicUnit2.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (basicUnit2_input_node) WHERE basicUnit2.URI IN basicUnit2_input_node.user_input AND basicUnit2_input_node.input="true"
+    OPTIONAL MATCH (simpleDescriptionUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(simpleDescriptionUnits2:orkg_SimpleDescriptionUnit_IND {{current_version:"true"}})
+    OPTIONAL MATCH (simpleDescriptionUnits2_object {{URI:simpleDescriptionUnits2.object_URI, current_version:"true"}})
+    OPTIONAL MATCH (simpleDescriptionUnits2_rep:RepresentationKGBBElement_IND {{KGBB_URI:simpleDescriptionUnits2.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (simpleDescriptionUnits2_input_node) WHERE simpleDescriptionUnits2.URI IN simpleDescriptionUnits2_input_node.user_input AND simpleDescriptionUnits2_input_node.input="true"
+    OPTIONAL MATCH (simpleDescriptionUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(granTree:orkg_GranularityTree_IND {{current_version:"true"}})
     OPTIONAL MATCH (granTree_object {{URI:granTree.object_URI, current_version:"true"}})
     OPTIONAL MATCH (granTree_rep:RepresentationKGBBElement_IND {{KGBB_URI:granTree.KGBB_URI, data_view_name:"{data_view_name}"}})
-
-    WITH DISTINCT [page, page_object, page_rep.container_nodes_dict] AS page, [assertion, assertion_object, assertion_rep.container_nodes_dict] AS assertion, [assertion2, assertion2_object, assertion2_rep.container_nodes_dict] AS assertion2, [pages2, pages2_object, pages2_rep.container_nodes_dict] AS pages2, pages2_input_node AS pages2_input, assertion_input_node AS assertion_input, assertion2_input_node AS assertion2_input, [page.KGBB_URI, assertion.KGBB_URI] AS KGBBs, [granTree, granTree_object, granTree_rep.container_nodes_dict] AS granularityTree
-    RETURN DISTINCT page, assertion, assertion_input, KGBBs, pages2, pages2_input, assertion2, assertion2_input, granularityTree'''.format(page_uri=page_uri, data_view_name=data_view_name)
+    WITH DISTINCT [simpleDescriptionUnit, simpleDescriptionUnit_object, simpleDescriptionUnit_rep.container_nodes_dict] AS simpleDescriptionUnit, [basicUnit, basicUnit_object, basicUnit_rep.container_nodes_dict] AS basicUnit, [basicUnit2, basicUnit2_object, basicUnit2_rep.container_nodes_dict] AS basicUnit2, [simpleDescriptionUnits2, simpleDescriptionUnits2_object, simpleDescriptionUnits2_rep.container_nodes_dict] AS simpleDescriptionUnits2, simpleDescriptionUnits2_input_node AS simpleDescriptionUnits2_input, basicUnit_input_node AS basicUnit_input, basicUnit2_input_node AS basicUnit2_input, [simpleDescriptionUnit.KGBB_URI, basicUnit.KGBB_URI] AS KGBBs, [granTree, granTree_object, granTree_rep.container_nodes_dict] AS granularityTree
+    RETURN DISTINCT simpleDescriptionUnit, basicUnit, basicUnit_input, KGBBs, simpleDescriptionUnits2, simpleDescriptionUnits2_input, basicUnit2, basicUnit2_input, granularityTree'''.format(simpleDescriptionUnit_uri=simpleDescriptionUnit_uri, data_view_name=data_view_name)
 
     query_result = connection.query(query_string, db='neo4j')
     query_result = query_result
@@ -1951,18 +1956,18 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
     print(len(query_result))
 
     init_granularity_trees = []
-    init_assertions = []
-    init_pages2 = []
+    init_basicUnits = []
+    init_simpleDescriptionUnits2 = []
     init_kgbb_list = []
-    init_assertion_input = []
-    init_pages2_input = []
-    init_assertion2 = []
-    init_assertion2_input = []
+    init_basicUnit_input = []
+    init_simpleDescriptionUnits2_input = []
+    init_basicUnit2 = []
+    init_basicUnit2_input = []
     for i in range (0, len(query_result)):
-        init_assertions.append(query_result[i].get('assertion'))
+        init_basicUnits.append(query_result[i].get('basicUnit'))
         print("--------------------------------------------------------------------")
-        print("------------------ INIT ASSERTIONS QUERY RESULT --------------------")
-        print(init_assertions)
+        print("------------------ INIT BASIC_UNITS QUERY RESULT --------------------")
+        print(init_basicUnits)
 
         for m in range (0,2):
             init_kgbb_list.append(query_result[i].get('KGBBs')[m])
@@ -1970,10 +1975,10 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
         print("-------------------------- INIT KGBB LIST --------------------------")
         print(init_kgbb_list)
 
-        init_assertion_input.append(query_result[i].get('assertion_input'))
+        init_basicUnit_input.append(query_result[i].get('basicUnit_input'))
         print("--------------------------------------------------------------------")
-        print("------------------ INIT ASSERTIONS INPUT QUERY RESULT --------------")
-        print(init_assertion_input)
+        print("------------------ INIT BASIC_UNITS INPUT QUERY RESULT --------------")
+        print(init_basicUnit_input)
 
         try:
             init_granularity_trees.append(query_result[i].get('granularityTree'))
@@ -1983,44 +1988,44 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
         except:
             pass
         try:
-            init_pages2.append(query_result[i].get('pages2'))
+            init_simpleDescriptionUnits2.append(query_result[i].get('simpleDescriptionUnits2'))
             print("--------------------------------------------------------------------")
-            print("------------------ INIT PAGES2 QUERY RESULT ------------------------")
-            print(init_pages2)
+            print("------------------ INIT SIMPLE_DESCRIPTION_UNITS2 QUERY RESULT ------------------------")
+            print(init_simpleDescriptionUnits2)
         except:
             pass
 
         try:
-            init_pages2_input.append(query_result[i].get('pages2_input'))
+            init_simpleDescriptionUnits2_input.append(query_result[i].get('simpleDescriptionUnits2_input'))
             print("--------------------------------------------------------------------")
-            print("------------------ INIT PAGES2 INPUT QUERY RESULT ------------------")
-            print(init_pages2_input)
+            print("------------------ INIT SIMPLE_DESCRIPTION_UNITS2 INPUT QUERY RESULT ------------------")
+            print(init_simpleDescriptionUnits2_input)
         except:
             pass
 
         try:
-            init_assertion2.append(query_result[i].get('assertion2'))
+            init_basicUnit2.append(query_result[i].get('basicUnit2'))
             print("--------------------------------------------------------------------")
-            print("------------------ INIT ASSERTION2 QUERY RESULT --------------------")
-            print(init_assertion2)
+            print("------------------ INIT BASIC_UNIT2 QUERY RESULT --------------------")
+            print(init_basicUnit2)
         except:
             pass
 
         try:
-            init_assertion2_input.append(query_result[i].get('assertion2_input'))
+            init_basicUnit2_input.append(query_result[i].get('basicUnit2_input'))
             print("--------------------------------------------------------------------")
-            print("-------------- INIT ASSERTION2 INPUT QUERY RESULT ------------------")
-            print(init_assertion2_input)
+            print("-------------- INIT BASIC_UNIT2 INPUT QUERY RESULT ------------------")
+            print(init_basicUnit2_input)
         except:
             pass
 
 
     # filter for only unique elements in lists
-    assertions = getUniqueList(init_assertions)
+    basicUnits = getUniqueList(init_basicUnits)
     print("---------------------------------------------------------------")
-    print("---------------- UNIQUE ASSERTIONS RESULT ---------------------")
-    print(assertions)
-    print(len(assertions))
+    print("---------------- UNIQUE BASIC_UNITS RESULT ---------------------")
+    print(basicUnits)
+    print(len(basicUnits))
 
     kgbb_list = getUniqueList(init_kgbb_list)
     print("---------------------------------------------------------------")
@@ -2028,11 +2033,11 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
     print(kgbb_list)
     print(len(kgbb_list))
 
-    assertion_input = getUniqueList(init_assertion_input)
+    basicUnit_input = getUniqueList(init_basicUnit_input)
     print("---------------------------------------------------------------")
-    print("--------------- UNIQUE ASSERTION INPUT RESULT -----------------")
-    print(assertion_input)
-    print(len(assertion_input))
+    print("--------------- UNIQUE BASIC_UNIT INPUT RESULT -----------------")
+    print(basicUnit_input)
+    print(len(basicUnit_input))
 
     try:
         granularity_trees = getUniqueList(init_granularity_trees)
@@ -2044,38 +2049,38 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
         pass
 
     try:
-        pages2 = getUniqueList(init_pages2)
+        simpleDescriptionUnits2 = getUniqueList(init_simpleDescriptionUnits2)
         print("---------------------------------------------------------------")
-        print("--------------- UNIQUE PAGES2 RESULT --------------------------")
-        print(pages2)
-        print(len(pages2))
+        print("--------------- UNIQUE SIMPLE_DESCRIPTION_UNITS2 RESULT --------------------------")
+        print(simpleDescriptionUnits2)
+        print(len(simpleDescriptionUnits2))
     except:
         pass
 
     try:
-        pages2_input = getUniqueList(init_pages2_input)
+        simpleDescriptionUnits2_input = getUniqueList(init_simpleDescriptionUnits2_input)
         print("---------------------------------------------------------------")
-        print("--------------- UNIQUE PAGES2 INPUT RESULT --------------------")
-        print(pages2_input)
-        print(len(pages2_input))
+        print("--------------- UNIQUE SIMPLE_DESCRIPTION_UNITS2 INPUT RESULT --------------------")
+        print(simpleDescriptionUnits2_input)
+        print(len(simpleDescriptionUnits2_input))
     except:
         pass
 
     try:
-        assertion2 = getUniqueList(init_assertion2)
+        basicUnit2 = getUniqueList(init_basicUnit2)
         print("---------------------------------------------------------------")
-        print("--------------- UNIQUE ASSERTION2 RESULT ----------------------")
-        print(assertion2)
-        print(len(assertion2))
+        print("--------------- UNIQUE BASIC_UNIT2 RESULT ----------------------")
+        print(basicUnit2)
+        print(len(basicUnit2))
     except:
         pass
 
     try:
-        assertion2_input = getUniqueList(init_assertion2_input)
+        basicUnit2_input = getUniqueList(init_basicUnit2_input)
         print("---------------------------------------------------------------")
-        print("--------------- UNIQUE ASSERTION2 INPUT RESULT ----------------")
-        print(assertion2_input)
-        print(len(assertion2_input))
+        print("--------------- UNIQUE BASIC_UNIT2 INPUT RESULT ----------------")
+        print(basicUnit2_input)
+        print(len(basicUnit2_input))
     except:
         pass
 
@@ -2115,213 +2120,213 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
 
 
 
-    if assertion2:
-        assertion2_view_tree = []
-        for i in range (0, len(assertion2)):
-            if assertion2[i][0] != None:
-                assertion2_node = assertion2[i][0]
+    if basicUnit2:
+        basicUnit2_view_tree = []
+        for i in range (0, len(basicUnit2)):
+            if basicUnit2[i][0] != None:
+                basicUnit2_node = basicUnit2[i][0]
                 print("---------------------------------------------------------------")
-                print("----------------------- ASSERTION2 NODE -----------------------")
-                print(assertion2_node)
+                print("----------------------- BASIC_UNIT2 NODE -----------------------")
+                print(basicUnit2_node)
 
-                assertion2_object = assertion2[i][1]
+                basicUnit2_object = basicUnit2[i][1]
                 print("---------------------------------------------------------------")
-                print("---------------------- ASSERTION2 OBJECT ----------------------")
-                print(assertion2_object)
+                print("---------------------- BASIC_UNIT2 OBJECT ----------------------")
+                print(basicUnit2_object)
 
-                assertion2_raw_container_nodes_dict = ast.literal_eval(assertion2[i][2])
+                basicUnit2_raw_container_nodes_dict = ast.literal_eval(basicUnit2[i][2])
                 print("---------------------------------------------------------------")
-                print("------------------ ASSERTION2 RAW CONT DICT -------------------")
-                print(assertion2_raw_container_nodes_dict)
+                print("------------------ BASIC_UNIT2 RAW CONT DICT -------------------")
+                print(basicUnit2_raw_container_nodes_dict)
 
-                assertion2_uri = assertion2[i][0].get('URI')
+                basicUnit2_uri = basicUnit2[i][0].get('URI')
                 print("---------------------------------------------------------------")
-                print("------------------- ASSERTION2 URI ----------------------------")
-                print(assertion2_uri)
-                assertion2_input_item = []
-                for m in range (0, len(assertion2_input)):
-                    if assertion2_uri == assertion2_input[m].get('assertion_URI'):
-                        assertion2_input_item.append(assertion2_input[m])
+                print("------------------- BASIC_UNIT2 URI ----------------------------")
+                print(basicUnit2_uri)
+                basicUnit2_input_item = []
+                for m in range (0, len(basicUnit2_input)):
+                    if basicUnit2_uri == basicUnit2_input[m].get('basicUnit_URI'):
+                        basicUnit2_input_item.append(basicUnit2_input[m])
                         print("---------------------------------------------------------------")
-                        print("------------------- ASSERTION2 INPUT NODES --------------------")
-                        print(assertion2_input_item)
-                assertion2_tree = getSubViewTree(assertion2_raw_container_nodes_dict, assertion2_node, assertion2_object, assertion2_input_item)
-                assertion2_view_tree.append(assertion2_tree)
+                        print("------------------- BASIC_UNIT2 INPUT NODES --------------------")
+                        print(basicUnit2_input_item)
+                basicUnit2_tree = getSubViewTree(basicUnit2_raw_container_nodes_dict, basicUnit2_node, basicUnit2_object, basicUnit2_input_item)
+                basicUnit2_view_tree.append(basicUnit2_tree)
 
         print("---------------------------------------------------------------")
         print("---------------------------------------------------------------")
-        print("------------------ ASSERTION2 VIEW TREE LIST ------------------")
-        print(assertion2_view_tree)
+        print("------------------ BASIC_UNIT2 VIEW TREE LIST ------------------")
+        print(basicUnit2_view_tree)
 
 
 
 
 
 
-    assertion_view_tree = []
-    for i in range (0, len(assertions)):
-        if assertions[i][0] != None:
-            assertion_node = assertions[i][0]
+    basicUnit_view_tree = []
+    for i in range (0, len(basicUnits)):
+        if basicUnits[i][0] != None:
+            basicUnit_node = basicUnits[i][0]
             print("---------------------------------------------------------------")
-            print("------------------------ ASSERTION NODE -----------------------")
-            print(assertion_node)
+            print("------------------------ BASIC_UNIT NODE -----------------------")
+            print(basicUnit_node)
 
-            assertion_object = assertions[i][1]
+            basicUnit_object = basicUnits[i][1]
             print("---------------------------------------------------------------")
-            print("----------------------- ASSERTION OBJECT ----------------------")
-            print(assertion_object)
+            print("----------------------- BASIC_UNIT OBJECT ----------------------")
+            print(basicUnit_object)
 
-            assertion_raw_container_nodes_dict = ast.literal_eval(assertions[i][2])
+            basicUnit_raw_container_nodes_dict = ast.literal_eval(basicUnits[i][2])
             print("---------------------------------------------------------------")
-            print("------------------- ASSERTION RAW CONT DICT -------------------")
-            print(assertion_raw_container_nodes_dict)
+            print("------------------- BASIC_UNIT RAW CONT DICT -------------------")
+            print(basicUnit_raw_container_nodes_dict)
 
-            assertion_uri = assertions[i][0].get('URI')
+            basicUnit_uri = basicUnits[i][0].get('URI')
             print("---------------------------------------------------------------")
-            print("------------------- ASSERTION URI -----------------------------")
-            print(assertion_uri)
-            assertion_input_item = []
-            for m in range (0, len(assertion_input)):
-                if assertion_uri == assertion_input[m].get('assertion_URI'):
-                    assertion_input_item.append(assertion_input[m])
+            print("------------------- BASIC_UNIT URI -----------------------------")
+            print(basicUnit_uri)
+            basicUnit_input_item = []
+            for m in range (0, len(basicUnit_input)):
+                if basicUnit_uri == basicUnit_input[m].get('basicUnit_URI'):
+                    basicUnit_input_item.append(basicUnit_input[m])
                     print("---------------------------------------------------------------")
-                    print("------------------- ASSERTION INPUT NODES ---------------------")
-                    print(assertion_input_item)
-            assertion_tree = getSubViewTree(assertion_raw_container_nodes_dict, assertion_node, assertion_object, assertion_input_item)
+                    print("------------------- BASIC_UNIT INPUT NODES ---------------------")
+                    print(basicUnit_input_item)
+            basicUnit_tree = getSubViewTree(basicUnit_raw_container_nodes_dict, basicUnit_node, basicUnit_object, basicUnit_input_item)
 
-            # check for assertions that are displayed by one of the page's assertions
+            # check for basicUnits that are displayed by one of the simpleDescriptionUnit's basicUnits
             try:
-                assertion_child_list = navi_dict.get(assertion_node.get('URI')).get('children')
+                basicUnit_child_list = navi_dict.get(basicUnit_node.get('URI')).get('children')
                 print("---------------------------------------------------------------")
-                print("----------------------- ASSERTION CHILD LIST ------------------")
-                print(assertion_child_list)
-                assertion_child_len = len(assertion_child_list)
-                print(assertion_child_len)
+                print("----------------------- BASIC_UNIT CHILD LIST ------------------")
+                print(basicUnit_child_list)
+                basicUnit_child_len = len(basicUnit_child_list)
+                print(basicUnit_child_len)
 
-                for i in range (0, assertion_child_len):
+                for i in range (0, basicUnit_child_len):
                     print("i = " + str(i))
-                    child_uri = assertion_child_list[i]
-                    for j in range (0, len(assertion2_view_tree)):
-                        if assertion2_view_tree[j].get('URI') == child_uri:
-                            kgbb_uri = assertion2_view_tree[j].get('KGBB_URI')
+                    child_uri = basicUnit_child_list[i]
+                    for j in range (0, len(basicUnit2_view_tree)):
+                        if basicUnit2_view_tree[j].get('URI') == child_uri:
+                            kgbb_uri = basicUnit2_view_tree[j].get('KGBB_URI')
                             print("---------------------------------------------------------------")
                             print("------------------- FOUND KGBB URI ----------------------------")
                             print(kgbb_uri)
 
                             for m in range (0, 600):
                                 try:
-                                    assertion_tree_container = assertion_tree.get(m)
-                                    target_kgbb_uri = assertion_tree_container.get('target_KGBB_URI')
+                                    basicUnit_tree_container = basicUnit_tree.get(m)
+                                    target_kgbb_uri = basicUnit_tree_container.get('target_KGBB_URI')
                                     if kgbb_uri == target_kgbb_uri:
-                                        sub_view_tree = assertion_tree.get(m).get('sub_view_tree')
-                                        sub_view_tree.append(assertion2_view_tree[j])
+                                        sub_view_tree = basicUnit_tree.get(m).get('sub_view_tree')
+                                        sub_view_tree.append(basicUnit2_view_tree[j])
                                         sub_view_tree_length = len(sub_view_tree)
-                                        assertion_tree.get(m)['sub_view_tree'] = sub_view_tree
-                                        assertion_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
+                                        basicUnit_tree.get(m)['sub_view_tree'] = sub_view_tree
+                                        basicUnit_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
 
                                         m = 601
                                         print("-----------------------------------------------------------")
-                                        print("------ ASSERTION2 SUB VIEW TREE SUCCESSFULLY ADDED --------")
+                                        print("------ BASIC_UNIT2 SUB VIEW TREE SUCCESSFULLY ADDED --------")
                                 except:
                                     pass
             except:
                 pass
 
-            assertion_view_tree.append(assertion_tree)
+            basicUnit_view_tree.append(basicUnit_tree)
 
     print("---------------------------------------------------------------")
     print("---------------------------------------------------------------")
-    print("------------------- ASSERTION VIEW TREE LIST ------------------")
-    print(assertion_view_tree)
+    print("------------------- BASIC_UNIT VIEW TREE LIST ------------------")
+    print(basicUnit_view_tree)
 
 
 
-    if pages2:
-        pages2_view_tree = []
-        for i in range (0, len(pages2)):
-            if pages2[i][0] != None:
-                page2_node = pages2[i][0]
+    if simpleDescriptionUnits2:
+        simpleDescriptionUnits2_view_tree = []
+        for i in range (0, len(simpleDescriptionUnits2)):
+            if simpleDescriptionUnits2[i][0] != None:
+                simpleDescriptionUnit2_node = simpleDescriptionUnits2[i][0]
                 print("---------------------------------------------------------------")
-                print("------------------------ PAGE2 NODE ---------------------------")
-                print(page2_node)
+                print("------------------------ SIMPLE_DESCRIPTION_UNIT2 NODE ---------------------------")
+                print(simpleDescriptionUnit2_node)
 
-                page2_object = pages2[i][1]
+                simpleDescriptionUnit2_object = simpleDescriptionUnits2[i][1]
                 print("---------------------------------------------------------------")
-                print("----------------------- PAGE2 OBJECT --------------------------")
-                print(page2_object)
+                print("----------------------- SIMPLE_DESCRIPTION_UNIT2 OBJECT --------------------------")
+                print(simpleDescriptionUnit2_object)
 
-                page2_raw_container_nodes_dict = ast.literal_eval(pages2[i][2])
+                simpleDescriptionUnit2_raw_container_nodes_dict = ast.literal_eval(simpleDescriptionUnits2[i][2])
                 print("---------------------------------------------------------------")
-                print("------------------- PAGE2 RAW CONT DICT -----------------------")
-                print(page2_raw_container_nodes_dict)
+                print("------------------- SIMPLE_DESCRIPTION_UNIT2 RAW CONT DICT -----------------------")
+                print(simpleDescriptionUnit2_raw_container_nodes_dict)
 
-                page2_uri = pages2[i][0].get('URI')
+                simpleDescriptionUnit2_uri = simpleDescriptionUnits2[i][0].get('URI')
                 print("---------------------------------------------------------------")
-                print("------------------- PAGE2 URI ---------------------------------")
-                print(page2_uri)
-                pages2_input_item = []
-                if pages2_input:
-                    for m in range (0, len(pages2_input)):
-                        if page2_uri == pages2_input[m].get('page_URI')[0]:
-                            pages2_input_item.append(pages2_input[m])
+                print("------------------- SIMPLE_DESCRIPTION_UNIT2 URI ---------------------------------")
+                print(simpleDescriptionUnit2_uri)
+                simpleDescriptionUnits2_input_item = []
+                if simpleDescriptionUnits2_input:
+                    for m in range (0, len(simpleDescriptionUnits2_input)):
+                        if simpleDescriptionUnit2_uri == simpleDescriptionUnits2_input[m].get('simpleDescriptionUnit_URI')[0]:
+                            simpleDescriptionUnits2_input_item.append(simpleDescriptionUnits2_input[m])
                             print("---------------------------------------------------------------")
-                            print("------------------- PAGE2 INPUT NODES -------------------------")
-                            print(pages2_input_item)
-                page2_tree = getSubViewTree(page2_raw_container_nodes_dict, page2_node, page2_object, pages2_input_item)
-                pages2_view_tree.append(page2_tree)
+                            print("------------------- SIMPLE_DESCRIPTION_UNIT2 INPUT NODES -------------------------")
+                            print(simpleDescriptionUnits2_input_item)
+                simpleDescriptionUnit2_tree = getSubViewTree(simpleDescriptionUnit2_raw_container_nodes_dict, simpleDescriptionUnit2_node, simpleDescriptionUnit2_object, simpleDescriptionUnits2_input_item)
+                simpleDescriptionUnits2_view_tree.append(simpleDescriptionUnit2_tree)
 
         print("---------------------------------------------------------------")
         print("---------------------------------------------------------------")
-        print("------------------- PAGES2 VIEW TREE LIST ---------------------")
-        print(pages2_view_tree)
+        print("------------------- SIMPLE_DESCRIPTION_UNITS2 VIEW TREE LIST ---------------------")
+        print(simpleDescriptionUnits2_view_tree)
 
 
-    page = query_result[0].get('page')
-    page_node = page[0]
+    simpleDescriptionUnit = query_result[0].get('simpleDescriptionUnit')
+    simpleDescriptionUnit_node = simpleDescriptionUnit[0]
     print("---------------------------------------------------------------")
-    print("------------------------- PAGE NODE ---------------------------")
-    print(page_node)
+    print("------------------------- SIMPLE_DESCRIPTION_UNIT NODE ---------------------------")
+    print(simpleDescriptionUnit_node)
 
-    page_object = page[1]
+    simpleDescriptionUnit_object = simpleDescriptionUnit[1]
     print("---------------------------------------------------------------")
-    print("------------------------ PAGE OBJECT --------------------------")
-    print(page_object)
+    print("------------------------ SIMPLE_DESCRIPTION_UNIT OBJECT --------------------------")
+    print(simpleDescriptionUnit_object)
 
-    page_raw_container_nodes_dict = ast.literal_eval(page[2])
+    simpleDescriptionUnit_raw_container_nodes_dict = ast.literal_eval(simpleDescriptionUnit[2])
     print("---------------------------------------------------------------")
-    print("------------------------ PAGE RAW CONT DICT -------------------")
-    print(page_raw_container_nodes_dict)
+    print("------------------------ SIMPLE_DESCRIPTION_UNIT RAW CONT DICT -------------------")
+    print(simpleDescriptionUnit_raw_container_nodes_dict)
 
-    page_view_tree = getSubViewTree(page_raw_container_nodes_dict, page_node, page_object, None)
+    simpleDescriptionUnit_view_tree = getSubViewTree(simpleDescriptionUnit_raw_container_nodes_dict, simpleDescriptionUnit_node, simpleDescriptionUnit_object, None)
 
-    # check for pages, assertions, and granularity trees that are displayed by page
-    page_child_list = navi_dict.get(page_node.get('URI')).get('children')
+    # check for simpleDescriptionUnits, basicUnits, and granularity trees that are displayed by simpleDescriptionUnit
+    simpleDescriptionUnit_child_list = navi_dict.get(simpleDescriptionUnit_node.get('URI')).get('children')
     print("---------------------------------------------------------------")
-    print("----------------------- PAGE CHILD LIST -----------------------")
-    print(page_child_list)
-    page_child_len = len(page_child_list)
-    print(page_child_len)
+    print("----------------------- SIMPLE_DESCRIPTION_UNIT CHILD LIST -----------------------")
+    print(simpleDescriptionUnit_child_list)
+    simpleDescriptionUnit_child_len = len(simpleDescriptionUnit_child_list)
+    print(simpleDescriptionUnit_child_len)
 
-    for i in range (0, page_child_len):
+    for i in range (0, simpleDescriptionUnit_child_len):
         print("i = " + str(i))
-        child_uri = page_child_list[i]
-        for j in range (0, len(assertion_view_tree)):
-            if assertion_view_tree[j].get('URI') == child_uri:
-                kgbb_uri = assertion_view_tree[j].get('KGBB_URI')
+        child_uri = simpleDescriptionUnit_child_list[i]
+        for j in range (0, len(basicUnit_view_tree)):
+            if basicUnit_view_tree[j].get('URI') == child_uri:
+                kgbb_uri = basicUnit_view_tree[j].get('KGBB_URI')
                 print("---------------------------------------------------------------")
                 print("------------------- FOUND KGBB URI ----------------------------")
                 print(kgbb_uri)
 
                 for m in range (0, 600):
                     try:
-                        page_view_tree_container = page_view_tree.get(m)
-                        target_kgbb_uri = page_view_tree_container.get('target_KGBB_URI')
+                        simpleDescriptionUnit_view_tree_container = simpleDescriptionUnit_view_tree.get(m)
+                        target_kgbb_uri = simpleDescriptionUnit_view_tree_container.get('target_KGBB_URI')
                         if kgbb_uri == target_kgbb_uri:
-                            sub_view_tree = page_view_tree.get(m).get('sub_view_tree')
-                            sub_view_tree.append(assertion_view_tree[j])
+                            sub_view_tree = simpleDescriptionUnit_view_tree.get(m).get('sub_view_tree')
+                            sub_view_tree.append(basicUnit_view_tree[j])
                             sub_view_tree_length = len(sub_view_tree)
-                            page_view_tree.get(m)['sub_view_tree'] = sub_view_tree
-                            page_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
+                            simpleDescriptionUnit_view_tree.get(m)['sub_view_tree'] = sub_view_tree
+                            simpleDescriptionUnit_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
 
                             m = 601
                             print("-----------------------------------------------------------")
@@ -2330,24 +2335,24 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
                     except:
                         pass
 
-        if pages2_view_tree:
-            for j in range (0, len(pages2_view_tree)):
-                if pages2_view_tree[j].get('URI') == child_uri:
-                    kgbb_uri = pages2_view_tree[j].get('KGBB_URI')
+        if simpleDescriptionUnits2_view_tree:
+            for j in range (0, len(simpleDescriptionUnits2_view_tree)):
+                if simpleDescriptionUnits2_view_tree[j].get('URI') == child_uri:
+                    kgbb_uri = simpleDescriptionUnits2_view_tree[j].get('KGBB_URI')
                     print("---------------------------------------------------------------")
                     print("------------------- FOUND KGBB URI ----------------------------")
                     print(kgbb_uri)
 
                     for m in range (0, 600):
                         try:
-                            page_view_tree_container = page_view_tree.get(m)
-                            target_kgbb_uri = page_view_tree_container.get('target_KGBB_URI')
+                            simpleDescriptionUnit_view_tree_container = simpleDescriptionUnit_view_tree.get(m)
+                            target_kgbb_uri = simpleDescriptionUnit_view_tree_container.get('target_KGBB_URI')
                             if kgbb_uri == target_kgbb_uri:
-                                sub_view_tree = page_view_tree.get(m).get('sub_view_tree')
-                                sub_view_tree.append(pages2_view_tree[j])
+                                sub_view_tree = simpleDescriptionUnit_view_tree.get(m).get('sub_view_tree')
+                                sub_view_tree.append(simpleDescriptionUnits2_view_tree[j])
                                 sub_view_tree_length = len(sub_view_tree)
-                                page_view_tree.get(m)['sub_view_tree'] = sub_view_tree
-                                page_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
+                                simpleDescriptionUnit_view_tree.get(m)['sub_view_tree'] = sub_view_tree
+                                simpleDescriptionUnit_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
 
                                 m = 601
                                 print("-----------------------------------------------------------")
@@ -2366,14 +2371,14 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
 
                     for m in range (0, 600):
                         try:
-                            page_view_tree_container = page_view_tree.get(m)
-                            target_kgbb_uri = page_view_tree_container.get('target_KGBB_URI')
+                            simpleDescriptionUnit_view_tree_container = simpleDescriptionUnit_view_tree.get(m)
+                            target_kgbb_uri = simpleDescriptionUnit_view_tree_container.get('target_KGBB_URI')
                             if kgbb_uri == target_kgbb_uri:
-                                sub_view_tree = page_view_tree.get(m).get('sub_view_tree')
+                                sub_view_tree = simpleDescriptionUnit_view_tree.get(m).get('sub_view_tree')
                                 sub_view_tree.append(granularity_trees_view_tree[j])
                                 sub_view_tree_length = len(sub_view_tree)
-                                page_view_tree.get(m)['sub_view_tree'] = sub_view_tree
-                                page_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
+                                simpleDescriptionUnit_view_tree.get(m)['sub_view_tree'] = sub_view_tree
+                                simpleDescriptionUnit_view_tree.get(m)['sub_view_tree_length'] = sub_view_tree_length
 
                                 m = 601
                                 print("-----------------------------------------------------------")
@@ -2384,10 +2389,10 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
 
 
     print("---------------------------------------------------------------")
-    print("-------------------------- PAGE VIEW TREE ---------------------")
-    print(page_view_tree)
+    print("-------------------------- SIMPLE_DESCRIPTION_UNIT VIEW TREE ---------------------")
+    print(simpleDescriptionUnit_view_tree)
 
-    return navi_dict, page_view_tree
+    return navi_dict, simpleDescriptionUnit_view_tree
 
 
 
@@ -2402,7 +2407,7 @@ def getPageViewData(entry_uri, page_uri, data_view_name):
 
 # INPUT: data_item_container_dict, data_item_node, data_item_object_node, data_item_input_nodes_dict
 
-# OUTPUT: view_tree dictionary -> a dict of all information required for representing data from a specific data item (i.e. page, assertion) in the UI. It follows the syntax (here for a page): {'URI':uri, 'data_item_type':"entry/page/assertion", 'KGBB_URI':uri, order[integer]: {page_label1:string, page_value1:string, page_label_tooltip1:string, page_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [assertion_uri, {assertion_view_tree}], etc.}, etc.
+# OUTPUT: view_tree dictionary -> a dict of all information required for representing data from a specific data item (i.e. simpleDescriptionUnit, basicUnit) in the UI. It follows the syntax (here for a simpleDescriptionUnit): {'URI':uri, 'data_item_type':"entry/simpleDescriptionUnit/basicUnit", 'KGBB_URI':uri, order[integer]: {simpleDescriptionUnit_label1:string, simpleDescriptionUnit_value1:string, simpleDescriptionUnit_label_tooltip1:string, simpleDescriptionUnit_value_tooltip1:string,  placeholder_text:string, editable:Boolean, include_html:string, div_class:string, input_control:{input_info_node}, sub_view_tree: {index[integer]: [basicUnit_uri, {basicUnit_view_tree}], etc.}, etc.
 def getSubViewTree(data_item_container_dict, data_item_node, data_item_object_node, data_item_input_nodes_dict):
     data_item_type = data_item_container_dict.get('data_item_type')
     data_item_uri = data_item_node.get('URI')
@@ -2452,49 +2457,49 @@ def getSubViewTree(data_item_container_dict, data_item_node, data_item_object_no
 
 
 
-# gather dictionary for navigating through pages and assertions of an entry
+# gather dictionary for navigating through simpleDescriptionUnits and basicUnits of an entry
 # INPUT: entry_uri
 
-# OUTPUT: navi_dict -> a dict of all pages and assertions linked to an entry node via :DISPLAYS relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
+# OUTPUT: navi_dict -> a dict of all simpleDescriptionUnits and basicUnits linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chaings, following syntax:  {uri: {'node_type':string, 'name':string, 'child_uris':[list of child uris]}, etc.}
 def getNaviDict(entry_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    # return entry node and all page nodes that are directly displayed by this entry
-    get_displayed_pages_query_string = '''
-    MATCH (n {{URI:"{entry_uri}"}})-[:DISPLAYS]-> (root_page {{root_page:"true", current_version:"true"}})
-    OPTIONAL MATCH (n)-[:DISPLAYS*]-> (m {{current_version:"true"}})
-    OPTIONAL MATCH (m)<-[:DISPLAYS]-(x {{current_version:"true"}})
-    WITH [n.URI, n.name, n.KGBB_URI, root_page.node_type, root_page.name, root_page.URI, root_page.KGBB_URI, n.publication_title] as entry_info,
-    [x.URI, m.node_type, m.name, m.URI, m.KGBB_URI, m.assertion_label, m.page_label] as child_info,
-    [root_page.URI, root_page.node_type, root_page.name, root_page.KGBB_URI] as root_page_info
-    RETURN entry_info, child_info, root_page_info'''.format(entry_uri=entry_uri)
-    page_nodes = connection.query(get_displayed_pages_query_string, db='neo4j')
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_displayed_simpleDescriptionUnits_query_string = '''
+    MATCH (n {{URI:"{entry_uri}"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-> (root_simpleDescriptionUnit {{root_simpleDescriptionUnit:"true", current_version:"true"}})
+    OPTIONAL MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]-> (m {{current_version:"true"}})
+    OPTIONAL MATCH (m)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(x {{current_version:"true"}})
+    WITH [n.URI, n.name, n.KGBB_URI, root_simpleDescriptionUnit.node_type, root_simpleDescriptionUnit.name, root_simpleDescriptionUnit.URI, root_simpleDescriptionUnit.KGBB_URI, n.publication_title] as entry_info,
+    [x.URI, m.node_type, m.name, m.URI, m.KGBB_URI, m.basicUnit_label, m.simpleDescriptionUnit_label] as child_info,
+    [root_simpleDescriptionUnit.URI, root_simpleDescriptionUnit.node_type, root_simpleDescriptionUnit.name, root_simpleDescriptionUnit.KGBB_URI] as root_simpleDescriptionUnit_info
+    RETURN entry_info, child_info, root_simpleDescriptionUnit_info'''.format(entry_uri=entry_uri)
+    simpleDescriptionUnit_nodes = connection.query(get_displayed_simpleDescriptionUnits_query_string, db='neo4j')
     print("---------------------------------------------------------------")
-    print("----------------- PAGE_NODES INITIAL QUERY RESULT -------------")
-    print(page_nodes)
+    print("----------------- SIMPLE_DESCRIPTION_UNIT_NODES INITIAL QUERY RESULT -------------")
+    print(simpleDescriptionUnit_nodes)
 
-    # defines dict and adds entry and root_page information
+    # defines dict and adds entry and root_simpleDescriptionUnit information
     navi_dict = {}
-    navi_dict[page_nodes[0].get('entry_info')[0]] = {'node_type': 'entry', 'name': page_nodes[0].get('entry_info')[1], 'KGBB_URI': page_nodes[0].get('entry_info')[2], 'children':[page_nodes[0].get('entry_info')[5]], 'title':page_nodes[0].get('entry_info')[7]}
-    navi_dict[page_nodes[0].get('entry_info')[5]] = {'root_page':"true", 'node_type': page_nodes[0].get('entry_info')[3], 'name': page_nodes[0].get('entry_info')[4], 'KGBB_URI': page_nodes[0].get('entry_info')[6], 'children':[]}
+    navi_dict[simpleDescriptionUnit_nodes[0].get('entry_info')[0]] = {'node_type': 'entry', 'name': simpleDescriptionUnit_nodes[0].get('entry_info')[1], 'KGBB_URI': simpleDescriptionUnit_nodes[0].get('entry_info')[2], 'children':[simpleDescriptionUnit_nodes[0].get('entry_info')[5]], 'title':simpleDescriptionUnit_nodes[0].get('entry_info')[7]}
+    navi_dict[simpleDescriptionUnit_nodes[0].get('entry_info')[5]] = {'root_simpleDescriptionUnit':"true", 'node_type': simpleDescriptionUnit_nodes[0].get('entry_info')[3], 'name': simpleDescriptionUnit_nodes[0].get('entry_info')[4], 'KGBB_URI': simpleDescriptionUnit_nodes[0].get('entry_info')[6], 'children':[]}
 
     print("--------------------------------------------------------------------")
     print("------------------INITIAL NAVIGATION DICT---------------------------")
     print(navi_dict)
 
-    len(page_nodes) # number of found page nodes
-    print(len(page_nodes))
+    len(simpleDescriptionUnit_nodes) # number of found simpleDescriptionUnit nodes
+    print(len(simpleDescriptionUnit_nodes))
 
-    # add all page nodes as items to pages dict
-    for i in range(0, len(page_nodes)):
-        # gather information to be added to the page element dict
-        item_node = page_nodes[i].get('child_info')
+    # add all simpleDescriptionUnit nodes as items to simpleDescriptionUnits dict
+    for i in range(0, len(simpleDescriptionUnit_nodes)):
+        # gather information to be added to the simpleDescriptionUnit element dict
+        item_node = simpleDescriptionUnit_nodes[i].get('child_info')
         parent_uri = item_node[0]
         node_uri = item_node[3]
         if not navi_dict.get(node_uri):
-            if item_node[1] == 'assertion':
+            if item_node[1] == 'basicUnit':
                 navi_dict[node_uri] = {'node_type': item_node[1], 'name': item_node[5], 'KGBB_URI': item_node[4], 'children':[]}
-            elif 'page' in item_node[1]:
+            elif 'simpleDescriptionUnit' in item_node[1]:
                 if item_node[6]:
                     navi_dict[node_uri] = {'node_type': item_node[1], 'name': item_node[6], 'KGBB_URI': item_node[4], 'children':[]}
                 else:
@@ -2557,7 +2562,7 @@ def updateEntryDict(entry_dict, selected_uri):
 
 
 
-# gives back bioportal return [0]answer, [1]preferred_name, [2] full_id, [3]ontology_id, [4]parent_uri, [5]entry_uri, [6]page_uri, [7]assertion_uri, [8]parent_item_type, [9]kgbb_uri, [10]input_results_in, [11]description, [12]query_key, [13]deleted_item_uri, [14]input_value
+# gives back bioportal return [0]answer, [1]preferred_name, [2] full_id, [3]ontology_id, [4]parent_uri, [5]entry_uri, [6]simpleDescriptionUnit_uri, [7]basicUnit_uri, [8]parent_item_type, [9]kgbb_uri, [10]input_results_in, [11]description, [12]query_key, [13]deleted_item_uri, [14]input_value
 def getBioPortalSingleInputData (input_name):
     description = "Bioportal API does not provide a description for this resource"
 
@@ -2597,13 +2602,13 @@ def getBioPortalSingleInputData (input_name):
     print("------------------------------ ENTRY URI --------------------------------")
     print(entry_uri)
 
-    page_uri = request.form[input_name + '_page_uri']
-    print("------------------------------ PAGE URI ---------------------------------")
-    print(page_uri)
+    simpleDescriptionUnit_uri = request.form[input_name + '_simpleDescriptionUnit_uri']
+    print("------------------------------ SIMPLE_DESCRIPTION_UNIT URI ---------------------------------")
+    print(simpleDescriptionUnit_uri)
 
-    assertion_uri = request.form[input_name + '_assertion_uri']
-    print("------------------------------ ASSERTION URI ----------------------------")
-    print(assertion_uri)
+    basicUnit_uri = request.form[input_name + '_basicUnit_uri']
+    print("------------------------------ BASIC_UNIT URI ----------------------------")
+    print(basicUnit_uri)
 
     parent_item_type = request.form[input_name + '_parent_item_type']
     print("----------------------- PARENT DATA ITEM TYPE ---------------------------")
@@ -2646,7 +2651,7 @@ def getBioPortalSingleInputData (input_name):
     except:
         input_value2=None
 
-    return bioportal_answer, bioportal_preferred_name, bioportal_full_id, bioportal_ontology_id, parent_uri, entry_uri, page_uri, assertion_uri, parent_item_type, kgbb_uri, input_result, description, query_key, deleted_item_uri, input_value, input_value1, input_value2
+    return bioportal_answer, bioportal_preferred_name, bioportal_full_id, bioportal_ontology_id, parent_uri, entry_uri, simpleDescriptionUnit_uri, basicUnit_uri, parent_item_type, kgbb_uri, input_result, description, query_key, deleted_item_uri, input_value, input_value1, input_value2
 
 
 
@@ -2658,14 +2663,14 @@ def getEditHistory(data_item_uri):
 
     # query string definition for getting all edit steps for this data item uri and all its child items by date, item name, user name, and uri of edited resource
     history_query_string = '''MATCH (n {{URI:"{data_item_uri}"}})
-    OPTIONAL MATCH (n)-[:DISPLAYS*]->(m)
-    OPTIONAL MATCH (x) WHERE (m.URI IN x.page_URI) OR (m.URI IN x.assertion_URI) OR (x.page_URI=m.URI) OR (x.assertion_URI=m.URI)
+    OPTIONAL MATCH (n)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]->(m)
+    OPTIONAL MATCH (x) WHERE (m.URI IN x.simpleDescriptionUnit_URI) OR (m.URI IN x.basicUnit_URI) OR (x.simpleDescriptionUnit_URI=m.URI) OR (x.basicUnit_URI=m.URI)
     WITH n, m, x ORDER BY n.last_updated_on, m.last_updated_on, x.last_updated_on DESC
     RETURN [n.last_updated_on, n.name, n.created_by, n.current_version, n.created_on, n.URI] AS n, [m.last_updated_on, m.name, m.created_by, m.current_version, m.created_on, m.URI] AS m, [x.last_updated_on, x.name, x.created_by, x.current_version, x.created_on, x.URI] AS x'''.format(data_item_uri=data_item_uri)
 
     query_result = connection.query(history_query_string, db='neo4j')
     print("---------------------------------------------------------------")
-    print("---------------------- HISTORY QUERY RESULT--------------------")
+    print("---------------------- HISTORY QUERY RESULT -------------------")
     print(query_result)
     edit_history = []
     for i in range (0, len(query_result)):
@@ -2709,7 +2714,104 @@ def getEditHistory(data_item_uri):
 
 
 
+# creates a new version of the data_item and links it to the data_item using pav properties. Also updates the previous current version of the data_item as just a version and links it to the new current version.
+def createVersion(data_item_uri, type):
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
+    if type == "Entry":
+        key = "entry_URI"
+        label = ":orkg_VersionedEntry_IND:orkg_Entry_IND:iao_Document_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity"
+        type_uri = "orkg_versioned_entry_class_URI"
+        label2 =":VersionedEntryDOI_IND:EntryDOI_IND:DOI_IND:Literal_IND"
+
+    elif type == "SimpleDescriptionUnit":
+        key = "simpleDescriptionUnit_URI"
+        label = ":orkg_VersionedSimpleDescriptionUnit_IND:orkg_SimpleDescriptionUnit_IND:iao_DocumentPart_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity"
+        type_uri = "orkg_versioned_simpleDescriptionUnit_class_URI"
+        label2 =":VersionedSimpleDescriptionUnitDOI_IND:SimpleDescriptionUnitDOI_IND:DOI_IND:Literal_IND"
+
+    elif type == "BasicUnit":
+        key = "basicUnit_URI"
+        label = ":orkg_VersionedBasicUnit_IND:orkg_BasicUnit_IND:iao_DocumentPart_IND:iao_InformationContentEntity_IND:NamedIndividual:Entity"
+        type_uri = "orkg_versioned_basicUnit_class_URI"
+        label2 =":VersionedBasicUnitDOI_IND:BasicUnitDOI_IND:DOI_IND:Literal_IND"
+
+
+    version_uri = str(uuid.uuid4())
+    version_doi = str(uuid.uuid4())
+
+    # query string definition for getting all versions of this data item uri
+    versions_query_string = '''MATCH (data_item {{URI:"{data_item_uri}", current_version:"true"}})
+    WITH DISTINCT data_item
+    MATCH (current_version_true_nodes {{{key}:"{data_item_uri}", current_version:"true"}}) SET current_version_true_nodes.versioned_doi = current_version_true_nodes.versioned_doi + "{version_doi}"
+    WITH DISTINCT data_item, current_version_true_nodes
+    OPTIONAL MATCH (data_item)-[r1:HAS_CURRENT_VERSION]->(previous_current_version)
+    MERGE (data_item)-[:HAS_CURRENT_VERSION {{category:"ObjectPropertyExpression", URI:"http://purl.org/pav/hasCurrentVersion", description:"This resource has a more specific, versioned resource with equivalent content. This property is intended for relating a non-versioned or abstract resource to a single snapshot that can be used as a permalink to indicate the current version of the content. For instance, if today is 2013-12-25, then a News simpleDescriptionUnit can indicate a corresponding snapshot resource which will refer to the news as they were of 2013-12-25. <http://news.example.com/> pav:hasCurrentVersion <http://news.example.com/2013-12-25/> . 'Equivalent content' is a loose definition, for instance the snapshot resource might include additional information to indicate it is a snapshot, and is not required to be immutable. Other versioned resources indicating the content at earlier times MAY be indicated with the superproperty pav:hasVersion, one of which MAY be related to the current version using pav:hasCurrentVersion: <http://news.example.com/2013-12-25/> pav:previousVersion <http://news.example.com/2013-12-24/> . <http://news.example.com/> pav:hasVersion <http://news.example.com/2013-12-23/> . Note that it might be confusing to also indicate pav:previousVersion from a resource that has hasCurrentVersion relations, as such a resource is intended to be a long-living 'unversioned' resource. The PAV ontology does however not formally restrict this, to cater for more complex scenarios with multiple abstraction levels. Similarly, it would normally be incorrect to indicate a pav:hasCurrentVersion from an older version; instead the current version would be found by finding the non-versioned resource that the particular resource is a version of, and then its current version. This property is normally used in a functional way, although PAV does not formally restrict this."}}]->(version{label} {{name:"Version of:" + data_item.name, URI:"{version_uri}", {key}:"{data_item_uri}", created_on:datetime(), version_type:"{type}", version:1, versioned_doi:"{version_doi}", version_of:"{data_item_uri}", created_by:"ORKGuserORCID", contributed_by:data_item.contributed_by, type:"{type_uri}"}})
+    MERGE (version)-[:HAS_DOI {{category:"DataPropertyExpression", URI:"http://prismstandard.org/namespaces/basic/2.0/doi"}}]->(doi{label2} {{value:"{version_doi}", versioned_doi:"{version_doi}", {key}:"{data_item_uri}", category:"NamedIndividual"}})
+    MERGE (version)-[:IDENTIFIER {{category:"DataPropertyExpression", URI:"https://dublincore.org/specifications/dublin-core/dcmi-terms/#identifier"}}]->(doi)
+    WITH DISTINCT data_item, version, previous_current_version, r1
+    FOREACH (i IN CASE WHEN previous_current_version IS NOT NULL THEN [1] ELSE [] END |
+    MERGE (data_item)-[:HAS_VERSION {{category:"ObjectPropertyExpression", URI:"http://purl.org/pav/hasVersion", description:"This resource has a more specific, versioned resource. This property is intended for relating a non-versioned or abstract resource to several versioned resources, e.g. snapshots. For instance, if there are two snapshots of the News simpleDescriptionUnit, made on 23rd and 24th of December, then: <http://news.example.com/> pav:hasVersion <http://news.example.com/2013-12-23/> ; pav:hasVersion <http://news.example.com/2013-12-24/> . If one of the versions has somewhat the equivalent content to this resource (e.g. can be used as a permalink for this resource), then it should instead be indicated with the subproperty pav:hasCurrentVersion: <http://news.example.com/> pav:hasCurrentVersion <http://news.example.com/2013-12-25/> . To order the versions, use pav:previousVersion: <http://news.example.com/2013-12-25/> pav:previousVersion <http://news.example.com/2013-12-24/> . <http://news.example.com/2013-12-24/> pav:previousVersion <http://news.example.com/2013-12-23/> . Note that it might be confusing to also indicate pav:previousVersion from a resource that has pav:hasVersion relations, as such a resource is intended to be a long-living 'unversioned' resource. The PAV ontology does however not formally restrict this, to cater for more complex scenarios with multiple abstraction levels. pav:hasVersion is a subproperty of dcterms:hasVersion to more strongly define this hierarchical pattern. It is therefore also a subproperty of pav:generalizationOf (inverse of prov:specializationOf). To indicate the existence of other, non-hierarchical kind of editions and adaptations of this resource that are not versioned snapshots (e.g. Powerpoint slides has a video recording version), use instead dcterms:hasVersion or prov:alternateOf."}}]->(previous_current_version)
+    MERGE (version)-[:PREVIOUS_VERSION {{category:"ObjectPropertyExpression", URI:"http://purl.org/pav/previousVersion", description:"The previous version of a resource in a lineage. For instance a news article updated to correct factual information would point to the previous version of the article with pav:previousVersion. If however the content has significantly changed so that the two resources no longer share lineage (say a new article that talks about the same facts), they can instead be related using pav:derivedFrom. This property is normally used in a functional way, although PAV does not formally restrict this. Earlier versions which are not direct ancestors of this resource may instead be provided using the superproperty pav:hasEarlierVersion. A version number of this resource can be provided using the data property pav:version. To indicate that this version is a snapshot of a more general, non-versioned resource, e.g. 'Weather Today' vs. 'Weather Today on 2013-12-07', see pav:hasVersion. Note that it might be confusing to indicate pav:previousVersion from a resource that also has pav:hasVersion or pav:hasCurrentVersion relations, as such resources are intended to be a long-living and 'unversioned', while pav:previousVersion is intended for use between permalink-like 'snapshots' arranged in a linear history."}}]->(previous_current_version)
+    SET version.version = previous_current_version.version +1
+    DELETE r1
+    )
+    RETURN version'''.format(data_item_uri=data_item_uri, key=key, label=label, version_uri=version_uri, type_uri=type_uri, version_doi=version_doi, label2=label2, type=type)
+
+    connection.query(versions_query_string, db='neo4j')
+
+    return
+
+
+
+
+
+
+
+
+
+def getVersionsDict(data_item_uri):
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # query string definition for getting all versions of this data item uri
+    versions_query_string = '''MATCH (n {{URI:"{data_item_uri}"}})
+    OPTIONAL MATCH (n)-[:HAS_VERSION]->(m)
+    OPTIONAL MATCH (n)-[:HAS_CURRENT_VERSION]-> (o)
+    RETURN o, m'''.format(data_item_uri=data_item_uri)
+
+    query_result = connection.query(versions_query_string, db='neo4j')
+    print("---------------------------------------------------------------")
+    print("---------------------- VERSIONS QUERY RESULT ------------------")
+    print(query_result)
+
+    if query_result[0].get('m') == None and query_result[0].get('o') == None:
+        result = None
+        return result
+
+    else:
+        past_versions = []
+        versions_dict = {}
+        try:
+            for i in range (0, len(query_result)):
+                past_version = query_result[i].get('m')
+                past_version['created_on'] = past_version['created_on'].isoformat()
+                past_versions.append(past_version)
+
+            # delete duplicates in list
+            past_versions = getUniqueList(past_versions)
+            versions_dict['past_versions'] = past_versions
+            print("-------------------------------------------------------")
+            print("-------------------- PAST VERSIONS LIST ----------------")
+            print(versions_dict)
+        except:
+            pass
+        current_version = query_result[0].get('o')
+        current_version['created_on'] = current_version['created_on'].isoformat()
+        versions_dict['current_version'] = current_version
+        print("-------------------------------------------------------")
+        print("-------------------- VERSIONS DICT --------------------")
+        print(versions_dict)
+        return versions_dict
 
 
 
@@ -2729,18 +2831,18 @@ def getEditHistory(data_item_uri):
 # gather dictionary for navigating of a granularity tree
 # INPUT: granularity_tree_uri, kgbb_uri, selected_uri
 
-# OUTPUT: a dict of all elements of the granularity tree, following syntax:  [{id:element_uri, parent:parent_element_uri, text:string, page:page_URI, state:{opened:boolean, selected:boolean}, li_attr:{}, a_attr:{}}, etc.]
+# OUTPUT: a dict of all elements of the granularity tree, following syntax:  [{id:element_uri, parent:parent_element_uri, text:string, simpleDescriptionUnit:simpleDescriptionUnit_URI, state:{opened:boolean, selected:boolean}, li_attr:{}, a_attr:{}}, etc.]
 def getGranularityTreeNaviJSON(granularity_tree_uri, kgbb_uri, selected_uri):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    # return entry node and all page nodes that are directly displayed by this entry
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
     get_granularity_tree_items_query_string = '''
     MATCH (n {{URI:"{kgbb_uri}"}})
     WITH n.granularity_tree_key AS key, n.partial_order_relation AS granularity_tree_relation
-    MATCH (n)-[:IS_ABOUT]->(root {{key:"{granularity_tree_uri}", current_version:"true"}})
+    MATCH (n)-[:HAS_SEMANTIC_UNIT_SUBJECT]->(root {{key:"{granularity_tree_uri}", current_version:"true"}})
     MATCH (root)-[:granularity_tree_relation*]->(nodes {{key:"{granularity_tree_uri}", current_version:"true"}})
     MATCH (nodes)<-[:granularity_tree_relation]-(parent_node {{key:"{granularity_tree_uri}", current_version:"true"}})
-    WITH [parent_node.URI, nodes.URI, nodes.page_URI, nodes.name] AS child_info, [root.URI, root.page_URI, root.name] AS root_info
+    WITH [parent_node.URI, nodes.URI, nodes.simpleDescriptionUnit_URI, nodes.name] AS child_info, [root.URI, root.simpleDescriptionUnit_URI, root.name] AS root_info
     RETURN child_info, root_info'''.format(kgbb_uri=kgbb_uri, granularity_tree_uri=granularity_tree_uri)
     results = connection.query(get_granularity_tree_items_query_string, db='neo4j')
     print("---------------------------------------------------------------")
@@ -2750,16 +2852,16 @@ def getGranularityTreeNaviJSON(granularity_tree_uri, kgbb_uri, selected_uri):
     # starting the GranTreeNaviJS with the root node
     root_info = results[0].get('root_info')
     if root_info[0] == selected_uri:
-        granularity_tree_naviJSON = [{'id': root_info[0], 'parent':'''#''', 'text': root_info[2], 'page':root_info[1], 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}]
+        granularity_tree_naviJSON = [{'id': root_info[0], 'parent':'''#''', 'text': root_info[2], 'simpleDescriptionUnit':root_info[1], 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}]
     else:
-        granularity_tree_naviJSON = [{'id': root_info[0], 'parent':'''#''', 'text': root_info[2], 'page':root_info[1], 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}]
+        granularity_tree_naviJSON = [{'id': root_info[0], 'parent':'''#''', 'text': root_info[2], 'simpleDescriptionUnit':root_info[1], 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}]
     # adding the other nodes
     child_info = results[0].get('child_info')
     for node in child_info:
         if node[1] == selected_uri:
-            nodeJSON = [{'id': node[1], 'parent':node[0], 'text': node[3], 'page':node[2], 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}]
+            nodeJSON = [{'id': node[1], 'parent':node[0], 'text': node[3], 'simpleDescriptionUnit':node[2], 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}]
         else:
-            nodeJSON = [{'id': node[1], 'parent':node[0], 'text': node[3], 'page':node[2], 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}]
+            nodeJSON = [{'id': node[1], 'parent':node[0], 'text': node[3], 'simpleDescriptionUnit':node[2], 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}]
         granularity_tree_naviJSON.append(nodeJSON)
 
     print("---------------------------------------------------------")
@@ -2776,38 +2878,39 @@ def getGranularityTreeNaviJSON(granularity_tree_uri, kgbb_uri, selected_uri):
 
 
 
-# gather list of dictionaries for navigating through pages and assertions of an entry
+# gather list of dictionaries for navigating through simpleDescriptionUnits and basicUnits of an entry
 # INPUT: entry_uri, data_view_name
 
-# OUTPUT: a list of dictionaries of all pages, assertions, and granularity trees linked to an entry node via :DISPLAYS relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:entry/page/assertion/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, pages: [{HAS_PAGE_ELEMENT representation info}], assertions: [{HAS_ASSERTION_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
+# OUTPUT: a list of dictionaries of all simpleDescriptionUnits, basicUnits, and granularity trees linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:entry/simpleDescriptionUnit/basicUnit/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, simpleDescriptionUnits: [{HAS_simpleDescriptionUnit_ELEMENT representation info}], basicUnits: [{HAS_BASIC_UNIT_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
 
 def getEntryDict(entry_uri, data_view_name):
     connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
 
-    # return entry node and all page nodes that are directly displayed by this entry
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
     get_entry_dict_information_query_string = '''
     MATCH (entry {{URI:"{entry_uri}"}})
     MATCH (entry_rep:RepresentationKGBBElement_IND {{KGBB_URI:entry.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_pages:HAS_PAGE_ELEMENT]->()
-    OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_assertions:HAS_ASSERTION_ELEMENT]->()
+    OPTIONAL MATCH (entry)-[:HAS_CURRENT_VERSION]->(entry_current_version)
+    OPTIONAL MATCH (entry)-[:HAS_VERSION]->(entry_version)
+    OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_simpleDescriptionUnits:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_basicUnits:HAS_BASIC_UNIT_ELEMENT]->()
     OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_granularity_trees:HAS_GRANULARITY_TREE_ELEMENT]->()
     OPTIONAL MATCH (entry_obj {{URI:entry.object_URI, current_version:"true"}})
     OPTIONAL MATCH (entry_input_info:InputInfoKGBBElement_IND {{KGBB_URI:entry.KGBB_URI}})
     OPTIONAL MATCH (entry_input_node {{entry_URI:"{entry_uri}", current_version:"true", input_info_URI:entry_input_info.URI}})
-
-    OPTIONAL MATCH (entry)-[:DISPLAYS*]-> (child_item {{current_version:"true"}})
-    OPTIONAL MATCH (child_item)<-[:DISPLAYS]-(parent_item {{current_version:"true"}})
+    OPTIONAL MATCH (entry)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]-> (child_item {{current_version:"true"}})
+    OPTIONAL MATCH (child_item)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(parent_item {{current_version:"true"}})
     MATCH (child_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI, data_view_name:"{data_view_name}"}})
-    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_pages:HAS_PAGE_ELEMENT]->()
-    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_assertions:HAS_ASSERTION_ELEMENT]->()
+    OPTIONAL MATCH (child_item)-[:HAS_CURRENT_VERSION]->(child_item_current_version)
+    OPTIONAL MATCH (child_item)-[:HAS_VERSION]->(child_item_version)
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_simpleDescriptionUnits:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_basicUnits:HAS_BASIC_UNIT_ELEMENT]->()
     OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_granularity_trees:HAS_GRANULARITY_TREE_ELEMENT]->()
     OPTIONAL MATCH (child_item_obj {{URI:child_item.object_URI, current_version:"true"}})
     OPTIONAL MATCH (child_item_input_info:InputInfoKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI}})
-    OPTIONAL MATCH (child_item_input_node {{current_version:"true", input_info_URI:child_item_input_info.URI}}) WHERE (child_item.URI IN child_item_input_node.page_URI) OR (child_item.URI IN child_item_input_node.assertion_URI)
-
-    WITH [entry, entry_rep, entry_obj, entry_input_info, entry_input_node, PROPERTIES(entry_pages), PROPERTIES(entry_assertions), PROPERTIES(entry_granularity_trees)] AS entry_info, [parent_item.URI, child_item, child_item_rep, child_item_obj, child_item_input_info, child_item_input_node, PROPERTIES(child_item_pages), PROPERTIES(child_item_assertions), PROPERTIES(child_item_granularity_trees)] AS child_info
-
-    RETURN DISTINCT entry_info, child_info'''.format(entry_uri=entry_uri, data_view_name=data_view_name)
+    OPTIONAL MATCH (child_item_input_node {{current_version:"true", input_info_URI:child_item_input_info.URI}}) WHERE (child_item.URI IN child_item_input_node.simpleDescriptionUnit_URI) OR (child_item.URI IN child_item_input_node.basicUnit_URI)
+    WITH [entry, entry_rep, entry_obj, entry_input_info, entry_input_node, PROPERTIES(entry_simpleDescriptionUnits), PROPERTIES(entry_basicUnits), PROPERTIES(entry_granularity_trees)] AS entry_info, [parent_item.URI, child_item, child_item_rep, child_item_obj, child_item_input_info, child_item_input_node, PROPERTIES(child_item_simpleDescriptionUnits), PROPERTIES(child_item_basicUnits), PROPERTIES(child_item_granularity_trees)] AS child_info, entry_current_version AS entry_current_version, entry_version AS entry_version, child_item_current_version AS child_item_current_version, child_item_version AS child_item_version
+    RETURN DISTINCT entry_info, child_info, entry_current_version, entry_version, child_item_current_version, child_item_version'''.format(entry_uri=entry_uri, data_view_name=data_view_name)
     results = connection.query(get_entry_dict_information_query_string, db='neo4j')
 
     entry_node = results[0].get('entry_info')[0]
@@ -2842,29 +2945,29 @@ def getEntryDict(entry_uri, data_view_name):
     print(entry_input_nodes)
     print(len(entry_input_nodes))
 
-    init_entry_pages = []
+    init_entry_simpleDescriptionUnits = []
     try:
         for i in range (0, len(results)):
-            init_entry_pages.append(results[i].get('entry_info')[5])
+            init_entry_simpleDescriptionUnits.append(results[i].get('entry_info')[5])
     except:
         pass
-    entry_pages = getUniqueList(init_entry_pages)
+    entry_simpleDescriptionUnits = getUniqueList(init_entry_simpleDescriptionUnits)
     print("---------------------------------------------------------------")
-    print("----------------- ENTRY PAGES QUERY RESULT --------------------")
-    print(entry_pages)
-    print(len(entry_pages))
+    print("----------------- ENTRY SIMPLE_DESCRIPTION_UNITS QUERY RESULT --------------------")
+    print(entry_simpleDescriptionUnits)
+    print(len(entry_simpleDescriptionUnits))
 
-    init_entry_assertions = []
+    init_entry_basicUnits = []
     try:
         for i in range (0, len(results)):
-            init_entry_assertions.append(results[i].get('entry_info')[6])
+            init_entry_basicUnits.append(results[i].get('entry_info')[6])
     except:
         pass
-    entry_assertions = getUniqueList(init_entry_assertions)
+    entry_basicUnits = getUniqueList(init_entry_basicUnits)
     print("---------------------------------------------------------------")
-    print("----------------- ENTRY ASSERTIONS QUERY RESULT ---------------")
-    print(entry_assertions)
-    print(len(entry_assertions))
+    print("----------------- ENTRY BASIC_UNITS QUERY RESULT ---------------")
+    print(entry_basicUnits)
+    print(len(entry_basicUnits))
 
     init_entry_granularity_trees = []
     try:
@@ -2878,9 +2981,38 @@ def getEntryDict(entry_uri, data_view_name):
     print(entry_granularity_trees)
     print(len(entry_granularity_trees))
 
+
+    init_entry_versions = []
+    try:
+        entry_current_version = results[0].get('entry_current_version')
+        entry_current_version['created_on'] = entry_current_version['created_on'].isoformat()
+        init_entry_versions.append(entry_current_version)
+    except:
+        pass
+
+    try:
+        for i in range (0, len(results)):
+            version = results[i].get('entry_version')
+            version['created_on'] = version['created_on'].isoformat()
+            init_entry_versions.append(version)
+    except:
+        pass
+    entry_versions = getUniqueList(init_entry_versions)
+    print("---------------------------------------------------------------")
+    print("----------------- ENTRY VERSIONS QUERY RESULT -----------------")
+    print(entry_versions)
+    print(len(entry_versions))
+
+    if entry_current_version:
+        version_value = True
+    else:
+        version_value = False
+
+
+
     entry_dict = []
     # preparing the entry_dict_element for the entry_dict
-    entry_dict_element = {'id': entry_uri, 'component':results[0].get('entry_info')[1].get('component'), 'node':entry_node, 'parent':'''#''', 'node_type': results[0].get('entry_info')[0].get('node_type'), 'text': results[0].get('entry_info')[2].get('name'), 'icon': url_for('static', filename='Entry_ICON_small.png'), 'object':entry_object, 'html':results[0].get('entry_info')[1].get('html'), 'pages':entry_pages, 'assertions':entry_assertions, 'granularity_trees':entry_granularity_trees, 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}
+    entry_dict_element = {'id': entry_uri, 'version': False, 'version_exists': version_value, 'component':results[0].get('entry_info')[1].get('component'), 'node':entry_node, 'parent':'''#''', 'node_type': results[0].get('entry_info')[0].get('node_type'), 'text': results[0].get('entry_info')[2].get('name'), 'versions_info': entry_versions,'icon': url_for('static', filename='Entry_ICON_small.png'), 'object':entry_object, 'html':results[0].get('entry_info')[1].get('html'), 'simpleDescriptionUnits':entry_simpleDescriptionUnits, 'basicUnits':entry_basicUnits, 'granularity_trees':entry_granularity_trees, 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}
 
     # extract various component links from the entry rep_node. They are "stored" in the rep_node by consecutively numbered integer keys and the key under which they must be added to the entry_dict_element is the value of the "name" key.
     entry_rep_node = results[0].get('entry_info')[1]
@@ -2989,33 +3121,33 @@ def getEntryDict(entry_uri, data_view_name):
         child_object['created_on'] = child_object['created_on'].isoformat()
         child_object['last_updated_on'] = child_object['last_updated_on'].isoformat()
 
-        init_child_item_pages = []
+        init_child_item_simpleDescriptionUnits = []
         try:
             for i in range (0, len(child_info)):
                 if child_info[i][1].get('URI') == child_item_uri:
                     if child_item[1].get('KGBB_URI') == child_info[i][6].get('KGBB_URI'):
-                        init_child_item_pages.append(child_info[i][6])
+                        init_child_item_simpleDescriptionUnits.append(child_info[i][6])
         except:
             pass
-        child_item_pages = getUniqueList(init_child_item_pages)
+        child_item_simpleDescriptionUnits = getUniqueList(init_child_item_simpleDescriptionUnits)
         print("---------------------------------------------------------------")
-        print("----------------- CHILD ITEM PAGES QUERY RESULT ---------------")
-        print(child_item_pages)
-        print(len(child_item_pages))
+        print("----------------- CHILD ITEM SIMPLE_DESCRIPTION_UNITS QUERY RESULT ---------------")
+        print(child_item_simpleDescriptionUnits)
+        print(len(child_item_simpleDescriptionUnits))
 
-        init_child_item_assertions = []
+        init_child_item_basicUnits = []
         try:
             for i in range (0, len(child_info)):
                 if child_info[i][1].get('URI') == child_item_uri:
                     if child_item[1].get('KGBB_URI') == child_info[i][7].get('KGBB_URI'):
-                        init_child_item_assertions.append(child_info[i][7])
+                        init_child_item_basicUnits.append(child_info[i][7])
         except:
             pass
-        child_item_assertions = getUniqueList(init_child_item_assertions)
+        child_item_basicUnits = getUniqueList(init_child_item_basicUnits)
         print("---------------------------------------------------------------")
-        print("------------ CHILD ITEM ASSERTIONS QUERY RESULT ---------------")
-        print(child_item_assertions)
-        print(len(child_item_assertions))
+        print("------------ CHILD ITEM BASIC_UNITS QUERY RESULT ---------------")
+        print(child_item_basicUnits)
+        print(len(child_item_basicUnits))
 
         init_child_item_granularity_trees = []
         try:
@@ -3031,16 +3163,16 @@ def getEntryDict(entry_uri, data_view_name):
         print(child_item_granularity_trees)
         print(len(child_item_granularity_trees))
 
-        if child_item[1].get('node_type') == "page":
-            icon = url_for('static', filename='Page_ICON_small.png')
-        elif child_item[1].get('node_type') == "assertion":
-            icon = url_for('static', filename='Assertion_ICON_small.png')
+        if child_item[1].get('node_type') == "simpleDescriptionUnit":
+            icon = url_for('static', filename='SimpleDescriptionUnit_ICON_small.png')
+        elif child_item[1].get('node_type') == "basicUnit":
+            icon = url_for('static', filename='BasicUnit_ICON_small.png')
         elif child_item[1].get('node_type') == "granularity_tree":
             icon = url_for('static', filename='GranularityTree_ICON_small.png')
 
 
         # starting the NaviJS with the entry node
-        child_dict = {'id': child_node.get('URI'), 'component':child_item[2].get('component'),'node':child_node, 'parent':child_item[0], 'node_type': child_item[1].get('node_type'), 'icon': icon, 'object':child_object, 'html':child_item[2].get('html'), 'pages':child_item_pages, 'assertions':child_item_assertions, 'granularity_trees':child_item_granularity_trees, 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}
+        child_dict = {'id': child_node.get('URI'), 'component':child_item[2].get('component'),'node':child_node, 'parent':child_item[0], 'node_type': child_item[1].get('node_type'), 'icon': icon, 'object':child_object, 'html':child_item[2].get('html'), 'simpleDescriptionUnits':child_item_simpleDescriptionUnits, 'basicUnits':child_item_basicUnits, 'granularity_trees':child_item_granularity_trees, 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}
 
         # extract various component links from the child_item rep_node. They are "stored" in the rep_node by consecutively numbered integer keys and the key under which they must be added to the child_dict dictionary is the value of the "name" key.
         child_rep_node = child_item[2]
@@ -3057,11 +3189,379 @@ def getEntryDict(entry_uri, data_view_name):
         child_dict['rep_node'] = child_rep_node
 
         # gathering input information by input type - if information available, the following will be added: 'input_name': {'input_control': input_info_node, 'input_nodes': [list of input nodes that belong to the input control]}
-        if child_item[1].get('node_type') == 'assertion':
-            child_dict['text'] = child_node.get('assertion_label')
+        if child_item[1].get('node_type') == 'basicUnit':
+            child_dict['text'] = child_node.get('basicUnit_label')
 
-        elif child_item[1].get('node_type') == 'page':
-            child_dict['text'] = child_node.get('page_label')
+        elif child_item[1].get('node_type') == 'simpleDescriptionUnit':
+            child_dict['text'] = child_node.get('simpleDescriptionUnit_label')
+
+        elif child_item[1].get('node_type') == 'granularity_tree':
+            child_dict['text'] = child_node.get('name')
+
+
+        entry_dict.append(child_dict)
+
+    # check for duplicates
+    entry_dict = getUniqueList(entry_dict)
+
+
+    # check for input_info and input_nodes
+    for item in entry_dict:
+        init_child_item_input_info = []
+        try:
+            for i in range (0, len(child_input_infos)):
+                if item.get('node').get('KGBB_URI') == child_input_infos[i].get('KGBB_URI'):
+                        init_child_item_input_info.append(child_input_infos[i])
+        except:
+            pass
+        child_item_input_info = getUniqueList(init_child_item_input_info)
+        print("---------------------------------------------------------------")
+        print("----------------- CHILD ITEM INPUT INFO QUERY RESULT ---------------")
+        print(child_item_input_info)
+        print(len(child_item_input_info))
+
+        try:
+            for input in child_item_input_info:
+                input_name = input.get('input_name')
+                input_uri = input.get('URI')
+                input_dict = {'input_control': input, 'input_nodes':[]}
+
+                try:
+                    for node in child_input_nodes:
+                        if node.get('input_info_URI') == input_uri and node.get('user_input') == item.get('node').get('URI'):
+                            node['created_on'] = node['created_on'].isoformat()
+                            node['last_updated_on'] = node['last_updated_on'].isoformat()
+                            input_dict.get('input_nodes').append(node)
+                    item[input_name] = input_dict
+                except:
+                    pass
+        except:
+            pass
+
+
+    print("---------------------------------------------------------------")
+    print("---------------------------------------------------------------")
+    print("-------------------- FINAL ENTRY DICT ITEM --------------------")
+    print(entry_dict)
+    print(len(entry_dict))
+    return entry_dict
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# gather list of dictionaries for navigating through simpleDescriptionUnits and basicUnits of an entry
+# INPUT: entry_uri, data_view_name
+
+# OUTPUT: a list of dictionaries of all simpleDescriptionUnits, basicUnits, and granularity trees linked to an entry node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:entry/simpleDescriptionUnit/basicUnit/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, simpleDescriptionUnits: [{HAS_simpleDescriptionUnit_ELEMENT representation info}], basicUnits: [{HAS_BASIC_UNIT_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
+
+def getVersDict(entry_uri, data_view_name, version_doi):
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_entry_dict_information_query_string = '''
+    MATCH (entry {{URI:"{entry_uri}"}})
+    MATCH (entry_rep:RepresentationKGBBElement_IND {{KGBB_URI:entry.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (entry)-[:HAS_CURRENT_VERSION]->(current_version) WHERE "{version_doi}" IN current_version.versioned_doi
+    OPTIONAL MATCH (entry)-[:HAS_VERSION]->(version) WHERE "{version_doi}" IN version.versioned_doi
+    OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_simpleDescriptionUnits:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_basicUnits:HAS_BASIC_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (entry_kgbb {{URI:entry.KGBB_URI}})-[entry_granularity_trees:HAS_GRANULARITY_TREE_ELEMENT]->()
+    OPTIONAL MATCH (entry_obj {{URI:entry.object_URI}}) WHERE "{version_doi}" IN entry_obj.versioned_doi
+    OPTIONAL MATCH (entry_input_info:InputInfoKGBBElement_IND {{KGBB_URI:entry.KGBB_URI}})
+    OPTIONAL MATCH (entry_input_node {{entry_URI:"{entry_uri}", input_info_URI:entry_input_info.URI}}) WHERE "{version_doi}" IN entry_input_node.versioned_doi
+    OPTIONAL MATCH (entry)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*]-> (child_item) WHERE "{version_doi}" IN child_item.versioned_doi
+    OPTIONAL MATCH (child_item)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(parent_item) WHERE "{version_doi}" IN parent_item.versioned_doi
+    MATCH (child_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_simpleDescriptionUnits:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_basicUnits:HAS_BASIC_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_granularity_trees:HAS_GRANULARITY_TREE_ELEMENT]->()
+    OPTIONAL MATCH (child_item_obj {{URI:child_item.object_URI}}) WHERE "{version_doi}" IN child_item_obj.versioned_doi
+    OPTIONAL MATCH (child_item_input_info:InputInfoKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI}})
+    OPTIONAL MATCH (child_item_input_node {{input_info_URI:child_item_input_info.URI}}) WHERE ( (child_item.URI IN child_item_input_node.simpleDescriptionUnit_URI) OR (child_item.URI IN child_item_input_node.basicUnit_URI) ) AND "{version_doi}" IN child_item_input_node.versioned_doi
+    WITH [entry, entry_rep, entry_obj, entry_input_info, entry_input_node, PROPERTIES(entry_simpleDescriptionUnits), PROPERTIES(entry_basicUnits), PROPERTIES(entry_granularity_trees)] AS entry_info, [parent_item.URI, child_item, child_item_rep, child_item_obj, child_item_input_info, child_item_input_node, PROPERTIES(child_item_simpleDescriptionUnits), PROPERTIES(child_item_basicUnits), PROPERTIES(child_item_granularity_trees)] AS child_info, current_version AS latest_version, version AS version
+    RETURN DISTINCT entry_info, child_info, latest_version, version'''.format(version_doi=version_doi, entry_uri=entry_uri, data_view_name=data_view_name)
+    results = connection.query(get_entry_dict_information_query_string, db='neo4j')
+
+    print("---------------------------------------RESULT-------------------------------------------------")
+    print(results)
+    version = None
+    if results[0].get('latest_version') != None:
+        version = results[0].get('latest_version')
+        version['created_on'] = version['created_on'].isoformat()
+
+    elif results[0].get('version') != None:
+        version = results[0].get('version')
+        version['created_on'] = version['created_on'].isoformat()
+
+
+    entry_node = results[0].get('entry_info')[0]
+    entry_node['created_on'] = entry_node['created_on'].isoformat()
+    entry_node['last_updated_on'] = entry_node['last_updated_on'].isoformat()
+
+    entry_object = results[0].get('entry_info')[2]
+    entry_object['created_on'] = entry_object['created_on'].isoformat()
+    entry_object['last_updated_on'] = entry_object['last_updated_on'].isoformat()
+
+    init_entry_input_info = []
+    try:
+        for i in range (0, len(results)):
+            init_entry_input_info.append(results[i].get('entry_info')[3])
+    except:
+        pass
+    entry_input_info = getUniqueList(init_entry_input_info)
+    print("---------------------------------------------------------------")
+    print("----------------- ENTRY INPUT INFO QUERY RESULT ---------------")
+    print(entry_input_info)
+    print(len(entry_input_info))
+
+    init_entry_input_nodes = []
+    try:
+        for i in range (0, len(results)):
+            init_entry_input_nodes.append(results[i].get('entry_info')[4])
+    except:
+        pass
+    entry_input_nodes = getUniqueList(init_entry_input_nodes)
+    print("---------------------------------------------------------------")
+    print("---------------- ENTRY INPUT NODES QUERY RESULT ---------------")
+    print(entry_input_nodes)
+    print(len(entry_input_nodes))
+
+    init_entry_simpleDescriptionUnits = []
+    try:
+        for i in range (0, len(results)):
+            init_entry_simpleDescriptionUnits.append(results[i].get('entry_info')[5])
+    except:
+        pass
+    entry_simpleDescriptionUnits = getUniqueList(init_entry_simpleDescriptionUnits)
+    print("---------------------------------------------------------------")
+    print("----------------- ENTRY SIMPLE_DESCRIPTION_UNITS QUERY RESULT --------------------")
+    print(entry_simpleDescriptionUnits)
+    print(len(entry_simpleDescriptionUnits))
+
+    init_entry_basicUnits = []
+    try:
+        for i in range (0, len(results)):
+            init_entry_basicUnits.append(results[i].get('entry_info')[6])
+    except:
+        pass
+    entry_basicUnits = getUniqueList(init_entry_basicUnits)
+    print("---------------------------------------------------------------")
+    print("----------------- ENTRY BASIC_UNITS QUERY RESULT ---------------")
+    print(entry_basicUnits)
+    print(len(entry_basicUnits))
+
+    init_entry_granularity_trees = []
+    try:
+        for i in range (0, len(results)):
+            init_entry_granularity_trees.append(results[i].get('entry_info')[7])
+    except:
+        pass
+    entry_granularity_trees = getUniqueList(init_entry_granularity_trees)
+    print("---------------------------------------------------------------")
+    print("----------- ENTRY GRANULARITY TREES QUERY RESULT --------------")
+    print(entry_granularity_trees)
+    print(len(entry_granularity_trees))
+
+    entry_dict = []
+    # preparing the entry_dict_element for the entry_dict
+    entry_dict_element = {'id': entry_uri, 'version':True, 'version_node': version, 'component':results[0].get('entry_info')[1].get('component'), 'node':entry_node, 'parent':'''#''', 'node_type': results[0].get('entry_info')[0].get('node_type'), 'text': results[0].get('entry_info')[2].get('name'), 'icon': url_for('static', filename='Entry_ICON_small.png'), 'object':entry_object, 'html':results[0].get('entry_info')[1].get('html'), 'simpleDescriptionUnits':entry_simpleDescriptionUnits, 'basicUnits':entry_basicUnits, 'granularity_trees':entry_granularity_trees, 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}
+
+    # extract various component links from the entry rep_node. They are "stored" in the rep_node by consecutively numbered integer keys and the key under which they must be added to the entry_dict_element is the value of the "name" key.
+    entry_rep_node = results[0].get('entry_info')[1]
+    search_key = "link_$$$_"
+    link_dict = dict(filter(lambda item: search_key in item[0], entry_rep_node.items()))
+    for link_key in link_dict:
+        component_link_string = entry_rep_node.get(link_key)
+        component_link = ast.literal_eval(component_link_string)
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print("------------ COMPONENT LINK DICT ---------------")
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print(component_link)
+        key_name = component_link.get('name')
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print("------------ KEY NAME --------------------------")
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print(key_name)
+        print(type(key_name))
+        print(type(component_link))
+        entry_dict_element[key_name] = component_link
+        # delete this key-value from the entry_rep_node
+        entry_rep_node.pop(link_key)
+    # add the entry_rep_node to the entry_dict_element under the key 'rep_node'
+    entry_dict_element['rep_node'] = entry_rep_node
+
+    # gathering input information by input type - if information available, the following will be added: 'input_name': {'input_control': input_info_node, 'input_nodes': [list of input nodes that belong to the input control]}
+    try:
+        for input in entry_input_info:
+            input_name = input.get('input_name')
+            input_uri = input.get('URI')
+            input_dict = {'input_control': input, 'input_nodes':[]}
+            try:
+                for node in entry_input_nodes:
+                    if node.get('input_info_URI') == input_uri:
+                        node['created_on'] = node['created_on'].isoformat()
+                        node['last_updated_on'] = node['last_updated_on'].isoformat()
+                        input_dict.get('input_nodes').append(node)
+                entry_dict_element[input_name] = input_dict
+            except:
+                pass
+    except:
+        pass
+    entry_dict.append(entry_dict_element)
+    print("---------------------------------------------------------------")
+    print("-------------------- ENTRY DICT ITEM --------------------------")
+    print(entry_dict)
+    print(len(entry_dict))
+
+
+
+
+
+
+    # clearing the child_info results to unique results
+    init_child_info = []
+    try:
+        for i in range (0, len(results)):
+            init_child_info.append(results[i].get('child_info'))
+    except:
+        pass
+    child_info = getUniqueList(init_child_info)
+    print("---------------------------------------------------------------")
+    print("-------------- UNIQUE CHILD INFO QUERY RESULT -----------------")
+    print(child_info)
+    print(len(child_info))
+
+
+    init_child_input_nodes = []
+    try:
+        for i in range (0, len(child_info)):
+            init_child_input_nodes.append(child_info[i][5])
+    except:
+        pass
+    child_input_nodes = getUniqueList(init_child_input_nodes)
+    print("---------------------------------------------------------------")
+    print("---------------- CHILD INPUT NODES QUERY RESULT ---------------")
+    print(child_input_nodes)
+    print(len(child_input_nodes))
+
+    init_child_input_infos = []
+    try:
+        for i in range (0, len(child_info)):
+            init_child_input_infos.append(child_info[i][4])
+    except:
+        pass
+    child_input_infos = getUniqueList(init_child_input_infos)
+    print("---------------------------------------------------------------")
+    print("---------------- CHILD INPUT INFOS QUERY RESULT ---------------")
+    print(child_input_infos)
+    print(len(child_input_infos))
+
+
+
+
+    # appending the entry_dict with child items
+    for child_item in child_info:
+        child_node = child_item[1]
+        child_node['created_on'] = child_node['created_on'].isoformat()
+        child_node['last_updated_on'] = child_node['last_updated_on'].isoformat()
+        child_item_uri = child_node.get('URI')
+        child_object = child_item[3]
+        child_object['created_on'] = child_object['created_on'].isoformat()
+        child_object['last_updated_on'] = child_object['last_updated_on'].isoformat()
+
+        init_child_item_simpleDescriptionUnits = []
+        try:
+            for i in range (0, len(child_info)):
+                if child_info[i][1].get('URI') == child_item_uri:
+                    if child_item[1].get('KGBB_URI') == child_info[i][6].get('KGBB_URI'):
+                        init_child_item_simpleDescriptionUnits.append(child_info[i][6])
+        except:
+            pass
+        child_item_simpleDescriptionUnits = getUniqueList(init_child_item_simpleDescriptionUnits)
+        print("---------------------------------------------------------------")
+        print("----------------- CHILD ITEM SIMPLE_DESCRIPTION_UNITS QUERY RESULT ---------------")
+        print(child_item_simpleDescriptionUnits)
+        print(len(child_item_simpleDescriptionUnits))
+
+        init_child_item_basicUnits = []
+        try:
+            for i in range (0, len(child_info)):
+                if child_info[i][1].get('URI') == child_item_uri:
+                    if child_item[1].get('KGBB_URI') == child_info[i][7].get('KGBB_URI'):
+                        init_child_item_basicUnits.append(child_info[i][7])
+        except:
+            pass
+        child_item_basicUnits = getUniqueList(init_child_item_basicUnits)
+        print("---------------------------------------------------------------")
+        print("------------ CHILD ITEM BASIC_UNITS QUERY RESULT ---------------")
+        print(child_item_basicUnits)
+        print(len(child_item_basicUnits))
+
+        init_child_item_granularity_trees = []
+        try:
+            for i in range (0, len(child_info)):
+                if child_info[i][1].get('URI') == child_item_uri:
+                    if child_item[1].get('KGBB_URI') == child_info[i][8].get('KGBB_URI'):
+                        init_child_item_granularity_trees.append(child_info[i][8])
+        except:
+            pass
+        child_item_granularity_trees = getUniqueList(init_child_item_granularity_trees)
+        print("---------------------------------------------------------------")
+        print("---------- CHILD ITEM GRANULARITY TREES QUERY RESULT ----------")
+        print(child_item_granularity_trees)
+        print(len(child_item_granularity_trees))
+
+        if child_item[1].get('node_type') == "simpleDescriptionUnit":
+            icon = url_for('static', filename='SimpleDescriptionUnit_ICON_small.png')
+        elif child_item[1].get('node_type') == "basicUnit":
+            icon = url_for('static', filename='BasicUnit_ICON_small.png')
+        elif child_item[1].get('node_type') == "granularity_tree":
+            icon = url_for('static', filename='GranularityTree_ICON_small.png')
+
+
+        # starting the NaviJS with the entry node
+        child_dict = {'id': child_node.get('URI'), 'component':child_item[2].get('component'),'node':child_node, 'parent':child_item[0], 'node_type': child_item[1].get('node_type'), 'icon': icon, 'object':child_object, 'html':child_item[2].get('html'), 'simpleDescriptionUnits':child_item_simpleDescriptionUnits, 'basicUnits':child_item_basicUnits, 'granularity_trees':child_item_granularity_trees, 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}
+
+        # extract various component links from the child_item rep_node. They are "stored" in the rep_node by consecutively numbered integer keys and the key under which they must be added to the child_dict dictionary is the value of the "name" key.
+        child_rep_node = child_item[2]
+        search_key = "link_$$$_"
+        child_link_dict = dict(filter(lambda item: search_key in item[0], child_rep_node.items()))
+        for child_link_key in child_link_dict:
+            component_link_string = child_rep_node.get(child_link_key)
+            component_link = ast.literal_eval(component_link_string)
+            key_name = component_link.get('name')
+            child_dict[key_name] = component_link
+            # delete this key-value from the child_rep_node
+            child_rep_node.pop(child_link_key)
+        # add the child_rep_node to the child_dict under the key 'rep_node'
+        child_dict['rep_node'] = child_rep_node
+
+        # gathering input information by input type - if information available, the following will be added: 'input_name': {'input_control': input_info_node, 'input_nodes': [list of input nodes that belong to the input control]}
+        if child_item[1].get('node_type') == 'basicUnit':
+            child_dict['text'] = child_node.get('basicUnit_label')
+
+        elif child_item[1].get('node_type') == 'simpleDescriptionUnit':
+            child_dict['text'] = child_node.get('simpleDescriptionUnit_label')
 
         elif child_item[1].get('node_type') == 'granularity_tree':
             child_dict['text'] = child_node.get('granularity_tree_label')
@@ -3113,3 +3613,562 @@ def getEntryDict(entry_uri, data_view_name):
     print(entry_dict)
     print(len(entry_dict))
     return entry_dict
+
+
+
+
+
+
+
+
+
+
+
+
+# gather list of ontology terms from graph
+# OUTPUT: a list of ontology class nodes
+def getOntoClassList():
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_ontology_class_list_information_query_string = '''
+    MATCH (ontology_class:ClassExpression {{ontology_class:"true"}})
+    RETURN ontology_class'''.format()
+    results = connection.query(get_ontology_class_list_information_query_string, db='neo4j')
+
+    print("------------- ONTOLOGY CLASS SEARCH RESULT --------------------")
+    print(results)
+    print(len(results))
+
+    ontology_class_list = []
+    for i in range (0, len(results)):
+        ontology_class_list.append(results[i].get('ontology_class'))
+
+    ontology_class_list = getUniqueList(ontology_class_list)
+    print("---------------------------------------------------------------")
+    print("----------------- ONTOLOGY CLASS LIST -------------------------")
+    print(ontology_class_list)
+    print(len(ontology_class_list))
+
+    return ontology_class_list
+
+
+
+
+# gather list of basicUnit classes from graph
+# OUTPUT: a list of basicUnit class nodes
+def getBasicUnitClassList():
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_basicUnit_class_list_information_query_string = '''
+    MATCH (basicUnit_class:orkg_BasicUnit)
+    RETURN basicUnit_class'''.format()
+    results = connection.query(get_basicUnit_class_list_information_query_string, db='neo4j')
+
+    print("------------- BASIC_UNIT CLASS SEARCH RESULT -------------------")
+    print(results)
+    print(len(results))
+
+    basicUnit_class_list = []
+    for i in range (0, len(results)):
+        basicUnit_class_list.append(results[i].get('basicUnit_class'))
+
+    basicUnit_class_list = getUniqueList(basicUnit_class_list)
+    print("---------------------------------------------------------------")
+    print("----------------- BASIC_UNIT CLASS LIST ------------------------")
+    print(basicUnit_class_list)
+    print(len(basicUnit_class_list))
+
+    return basicUnit_class_list
+
+
+
+
+# gather list of simpleDescriptionUnit classes from graph
+# OUTPUT: a list of simpleDescriptionUnit class nodes
+def getSimpleDescriptionUnitClassList():
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_simpleDescriptionUnit_class_list_information_query_string = '''
+    MATCH (simpleDescriptionUnit_class:orkg_SimpleDescriptionUnit)
+    RETURN simpleDescriptionUnit_class'''.format()
+    results = connection.query(get_simpleDescriptionUnit_class_list_information_query_string, db='neo4j')
+
+    print("----------------- SIMPLE_DESCRIPTION_UNIT CLASS SEARCH RESULT --------------------")
+    print(results)
+    print(len(results))
+
+    simpleDescriptionUnit_class_list = []
+    for i in range (0, len(results)):
+        simpleDescriptionUnit_class_list.append(results[i].get('simpleDescriptionUnit_class'))
+
+    simpleDescriptionUnit_class_list = getUniqueList(simpleDescriptionUnit_class_list)
+    print("---------------------------------------------------------------")
+    print("---------------------- SIMPLE_DESCRIPTION_UNIT CLASS LIST ------------------------")
+    print(simpleDescriptionUnit_class_list)
+    print(len(simpleDescriptionUnit_class_list))
+
+    return simpleDescriptionUnit_class_list
+
+
+
+
+# gather list of entry classes from graph
+# OUTPUT: a list of entry class nodes
+def getEntryClassList():
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_entry_class_list_information_query_string = '''
+    MATCH (entry_class:orkg_Entry)
+    RETURN entry_class'''.format()
+    results = connection.query(get_entry_class_list_information_query_string, db='neo4j')
+
+    print("----------------- ENTRY CLASS SEARCH RESULT -------------------")
+    print(results)
+    print(len(results))
+
+    entry_class_list = []
+    for i in range (0, len(results)):
+        entry_class_list.append(results[i].get('entry_class'))
+
+    entry_class_list = getUniqueList(entry_class_list)
+    print("---------------------------------------------------------------")
+    print("---------------------- ENTRY CLASS LIST -----------------------")
+    print(entry_class_list)
+    print(len(entry_class_list))
+
+    return entry_class_list
+
+
+
+
+
+
+
+
+
+# gather list of instances of a specific class from graph
+# INPUT: URI of class
+# OUTPUT: a list of instances of the input class
+def getInstanceList(type_uri):
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_instance_list_information_query_string = '''
+    MATCH (instance:NamedIndividual {{type:"{type_uri}", current_version:"true"}})
+    RETURN instance'''.format(type_uri=type_uri)
+    results = connection.query(get_instance_list_information_query_string, db='neo4j')
+
+    print("----------------- INSTANCES SEARCH RESULT ---------------------")
+    print(results)
+    print(len(results))
+
+    instances_list = []
+    for i in range (0, len(results)):
+        instances_list.append(results[i].get('instance'))
+
+    instances_list = getUniqueList(instances_list)
+    print("---------------------------------------------------------------")
+    print("---------------------- INSTANCES LIST -------------------------")
+    print(instances_list)
+    print(len(instances_list))
+
+    return instances_list
+
+
+
+
+
+
+
+
+# gather subgraph of simpleDescriptionUnit from graph
+# INPUT: URI of simpleDescriptionUnit
+# OUTPUT: a list of dictionaries of all simpleDescriptionUnits, basicUnits, and granularity trees linked to a particular simpleDescriptionUnit node via :HAS_ASSOCIATED_SEMANTIC_UNIT relation chains, following syntax:  [{id:data_item_uri, component:string, node:{data_item_node}, parent:parent_uri, node_type:simpleDescriptionUnit/basicUnit/granularity_tree, text:name, icon:image, object:{object_node}, rep_node:{representation_node}, html:html, simpleDescriptionUnits: [{HAS_simpleDescriptionUnit_ELEMENT representation info}], basicUnits: [{HAS_BASIC_UNIT_ELEMENT representation info}], granularity_trees: [{HAS_GRANULARITY_TREE_ELEMENT representation info}], (various component links by their own keys, extracted from the rep_node), state:{required for navi tree}, "input_name//from input_info":{'input_control':{input control}, 'input_nodes':[{input_node}, etc.]}}, etc.]
+def getSimpleDescriptionUnitRepresentation(simpleDescriptionUnit_uri, data_view_name):
+    connection = Neo4jConnection(uri="bolt://localhost:7687", user="python", pwd="useCaseKGBB")
+    print("------------------------- SIMPLE_DESCRIPTION_UNIT URI INPUT ----------------------------------------")
+    print(simpleDescriptionUnit_uri)
+
+    # return simpleDescriptionUnit node and all child nodes that are directly displayed by this simpleDescriptionUnit
+    get_simpleDescriptionUnit_dict_information_query_string = '''
+    MATCH (simpleDescriptionUnit {{URI:"{simpleDescriptionUnit_uri}"}})
+    MATCH (entry {{URI:simpleDescriptionUnit.entry_URI}})
+    OPTIONAL MATCH (simpleDescriptionUnit_parent  {{current_version:"true"}})-[:HAS_ASSOCIATED_SEMANTIC_UNIT]->(simpleDescriptionUnit)
+    MATCH (simpleDescriptionUnit_rep:RepresentationKGBBElement_IND {{KGBB_URI:simpleDescriptionUnit.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (simpleDescriptionUnit_kgbb {{URI:simpleDescriptionUnit.KGBB_URI}})-[simpleDescriptionUnit_simpleDescriptionUnits:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (simpleDescriptionUnit_kgbb {{URI:simpleDescriptionUnit.KGBB_URI}})-[simpleDescriptionUnit_basicUnits:HAS_BASIC_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (simpleDescriptionUnit_kgbb {{URI:simpleDescriptionUnit.KGBB_URI}})-[simpleDescriptionUnit_granularity_trees:HAS_GRANULARITY_TREE_ELEMENT]->()
+    OPTIONAL MATCH (simpleDescriptionUnit_obj {{URI:simpleDescriptionUnit.object_URI, current_version:"true"}})
+    OPTIONAL MATCH (simpleDescriptionUnit_input_info:InputInfoKGBBElement_IND {{KGBB_URI:simpleDescriptionUnit.KGBB_URI}})
+    OPTIONAL MATCH (simpleDescriptionUnit_input_node {{simpleDescriptionUnit_URI:"{simpleDescriptionUnit_uri}", current_version:"true", input_info_URI:simpleDescriptionUnit_input_info.URI}})
+    OPTIONAL MATCH (simpleDescriptionUnit)-[:HAS_ASSOCIATED_SEMANTIC_UNIT*1..2]-> (child_item {{current_version:"true"}}) WHERE NOT child_item.name="material entity parthood basicUnit unit"
+    OPTIONAL MATCH (child_item)<-[:HAS_ASSOCIATED_SEMANTIC_UNIT]-(parent_item {{current_version:"true"}})
+    OPTIONAL MATCH (child_item_rep:RepresentationKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI, data_view_name:"{data_view_name}"}})
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_simpleDescriptionUnits:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_basicUnits:HAS_BASIC_UNIT_ELEMENT]->()
+    OPTIONAL MATCH (child_item_kgbb {{URI:child_item.KGBB_URI}})-[child_item_granularity_trees:HAS_GRANULARITY_TREE_ELEMENT]->()
+    OPTIONAL MATCH (child_item_obj {{URI:child_item.object_URI, current_version:"true"}})
+    OPTIONAL MATCH (child_item_input_info:InputInfoKGBBElement_IND {{KGBB_URI:child_item.KGBB_URI}})
+    OPTIONAL MATCH (child_item_input_node {{current_version:"true", input_info_URI:child_item_input_info.URI}}) WHERE (child_item.URI IN child_item_input_node.simpleDescriptionUnit_URI) OR (child_item.URI IN child_item_input_node.basicUnit_URI)
+    WITH [simpleDescriptionUnit, simpleDescriptionUnit_rep, simpleDescriptionUnit_obj, simpleDescriptionUnit_input_info, simpleDescriptionUnit_input_node, PROPERTIES(simpleDescriptionUnit_simpleDescriptionUnits), PROPERTIES(simpleDescriptionUnit_basicUnits), PROPERTIES(simpleDescriptionUnit_granularity_trees)] AS simpleDescriptionUnit_info, [parent_item.URI, child_item, child_item_rep, child_item_obj, child_item_input_info, child_item_input_node, PROPERTIES(child_item_simpleDescriptionUnits), PROPERTIES(child_item_basicUnits), PROPERTIES(child_item_granularity_trees)] AS child_info, simpleDescriptionUnit_parent.URI AS parent_URI, entry.publication_title AS entry_title
+    RETURN simpleDescriptionUnit_info, child_info, parent_URI, entry_title'''.format(simpleDescriptionUnit_uri=simpleDescriptionUnit_uri, data_view_name=data_view_name)
+    results = connection.query(get_simpleDescriptionUnit_dict_information_query_string, db='neo4j')
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("+++++++++++++++++++++ INITIAL QUERY RESULT +++++++++++++++++++++++++++")
+    print(results)
+
+    simpleDescriptionUnit_parent_URI = results[0].get('parent_URI')
+    entry_title = results[0].get('entry_title')
+    simpleDescriptionUnit_node = results[0].get('simpleDescriptionUnit_info')[0]
+    simpleDescriptionUnit_node['created_on'] = simpleDescriptionUnit_node['created_on'].isoformat()
+    simpleDescriptionUnit_node['last_updated_on'] = simpleDescriptionUnit_node['last_updated_on'].isoformat()
+
+    simpleDescriptionUnit_object = results[0].get('simpleDescriptionUnit_info')[2]
+    simpleDescriptionUnit_object['created_on'] = simpleDescriptionUnit_object['created_on'].isoformat()
+    simpleDescriptionUnit_object['last_updated_on'] = simpleDescriptionUnit_object['last_updated_on'].isoformat()
+
+    init_simpleDescriptionUnit_input_info = []
+    try:
+        for i in range (0, len(results)):
+            init_simpleDescriptionUnit_input_info.append(results[i].get('simpleDescriptionUnit_info')[3])
+    except:
+        pass
+    simpleDescriptionUnit_input_info = getUniqueList(init_simpleDescriptionUnit_input_info)
+    print("---------------------------------------------------------------")
+    print("----------------- SIMPLE_DESCRIPTION_UNIT INPUT INFO QUERY RESULT ----------------")
+    print(simpleDescriptionUnit_input_info)
+    print(len(simpleDescriptionUnit_input_info))
+
+    init_simpleDescriptionUnit_input_nodes = []
+    try:
+        for i in range (0, len(results)):
+            init_simpleDescriptionUnit_input_nodes.append(results[i].get('simpleDescriptionUnit_info')[4])
+    except:
+        pass
+    simpleDescriptionUnit_input_nodes = getUniqueList(init_simpleDescriptionUnit_input_nodes)
+    print("---------------------------------------------------------------")
+    print("----------------- SIMPLE_DESCRIPTION_UNIT INPUT NODES QUERY RESULT ---------------")
+    print(simpleDescriptionUnit_input_nodes)
+    print(len(simpleDescriptionUnit_input_nodes))
+
+    init_simpleDescriptionUnit_simpleDescriptionUnits = []
+    try:
+        for i in range (0, len(results)):
+            init_simpleDescriptionUnit_simpleDescriptionUnits.append(results[i].get('simpleDescriptionUnit_info')[5])
+    except:
+        pass
+    simpleDescriptionUnit_simpleDescriptionUnits = getUniqueList(init_simpleDescriptionUnit_simpleDescriptionUnits)
+    print("---------------------------------------------------------------")
+    print("----------------- SIMPLE_DESCRIPTION_UNIT SIMPLE_DESCRIPTION_UNITS QUERY RESULT ---------------------")
+    print(simpleDescriptionUnit_simpleDescriptionUnits)
+    print(len(simpleDescriptionUnit_simpleDescriptionUnits))
+
+    init_simpleDescriptionUnit_basicUnits = []
+    try:
+        for i in range (0, len(results)):
+            init_simpleDescriptionUnit_basicUnits.append(results[i].get('simpleDescriptionUnit_info')[6])
+    except:
+        pass
+    simpleDescriptionUnit_basicUnits = getUniqueList(init_simpleDescriptionUnit_basicUnits)
+    print("---------------------------------------------------------------")
+    print("----------------- SIMPLE_DESCRIPTION_UNIT BASIC_UNITS QUERY RESULT ----------------")
+    print(simpleDescriptionUnit_basicUnits)
+    print(len(simpleDescriptionUnit_basicUnits))
+
+    init_simpleDescriptionUnit_granularity_trees = []
+    try:
+        for i in range (0, len(results)):
+            init_simpleDescriptionUnit_granularity_trees.append(results[i].get('simpleDescriptionUnit_info')[7])
+    except:
+        pass
+    simpleDescriptionUnit_granularity_trees = getUniqueList(init_simpleDescriptionUnit_granularity_trees)
+    print("---------------------------------------------------------------")
+    print("------------ SIMPLE_DESCRIPTION_UNIT GRANULARITY TREES QUERY RESULT --------------")
+    print(simpleDescriptionUnit_granularity_trees)
+    print(len(simpleDescriptionUnit_granularity_trees))
+
+
+    simpleDescriptionUnit_dict = []
+    # preparing the simpleDescriptionUnit_dict_element for the simpleDescriptionUnit_dict
+    simpleDescriptionUnit_dict_element = {'id': simpleDescriptionUnit_uri, 'component':results[0].get('simpleDescriptionUnit_info')[1].get('component'), 'entry_title':entry_title, 'node':simpleDescriptionUnit_node, 'parent':simpleDescriptionUnit_parent_URI, 'node_type': results[0].get('simpleDescriptionUnit_info')[0].get('node_type'), 'text': results[0].get('simpleDescriptionUnit_info')[2].get('name'), 'icon': url_for('static', filename='SimpleDescriptionUnit_ICON_small.png'), 'object':simpleDescriptionUnit_object, 'html':results[0].get('simpleDescriptionUnit_info')[1].get('html'), 'simpleDescriptionUnits':simpleDescriptionUnit_simpleDescriptionUnits, 'basicUnits':simpleDescriptionUnit_basicUnits, 'granularity_trees':simpleDescriptionUnit_granularity_trees, 'state': {'opened': True, 'selected': True}, 'li_attr':{}, 'a_attr':{}}
+
+    # extract various component links from the simpleDescriptionUnit rep_node. They are "stored" in the rep_node by consecutively numbered integer keys and the key under which they must be added to the simpleDescriptionUnit_dict_element is the value of the "name" key.
+    simpleDescriptionUnit_rep_node = results[0].get('simpleDescriptionUnit_info')[1]
+    search_key = "link_$$$_"
+    link_dict = dict(filter(lambda item: search_key in item[0], simpleDescriptionUnit_rep_node.items()))
+    for link_key in link_dict:
+        component_link_string = simpleDescriptionUnit_rep_node.get(link_key)
+        component_link = ast.literal_eval(component_link_string)
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print("------------ COMPONENT LINK DICT ---------------")
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print(component_link)
+        key_name = component_link.get('name')
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print("------------ KEY NAME --------------------------")
+        print("------------------------------------------------")
+        print("------------------------------------------------")
+        print(key_name)
+        print(type(key_name))
+        print(type(component_link))
+        simpleDescriptionUnit_dict_element[key_name] = component_link
+        # delete this key-value from the simpleDescriptionUnit_rep_node
+        simpleDescriptionUnit_rep_node.pop(link_key)
+    # add the simpleDescriptionUnit_rep_node to the simpleDescriptionUnit_dict_element under the key 'rep_node'
+    simpleDescriptionUnit_dict_element['rep_node'] = simpleDescriptionUnit_rep_node
+
+    # gathering input information by input type - if information available, the following will be added: 'input_name': {'input_control': input_info_node, 'input_nodes': [list of input nodes that belong to the input control]}
+    try:
+        for input in simpleDescriptionUnit_input_info:
+            input_name = input.get('input_name')
+            input_uri = input.get('URI')
+            input_dict = {'input_control': input, 'input_nodes':[]}
+            try:
+                for node in simpleDescriptionUnit_input_nodes:
+                    if node.get('input_info_URI') == input_uri:
+                        node['created_on'] = node['created_on'].isoformat()
+                        node['last_updated_on'] = node['last_updated_on'].isoformat()
+                        input_dict.get('input_nodes').append(node)
+                simpleDescriptionUnit_dict_element[input_name] = input_dict
+            except:
+                pass
+    except:
+        pass
+    simpleDescriptionUnit_dict.append(simpleDescriptionUnit_dict_element)
+    print("---------------------------------------------------------------")
+    print("-------------------- SIMPLE_DESCRIPTION_UNIT DICT ITEM ---------------------------")
+    print(simpleDescriptionUnit_dict)
+    print(len(simpleDescriptionUnit_dict))
+
+
+
+
+    # clearing the child_info results to unique results
+    init_child_info = []
+    try:
+        for i in range (0, len(results)):
+            init_child_info.append(results[i].get('child_info'))
+    except:
+        pass
+    child_info = getUniqueList(init_child_info)
+    print("---------------------------------------------------------------")
+    print("-------------- UNIQUE CHILD INFO QUERY RESULT -----------------")
+    print(child_info)
+    print(len(child_info))
+
+
+    init_child_input_nodes = []
+    try:
+        for i in range (0, len(child_info)):
+            init_child_input_nodes.append(child_info[i][5])
+    except:
+        pass
+    child_input_nodes = getUniqueList(init_child_input_nodes)
+    print("---------------------------------------------------------------")
+    print("---------------- CHILD INPUT NODES QUERY RESULT ---------------")
+    print(child_input_nodes)
+    print(len(child_input_nodes))
+
+    init_child_input_infos = []
+    try:
+        for i in range (0, len(child_info)):
+            init_child_input_infos.append(child_info[i][4])
+    except:
+        pass
+    child_input_infos = getUniqueList(init_child_input_infos)
+    print("---------------------------------------------------------------")
+    print("---------------- CHILD INPUT INFOS QUERY RESULT ---------------")
+    print(child_input_infos)
+    print(len(child_input_infos))
+
+
+
+
+    # appending the simpleDescriptionUnit_dict with child items
+    for child_item in child_info:
+        if child_info[0][0] != None:
+            child_node = child_item[1]
+            child_node['created_on'] = child_node['created_on'].isoformat()
+            child_node['last_updated_on'] = child_node['last_updated_on'].isoformat()
+            child_item_uri = child_node.get('URI')
+            child_object = child_item[3]
+            child_object['created_on'] = child_object['created_on'].isoformat()
+            child_object['last_updated_on'] = child_object['last_updated_on'].isoformat()
+
+            init_child_item_simpleDescriptionUnits = []
+            try:
+                for i in range (0, len(child_info)):
+                    if child_info[i][1].get('URI') == child_item_uri:
+                        if child_item[1].get('KGBB_URI') == child_info[i][6].get('KGBB_URI'):
+                            init_child_item_simpleDescriptionUnits.append(child_info[i][6])
+            except:
+                pass
+            child_item_simpleDescriptionUnits = getUniqueList(init_child_item_simpleDescriptionUnits)
+            print("---------------------------------------------------------------")
+            print("----------------- CHILD ITEM SIMPLE_DESCRIPTION_UNITS QUERY RESULT ---------------")
+            print(child_item_simpleDescriptionUnits)
+            print(len(child_item_simpleDescriptionUnits))
+
+            init_child_item_basicUnits = []
+            try:
+                for i in range (0, len(child_info)):
+                    if child_info[i][1].get('URI') == child_item_uri:
+                        if child_item[1].get('KGBB_URI') == child_info[i][7].get('KGBB_URI'):
+                            init_child_item_basicUnits.append(child_info[i][7])
+            except:
+                pass
+            child_item_basicUnits = getUniqueList(init_child_item_basicUnits)
+            print("---------------------------------------------------------------")
+            print("------------ CHILD ITEM BASIC_UNITS QUERY RESULT ---------------")
+            print(child_item_basicUnits)
+            print(len(child_item_basicUnits))
+
+            init_child_item_granularity_trees = []
+            try:
+                for i in range (0, len(child_info)):
+                    if child_info[i][1].get('URI') == child_item_uri:
+                        if child_item[1].get('KGBB_URI') == child_info[i][8].get('KGBB_URI'):
+                            init_child_item_granularity_trees.append(child_info[i][8])
+            except:
+                pass
+            child_item_granularity_trees = getUniqueList(init_child_item_granularity_trees)
+            print("---------------------------------------------------------------")
+            print("---------- CHILD ITEM GRANULARITY TREES QUERY RESULT ----------")
+            print(child_item_granularity_trees)
+            print(len(child_item_granularity_trees))
+
+            if child_item[1].get('node_type') == "simpleDescriptionUnit":
+                icon = url_for('static', filename='SimpleDescriptionUnit_ICON_small.png')
+            elif child_item[1].get('node_type') == "basicUnit":
+                icon = url_for('static', filename='BasicUnit_ICON_small.png')
+            elif child_item[1].get('node_type') == "granularity_tree":
+                icon = url_for('static', filename='GranularityTree_ICON_small.png')
+
+
+            # starting the NaviJS with the simpleDescriptionUnit node
+            child_dict = {'id': child_node.get('URI'), 'component':child_item[2].get('component'),'node':child_node, 'parent':child_item[0], 'node_type': child_item[1].get('node_type'), 'icon': icon, 'object':child_object, 'html':child_item[2].get('html'), 'simpleDescriptionUnits':child_item_simpleDescriptionUnits, 'basicUnits':child_item_basicUnits, 'granularity_trees':child_item_granularity_trees, 'state': {'opened': False, 'selected': False}, 'li_attr':{}, 'a_attr':{}}
+
+            # extract various component links from the child_item rep_node. They are "stored" in the rep_node by consecutively numbered integer keys and the key under which they must be added to the child_dict dictionary is the value of the "name" key.
+            child_rep_node = child_item[2]
+            search_key = "link_$$$_"
+            child_link_dict = dict(filter(lambda item: search_key in item[0], child_rep_node.items()))
+            for child_link_key in child_link_dict:
+                component_link_string = child_rep_node.get(child_link_key)
+                component_link = ast.literal_eval(component_link_string)
+                key_name = component_link.get('name')
+                child_dict[key_name] = component_link
+                # delete this key-value from the child_rep_node
+                child_rep_node.pop(child_link_key)
+            # add the child_rep_node to the child_dict under the key 'rep_node'
+            child_dict['rep_node'] = child_rep_node
+
+            # gathering input information by input type - if information available, the following will be added: 'input_name': {'input_control': input_info_node, 'input_nodes': [list of input nodes that belong to the input control]}
+            if child_item[1].get('node_type') == 'basicUnit':
+                child_dict['text'] = child_node.get('basicUnit_label')
+
+            elif child_item[1].get('node_type') == 'simpleDescriptionUnit':
+                child_dict['text'] = child_node.get('simpleDescriptionUnit_label')
+
+            elif child_item[1].get('node_type') == 'granularity_tree':
+                child_dict['text'] = child_node.get('name')
+
+
+            simpleDescriptionUnit_dict.append(child_dict)
+
+    # check for duplicates
+    simpleDescriptionUnit_dict = getUniqueList(simpleDescriptionUnit_dict)
+
+
+    # check for input_info and input_nodes
+    for item in simpleDescriptionUnit_dict:
+        init_child_item_input_info = []
+        try:
+            for i in range (0, len(child_input_infos)):
+                if item.get('node').get('KGBB_URI') == child_input_infos[i].get('KGBB_URI'):
+                        init_child_item_input_info.append(child_input_infos[i])
+        except:
+            pass
+        child_item_input_info = getUniqueList(init_child_item_input_info)
+        print("---------------------------------------------------------------")
+        print("----------------- CHILD ITEM INPUT INFO QUERY RESULT ---------------")
+        print(child_item_input_info)
+        print(len(child_item_input_info))
+
+        try:
+            for input in child_item_input_info:
+                input_name = input.get('input_name')
+                input_uri = input.get('URI')
+                input_dict = {'input_control': input, 'input_nodes':[]}
+
+                try:
+                    for node in child_input_nodes:
+                        if node.get('input_info_URI') == input_uri and node.get('user_input') == item.get('node').get('URI'):
+                            node['created_on'] = node['created_on'].isoformat()
+                            node['last_updated_on'] = node['last_updated_on'].isoformat()
+                            input_dict.get('input_nodes').append(node)
+                    item[input_name] = input_dict
+                except:
+                    pass
+        except:
+            pass
+
+
+    print("---------------------------------------------------------------")
+    print("---------------------------------------------------------------")
+    print("--------------------- FINAL SIMPLE_DESCRIPTION_UNIT DICT ITEM --------------------")
+    print(simpleDescriptionUnit_dict)
+    print(len(simpleDescriptionUnit_dict))
+    return simpleDescriptionUnit_dict
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # return entry node and all simpleDescriptionUnit nodes that are directly displayed by this entry
+    get_simpleDescriptionUnit_node_list_information_query_string = '''
+    MATCH (nodes:orkg_SimpleDescriptionUnit_IND {{simpleDescriptionUnit_URI:"{simpleDescriptionUnit_uri}", current_version:"true"}})
+    RETURN nodes'''.format(simpleDescriptionUnit_uri=simpleDescriptionUnit_uri)
+    results = connection.query(get_simpleDescriptionUnit_node_list_information_query_string, db='neo4j')
+
+    print("----------------- SIMPLE_DESCRIPTION_UNIT NODES SEARCH RESULT ---------------------")
+    print(results)
+    print(len(results))
+
+    nodes_list = []
+    for i in range (0, len(results)):
+        nodes_list.append(results[i].get('nodes'))
+
+    nodes_list = getUniqueList(nodes_list)
+    print("---------------------------------------------------------------")
+    print("-------------------------- NODES LIST -------------------------")
+    print(nodes_list)
+    print(len(nodes_list))
+
+    return nodes_list
