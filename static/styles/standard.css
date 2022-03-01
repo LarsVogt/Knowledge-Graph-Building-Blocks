@@ -44,7 +44,7 @@ h6 {
 }
 
 
-.simpleDescriptionUnit_resource {
+.itemUnit_resource {
   width: 100%;
   height: 32px;
   top: 0;
@@ -55,7 +55,7 @@ h6 {
   border-width: 1px;
   position: absolute;
 }
-.simpleDescriptionUnit_resource:hover {
+.itemUnit_resource:hover {
   background: #4E5263; /* dark grey background on hover */
   opacity:0.2;
 }
@@ -190,7 +190,7 @@ form, h1 {
   overflow-x: scroll;
 }
 
-.simpleDescriptionUnit_display {
+.itemUnit_display {
   width: 1094px;
   height: 600px;
   float: left;
@@ -495,13 +495,13 @@ form {
 
 
 /*Tooltip text*/
-.tooltip_basicUnit {
+.tooltip_statementUnit {
   position: relative;
   color: #4E5263; /* dark grey  */
   font-style: italic;
 }
 
-.tooltip_basicUnit .tooltip-text_basicUnit {
+.tooltip_statementUnit .tooltip-text_statementUnit {
   font-size: 14px;
   font-weight: normal;
   visibility: hidden;
@@ -522,7 +522,7 @@ form {
   transform: translate3d(0px, 20px, 0px);
 }
 
-.tooltip_basicUnit .tooltip-text_basicUnit::after {
+.tooltip_statementUnit .tooltip-text_statementUnit::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -533,20 +533,20 @@ form {
   border-color: #4E5263 transparent transparent transparent; /* dark green  */
 }
 
-.tooltip_basicUnit:hover .tooltip-text_basicUnit {
+.tooltip_statementUnit:hover .tooltip-text_statementUnit {
   visibility: visible;
   opacity: 1;
   transform: translate3d(0px, 0px, 0px);
 }
 
 
-.tooltip_simpleDescriptionUnit {
+.tooltip_itemUnit {
   position: relative;
   color: #4E5263; /* dark grey  */
   font-style: italic;
 }
 
-.tooltip_simpleDescriptionUnit .tooltip-text_simpleDescriptionUnit {
+.tooltip_itemUnit .tooltip-text_itemUnit {
   font-size: 14px;
   font-weight: normal;
   visibility: hidden;
@@ -567,7 +567,7 @@ form {
   transform: translate3d(0px, 20px, 0px);
 }
 
-.tooltip_simpleDescriptionUnit .tooltip-text_simpleDescriptionUnit::after {
+.tooltip_itemUnit .tooltip-text_itemUnit::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -578,7 +578,7 @@ form {
   border-color: #4E5263 transparent transparent transparent; /* dark red  */
 }
 
-.tooltip_simpleDescriptionUnit:hover .tooltip-text_simpleDescriptionUnit {
+.tooltip_itemUnit:hover .tooltip-text_itemUnit {
   visibility: visible;
   opacity: 1;
   transform: translate3d(0px, 0px, 0px);
@@ -643,7 +643,7 @@ form {
   color: #D92E23; /* red */
 }
 
-.resource_basicUnit_ontology_id {
+.resource_statementUnit_ontology_id {
   width: auto;
   height: auto;
   font-size: 11px;
@@ -672,7 +672,7 @@ form {
   cursor: pointer; /* Pointer/hand icon */
 }
 
-.resource_simpleDescriptionUnit_ontology_id {
+.resource_itemUnit_ontology_id {
   width: auto;
   height: auto;
   font-size: 11px;
