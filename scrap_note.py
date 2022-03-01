@@ -1,8 +1,8 @@
 data set icon &#xf07b;
 
 
-(ResearchActivitySimpleDescriptionUnit_ind)
-(ResearchResultSimpleDescriptionUnit_ind)
+(ResearchActivityItemUnit_ind)
+(ResearchResultItemUnit_ind)
 
 
 

@@ -91,7 +91,7 @@ function AjaxCall (node_data) {
 console.log(node_data)
 $.ajax({
 type: 'POST',
-url: '/simpleDescriptionUnit',
+url: '/itemUnit',
 data: JSON.stringify({node_data: node_data}),
 success : function(text)
 {
@@ -100,7 +100,7 @@ success : function(text)
 })
 .done(function( data ) {
 console.log(data)
-$('.simpleDescriptionUnit_display').replaceWith($('.simpleDescriptionUnit_display'), data);
+$('.itemUnit_display').replaceWith($('.itemUnit_display'), data);
 })
 };
 ---------------------------------------------------------------
@@ -169,7 +169,7 @@ $('.simpleDescriptionUnit_display').replaceWith($('.simpleDescriptionUnit_displa
 
 
 
------------------------------- FÜR DARSTELLUNG VON BASIC_UNITS -----------
+------------------------------ FÜR DARSTELLUNG VON STATEMENT_UNITS -----------
 
 INCLUDING HTML IN HTML (JavaScript):
 if you have to include a lot of files. Use this JS code:
@@ -202,12 +202,12 @@ ALLGEMEIN
 
 
 RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-            CHANGE LOG FÜR SIMPLE_DESCRIPTION_UNIT & BASIC_UNITS NICHT VERGESSEN!
+            CHANGE LOG FÜR ITEM_UNIT & STATEMENT_UNITS NICHT VERGESSEN!
 RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
 
 RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-        SEARCH SIMPLE_DESCRIPTION_UNIT with ONTOLOGY TERM/ENTRY/SIMPLE_DESCRIPTION_UNIT/BASIC_UNIT -> ENTRY/SIMPLE_DESCRIPTION_UNIT
-                        LIST SIMPLE_DESCRIPTION_UNITS (ENTRIES,SIMPLE_DESCRIPTION_UNITS, BASIC_UNITS,KGBBs
+        SEARCH ITEM_UNIT with ONTOLOGY TERM/ENTRY/ITEM_UNIT/STATEMENT_UNIT -> ENTRY/ITEM_UNIT
+                        LIST ITEM_UNITS (ENTRIES,ITEM_UNITS, STATEMENT_UNITS,KGBBs
                         all BY TYPE) AUCH NICHT VERGESSEN!
 RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
 
@@ -219,7 +219,7 @@ ENTRY
     [0] entry-metadata      -> entry_view_dict
     [1] publication title   -> entry_view_dict
     [2-x] key-value pairs   -> entry_view_dict
-    allowed add simpleDescriptionUnits       -> add_simpleDescriptionUnits_dict
+    allowed add itemUnits       -> add_itemUnits_dict
 
     entry_view_tree_dict:
         {order[integer]: {entry_label1:string, entry_value1:string, entry_label_tooltip1:string, entry_value_tooltip1:string, editable:Boolean, include_html:string, div_class:string, placeholder_text:string, required:Boolean, input_control:{}, quantity:"1/m", sub_view_tree:{}
@@ -230,19 +230,19 @@ ENTRY
 
 
 
-    add_simpleDescriptionUnits_dict:
+    add_itemUnits_dict:
         {order[integer]: {kgbb_uri:uri, required:Boolean, quantity:"1/m", data_item_type_label:string}, }
-        1) get all simpleDescriptionUnit element nodes über :HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT
+        1) get all itemUnit element nodes über :HAS_ITEM_UNIT_ELEMENT
 
 
 
-SIMPLE_DESCRIPTION_UNIT
+ITEM_UNIT
 
 
 
 
 
-BASIC_UNIT
+STATEMENT_UNIT
 
 
 
@@ -263,7 +263,7 @@ INPUT INFO
 DATA NODE
 
 
-DATA ITEM NODE (ENTRY/SIMPLE_DESCRIPTION_UNIT/BASIC_UNIT)
+DATA ITEM NODE (ENTRY/ITEM_UNIT/STATEMENT_UNIT)
 
 
 
@@ -286,29 +286,29 @@ resolveValue(input_node, data_item_type, data_item_node, object_node, input_node
 
 NEXT STEPS:
 
-    DONE 1) addBasicUnit function
-    DONE 2) BasicUnitRepresentation Class
-    DONE 3) adjust addEntry function to check for required simpleDescriptionUnits and basicUnits...
+    DONE 1) addStatementUnit function
+    DONE 2) StatementUnitRepresentation Class
+    DONE 3) adjust addEntry function to check for required itemUnits and statementUnits...
 4) addControl function to check whether the parent data item may display the data item to be added and whether only once or multiples
 
 
 
 
 
-# check for required simpleDescriptionUnits
-search_required_simpleDescriptionUnits_query_string = '''OPTIONAL MATCH (n {{URI:"{entry_kgbb_uri}"}})-[:HAS_SIMPLE_DESCRIPTION_UNIT_ELEMENT]->(p)
+# check for required itemUnits
+search_required_itemUnits_query_string = '''OPTIONAL MATCH (n {{URI:"{entry_kgbb_uri}"}})-[:HAS_ITEM_UNIT_ELEMENT]->(p)
 RETURN p'''.format(entry_kgbb_uri=entry_kgbb_uri)
 
-simpleDescriptionUnits_query = connection.query(search_required_simpleDescriptionUnits_query_string, db='neo4j')
+itemUnits_query = connection.query(search_required_itemUnits_query_string, db='neo4j')
 print("-------------------------------------------------------------------------------")
-print("--------------------- INITIAL REQUIRED SIMPLE_DESCRIPTION_UNITS QUERY ----------------------------")
-print(simpleDescriptionUnits_query)
+print("--------------------- INITIAL REQUIRED ITEM_UNITS QUERY ----------------------------")
+print(itemUnits_query)
 
-# check for required basicUnits
-search_required_basicUnits_query_string = '''OPTIONAL MATCH (n {{URI:"{entry_kgbb_uri}"}})-[:HAS_BASIC_UNIT_ELEMENT]->(a)
+# check for required statementUnits
+search_required_statementUnits_query_string = '''OPTIONAL MATCH (n {{URI:"{entry_kgbb_uri}"}})-[:HAS_STATEMENT_UNIT_ELEMENT]->(a)
 RETURN a'''.format(entry_kgbb_uri=entry_kgbb_uri)
 
-basicUnit_query = connection.query(search_required_basicUnits_query_string, db='neo4j')
+statementUnit_query = connection.query(search_required_statementUnits_query_string, db='neo4j')
 print("-------------------------------------------------------------------------------")
-print("------------------- INITIAL REQUIRED BASIC_UNITS QUERY -------------------------")
-print(basicUnit_query)
+print("------------------- INITIAL REQUIRED STATEMENT_UNITS QUERY -------------------------")
+print(statementUnit_query)
