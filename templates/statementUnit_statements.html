@@ -1,9 +1,9 @@
 <div id="{{id  | replace('-', '_')}}overlayStatements" style="position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.7); z-index: 2; ">
   <div id="statements" style="padding-top: 10px; ">
     <span style="font-weight: bold; float: left; position: relative; margin-left: 19px; margin-top: 14px; ">Statement: </span>
-    <span style="font-weight: normal; float: left; position: relative; margin-left: 19px; margin-top: 14px; "> "{{statement}} &nbsp;&nbsp;</span>
+    <span style="font-weight: normal; float: left; position: relative; margin-left: 19px; margin-top: 14px; "> "{{statementUnit_statement}} &nbsp;&nbsp;</span>
     <div class="resource_input" style="position: relative; margin-top: 0px; margin-right: 5px; padding: 0px 0px 5px 0px; height: auto;">
-      {% include input_representation %}
+      {% include 'single_resource.html' %}
     </div><span style="font-weight: normal; float: left; position: relative; margin-left: 0px; margin-top: 14px; ">."</span>
 
     <button onclick="off{{id  | replace('-', '_')}}_Statements()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  cursor: pointer; background: #7F869B; margin-top: -10px; float: right; font-weight: bold; " class="btn btn-primary">X</button>
@@ -29,11 +29,9 @@
       <input class="itemUnit_resource" type="hidden" name="{{ id }}_statementUnit_uri" value="{{ id }}"></input>
       <button onclick="off{{id  | replace('-', '_')}}_Statements()" id="{{id  | replace('-', '_')}}_certainty" href="#" name="button" style="height: 30px; padding-top: 3px; margin-right: 20px; float: right; margin-top: 80px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> save
       </button>
-      <input type="hidden" name="input_name" id="input_name{{ id }}" value="{{ id }}"/>
       <input type="hidden" name="{{ id }}_itemUnit_uri" value=None />
       <input type="hidden" name="{{ id }}_entry_uri" value="{{ entry_id }}"/>
-      <input type="hidden" name="{{ id }}_parent_type" value="{{ parent_type }}"/>
-      <input type="hidden" name="{{ id }}_parent_uri" value="{{ parent_uri }}"/>
+      <input type="hidden" name="input_name" id="input_name{{ id }}" value="{{ id }}"/>
     </form>
   </div>
 </div>

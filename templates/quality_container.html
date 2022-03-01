@@ -2,25 +2,25 @@
 <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
 
 
-<div class="data_row">{{ simpleDescriptionUnit_view_tree.get(2).get("basicUnit_label1") }}
+<div class="data_row">{{ itemUnit_view_tree.get(2).get("statementUnit_label1") }}
 
-  {% if 'URI' in simpleDescriptionUnit_view_tree.get(2).get('sub_view_tree')[0] %}
-    {% include  simpleDescriptionUnit_view_tree.get(2).get('sub_view_tree')[0].get(0).get('include_html') ignore missing  %}
+  {% if 'URI' in itemUnit_view_tree.get(2).get('sub_view_tree')[0] %}
+    {% include  itemUnit_view_tree.get(2).get('sub_view_tree')[0].get(0).get('include_html') ignore missing  %}
   {% endif %}
 
 
   <div class="datum">
     <form action="/user_input" accept-charset="UTF-8" style="display:flex; width:600px;" method="POST"><input name="utf8" type="hidden" value="&#x2713;" />
-      <input type="text" style="height: 30px; " name="single_resource_input" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/PATO_0001241" class="bp_form_complete-PATO-name" size="40" placeholder="{{ simpleDescriptionUnit_view_tree.get(2).get('placeholder_text') }}" />
+      <input type="text" style="height: 30px; " name="single_resource_input" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/PATO_0001241" class="bp_form_complete-PATO-name" size="40" placeholder="{{ itemUnit_view_tree.get(2).get('placeholder_text') }}" />
       <div class='input-group-append'>
-        <input type="hidden" name="single_resource_input_parent_uri" value="{{ simpleDescriptionUnit_view_tree.get('URI') }}">
-        <input type="hidden" name="single_resource_input_parent_item_type" value="{{ simpleDescriptionUnit_view_tree.get('data_item_type') }}">
+        <input type="hidden" name="single_resource_input_parent_uri" value="{{ itemUnit_view_tree.get('URI') }}">
+        <input type="hidden" name="single_resource_input_parent_item_type" value="{{ itemUnit_view_tree.get('data_item_type') }}">
         <input type="hidden" name="single_resource_input_entry_uri" value="{{ entry_view_tree.get('URI') }}">
-        <input type="hidden" name="single_resource_input_simpleDescriptionUnit_uri" value="{{ simpleDescriptionUnit_view_tree.get('URI') }}">
-        <input type="hidden" name="single_resource_input_basicUnit_uri" value=None>
-        <input type="hidden" name="single_resource_input_kgbb_uri" value="{{ simpleDescriptionUnit_view_tree.get(2).get('target_KGBB_URI') }}">
-        <input type="hidden" name="single_resource_input_input_result" value="{{ simpleDescriptionUnit_view_tree.get(2).get('input_results_in') }}">
-        <input type="hidden" name="single_resource_input_query_key" value="{{ simpleDescriptionUnit_view_tree.get(2).get('query_key') }}">
+        <input type="hidden" name="single_resource_input_itemUnit_uri" value="{{ itemUnit_view_tree.get('URI') }}">
+        <input type="hidden" name="single_resource_input_statementUnit_uri" value=None>
+        <input type="hidden" name="single_resource_input_kgbb_uri" value="{{ itemUnit_view_tree.get(2).get('target_KGBB_URI') }}">
+        <input type="hidden" name="single_resource_input_input_result" value="{{ itemUnit_view_tree.get(2).get('input_results_in') }}">
+        <input type="hidden" name="single_resource_input_query_key" value="{{ itemUnit_view_tree.get(2).get('query_key') }}">
         <input type="hidden" name="single_resource_input_deleted_item_uri" value=None>
         <button name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> add
         </button>
@@ -29,22 +29,22 @@
   </div>
 </div>
 
-{% if 'URI' in simpleDescriptionUnit_view_tree.get(2).get('sub_view_tree')[0] %}
-  {% for m in range (0, simpleDescriptionUnit_view_tree.get(2).get('sub_view_tree_length')) %}
+{% if 'URI' in itemUnit_view_tree.get(2).get('sub_view_tree')[0] %}
+  {% for m in range (0, itemUnit_view_tree.get(2).get('sub_view_tree_length')) %}
   <div id="overlay">
     <div class="datum" style="margin-top: 300px; margin-left: 450px; float:left">
       <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST"><input name="utf8" type="hidden" value="&#x2713;" />
-        <input type="text" style="height: 30px; " name="single_resource_input_edit" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/PATO_0001241" class="bp_form_complete-PATO-name" size="40" placeholder="{{ simpleDescriptionUnit_view_tree.get(2).get('placeholder_text') }}" />
+        <input type="text" style="height: 30px; " name="single_resource_input_edit" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/PATO_0001241" class="bp_form_complete-PATO-name" size="40" placeholder="{{ itemUnit_view_tree.get(2).get('placeholder_text') }}" />
         <div class='input-group-append'>
-          <input type="hidden" name="single_resource_input_edit_parent_uri" value="{{ simpleDescriptionUnit_view_tree.get('URI') }}">
-          <input type="hidden" name="single_resource_input_edit_parent_item_type" value="{{ simpleDescriptionUnit_view_tree.get('data_item_type') }}">
+          <input type="hidden" name="single_resource_input_edit_parent_uri" value="{{ itemUnit_view_tree.get('URI') }}">
+          <input type="hidden" name="single_resource_input_edit_parent_item_type" value="{{ itemUnit_view_tree.get('data_item_type') }}">
           <input type="hidden" name="single_resource_input_edit_entry_uri" value="{{ entry_view_tree.get('URI') }}">
-          <input type="hidden" name="single_resource_input_edit_simpleDescriptionUnit_uri" value="{{ simpleDescriptionUnit_view_tree.get('URI') }}">
-          <input type="hidden" name="single_resource_input_edit_basicUnit_uri" value=None>
-          <input type="hidden" name="single_resource_input_edit_kgbb_uri" value="{{ simpleDescriptionUnit_view_tree.get(2).get('target_KGBB_URI') }}">
-          <input type="hidden" name="single_resource_input_edit_input_result" value="{{ simpleDescriptionUnit_view_tree.get(2).get('input_results_in') }}">
-          <input type="hidden" name="single_resource_input_edit_query_key" value="{{ simpleDescriptionUnit_view_tree.get(2).get('query_key') }}">
-          <input type="hidden" name="single_resource_input_edit_deleted_item_uri" value="{{ simpleDescriptionUnit_view_tree.get(2).get('sub_view_tree')[m].get('URI') }}">
+          <input type="hidden" name="single_resource_input_edit_itemUnit_uri" value="{{ itemUnit_view_tree.get('URI') }}">
+          <input type="hidden" name="single_resource_input_edit_statementUnit_uri" value=None>
+          <input type="hidden" name="single_resource_input_edit_kgbb_uri" value="{{ itemUnit_view_tree.get(2).get('target_KGBB_URI') }}">
+          <input type="hidden" name="single_resource_input_edit_input_result" value="{{ itemUnit_view_tree.get(2).get('input_results_in') }}">
+          <input type="hidden" name="single_resource_input_edit_query_key" value="{{ itemUnit_view_tree.get(2).get('query_key') }}">
+          <input type="hidden" name="single_resource_input_edit_deleted_item_uri" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get('URI') }}">
           <button onclick="off()" name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> edit
           </button>
         </div>

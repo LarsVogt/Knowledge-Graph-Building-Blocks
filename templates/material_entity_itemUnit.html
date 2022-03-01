@@ -1,0 +1,219 @@
+{% set id = child.get('id') %}
+{% set entry_id = entry_dict[0].get('id') %}
+{% set statementUnit_uri =  None %}
+{% set resource_node = child.get('object') %}
+{% set resource_input_info = child.get('material_entity_itemUnit_input_info') %}
+{% set parent_id = child.get('parent') %}
+{% set ITEM_UNIT_uri =  child.get('id') %}
+{% set instance_label_edit =  True %}
+{% set input_representation = "single_resource.html" %}
+{% for parent in entry_dict if parent.get('id') == parent_id %}
+  {% set parent_type = parent.get('node_type') %}
+  {% include "itemUnit_header_resource.html" %}
+{% endfor %}
+<br><br><br><br><br>
+
+{% for gran_tree in entry_dict %}
+  {% if gran_tree.get('object').get('URI') == child.get('object').get('URI') and gran_tree != child and gran_tree.get('node_type') == "granularity_tree" %}
+
+    {% set component = "material_entity_parthood_granularity_tree" %}
+    {% set label = "has granularity tree:" %}
+    {% set statement = "Material entity is root of granularity tree:" %}
+    {% set id = gran_tree.get('id') %}
+    {% set parent_id = itemUnit_uri %}
+    {% set parent_type = child.get('node_type') %}
+    {% set instance_label_edit =  False %}
+    {% set parent_uri = itemUnit_uri %}
+    {% set parent_uri_label = "itemUnit_uri" %}
+    {% set ITEM_UNIT_uri =  child.get('id') %}
+    {% set property_key =  gran_tree.get('node').get('URI_property_key') %}
+    {% set statementUnit_uri =  None %}
+    {% set entry_id = entry_dict[0].get('id') %}
+    {% set node = gran_tree.get('node') %}
+    {% set resource_node = gran_tree.get('node') %}
+    {% set node = gran_tree.get('node') %}
+    {% set resource_input_info = gran_tree.get('node') %}
+    {% set input_representation = "single_resource.html" %}
+    {% include  "granularity_tree.html" %}
+  {% endif %}
+{% endfor %}
+
+
+{% for child in entry_dict %}
+
+  {% if child.get('component') == "material_entity_itemUnit" and child.get('parent') == itemUnit_uri %}
+    {% set component = "material_entity_itemUnit" %}
+    {% set label = "has part:" %}
+    {% set statement = "Material entity has part:" %}
+    {% set id = child.get('id') %}
+    {% set parent_id = itemUnit_uri %}
+    {% set parent_type = child.get('node_type') %}
+    {% set parent_uri = itemUnit_uri %}
+    {% set parent_uri_label = "itemUnit_uri" %}
+    {% set ITEM_UNIT_uri =  child.get('id') %}
+    {% set statementUnit_uri =  None %}
+    {% set instance_label_edit =  True %}
+    {% set entry_id = entry_dict[0].get('id') %}
+    {% set resource_input_info = child.get('material_entity_itemUnit_input_info') %}
+    {% set node = child.get('node') %}
+    {% set resource_node = child.get('object') %}
+    {% set input_representation = "single_resource.html" %}
+    {% include  "single_resource_input_itemUnit.html" %}
+  {% endif %}
+
+{% endfor %}
+
+{% if not entry_dict[0].get('version') %}
+  {% set component = "material_entity_itemUnit" %}
+  {% set resource_label = "has part:" %}
+  {% set statementUnit_uri = None %}
+  {% set parent_id = itemUnit_uri %}
+  {% set ITEM_UNIT_uri =  None %}
+  {% set parent_type = child.get('node_type') %}
+  {% set entry_id = entry_dict[0].get('id') %}
+  {% set resource_input_info = child.get('material_entity_itemUnit_input_info') %}
+  {% include  "single_resource_input_container.html" %}
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+{% for child in entry_dict %}
+
+  {% if child.get('component') == "quality_relation_identification_statementUnit" and child.get('parent') == itemUnit_uri %}
+    {% set component = "quality_relation_identification_statementUnit" %}
+    {% set label = "has quality:" %}
+    {% set statement = "Material entity has quality:" %}
+    {% set id = child.get('id') %}
+    {% set parent_id = itemUnit_uri %}
+    {% set parent_type = child.get('node_type') %}
+    {% set parent_uri = itemUnit_uri %}
+    {% set parent_uri_label = "itemUnit_uri" %}
+    {% set ITEM_UNIT_uri =  None %}
+    {% set instance_label_edit =  False %}
+    {% set statementUnit_uri = child.get('id') %}
+    {% set entry_id = entry_dict[0].get('id') %}
+    {% set resource_input_info = child.get('quality_statementUnit_relation_identification_input_info') %}
+    {% set node = child.get('node') %}
+    {% set resource_node = child.get('object') %}
+    {% set input_representation = "single_resource.html" %}
+    {% include  "single_resource_input_statementUnit.html" %}
+
+    {% for statementUnit_child in entry_dict if statementUnit_child.get('component') == "weight_measurement_statementUnit" and statementUnit_child.get('parent') == child.get('id') %}
+      {% set component = "weight_measurement_statementUnit" %}
+      {% set label = ":" %}
+      {% set statement = "Quality has measurement:" %}
+      {% set id = statementUnit_child.get('id') %}
+      {% set parent_id = itemUnit_uri %}
+      {% set parent_type = statementUnit_child.get('node_type') %}
+      {% set parent_uri = itemUnit_uri %}
+      {% set parent_uri_label = "itemUnit_uri" %}
+      {% set ITEM_UNIT_uri =  None %}
+      {% set instance_label_edit =  False %}
+      {% set statementUnit_uri = statementUnit_child.get('id') %}
+      {% set entry_id = entry_dict[0].get('id') %}
+      {% set resource_input_info = statementUnit_child.get('weight_measurement_statementUnit_input_info') %}
+      {% set node = statementUnit_child.get('node') %}
+      {% set resource_node = statementUnit_child.get('weight_unit_input').get('input_nodes')[0] %}
+      {% set value_node = statementUnit_child.get('weight_value_input').get('input_nodes')[0] %}
+      {% set input_representation = "single_value_with_single_resource.html" %}
+      {% include  "linked_single_value_with_single_resource_input_statementUnit.html" %}
+    {% endfor %}
+
+    {% if child.get('object').get('type') == "http://purl.obolibrary.org/obo/PATO_0000128" %}
+      {% if not entry_dict[0].get('version') %}
+        {% set component = "weight_measurement_statementUnit" %}
+        {% set resource_label = ":" %}
+        {% set statementUnit_uri = None %}
+        {% set parent_id = id %}
+        {% set ITEM_UNIT_uri =  itemUnit_uri %}
+        {% set parent_type = child.get('node_type') %}
+        {% set entry_id = entry_dict[0].get('id') %}
+        {% set resource_input_info = child.get('weight_measurement_statementUnit_input_info') %}
+        {% include  "linked_single_value_with_single_resource_input_container.html" %}
+
+      {% endif %}
+    {% endif %}
+
+
+
+
+
+    {% for statementUnit_child in entry_dict if statementUnit_child.get('component') == "R0_measurement_statementUnit" and statementUnit_child.get('parent') == child.get('id') %}
+      {% set component = "R0_measurement_statementUnit" %}
+      {% set label = ":" %}
+      {% set label1 = "95% confidence interval:" %}
+      {% set statement = "Quality has measurement:" %}
+      {% set id = statementUnit_child.get('id') %}
+      {% set parent_id = itemUnit_uri %}
+      {% set parent_type = statementUnit_child.get('node_type') %}
+      {% set parent_uri = itemUnit_uri %}
+      {% set parent_uri_label = "itemUnit_uri" %}
+      {% set ITEM_UNIT_uri =  None %}
+      {% set instance_label_edit =  False %}
+      {% set statementUnit_uri = statementUnit_child.get('id') %}
+      {% set entry_id = entry_dict[0].get('id') %}
+      {% set resource_input_info = statementUnit_child.get('R0_measurement_statementUnit_input_info') %}
+      {% set node = statementUnit_child.get('node') %}
+      {% set value_node1 = statementUnit_child.get('R0_value_input').get('input_nodes')[0] %}
+      {% set value_node2 = statementUnit_child.get('lower_confidence_limit_value_input').get('input_nodes')[0] %}
+      {% set value_node3 = statementUnit_child.get('upper_confidence_limit_value_input').get('input_nodes')[0] %}
+      {% set input_representation = "single_value_with_label_and_double_value_input.html" %}
+      {% include  "linked_value_with_label_and_double_value_input_statementUnit.html" %}
+    {% endfor %}
+
+    {% if child.get('object').get('type') == "http://purl.obolibrary.org/obo/OMIT_0024604" %}
+      {% if not entry_dict[0].get('version') %}
+        {% set component = "R0_measurement_statementUnit" %}
+        {% set resource_label = "95% confidence interval:" %}
+        {% set statementUnit_uri = None %}
+        {% set parent_id = id %}
+        {% set ITEM_UNIT_uri =  itemUnit_uri %}
+        {% set parent_type = child.get('node_type') %}
+        {% set entry_id = entry_dict[0].get('id') %}
+        {% set resource_input_info = child.get('R0_measurement_statementUnit_input_info') %}
+        {% include  "linked_triple_value_input_container.html" %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+
+
+{% endfor %}
+
+
+
+{% if not entry_dict[0].get('version') %}
+  {% set component = "quality_relation_identification_statementUnit" %}
+  {% set resource_label = "has quality:" %}
+  {% set statementUnit_uri = None %}
+  {% set parent_id = itemUnit_uri %}
+  {% set ITEM_UNIT_uri =  itemUnit_uri %}
+  {% set parent_type = child.get('node_type') %}
+  {% set entry_id = entry_dict[0].get('id') %}
+  {% set resource_input_info = child.get('quality_relation_identification_statementUnit_input_info') %}
+  {% include  "single_resource_input_container.html" %}
+{% endif %}
+
+
+
+
+
+
+
+
+{% set itemUnit_node = child.get('node') %}
+
+
+
+
+
+
+
+{% include  'history.html'  %}

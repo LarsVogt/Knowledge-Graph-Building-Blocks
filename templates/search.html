@@ -2,17 +2,17 @@
 
 
 <head>
-  <title>KGBB Use Case: SEARCH SIMPLE_DESCRIPTION_UNIT</title>
+  <title>KGBB Use Case: SEARCH ITEM_UNIT</title>
   <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/standard.css')}}>
   <link rel="stylesheet" type="text/css" href={{url_for('static', filename='styles/font-awesome-4.7.0/css/font-awesome.min.css')}}>
 </head>
 <body>
 <div class="header">
-  <h4>Search SimpleDescriptionUnit</h4>
+  <h4>Search ItemUnit</h4>
 </div>
 
 
-<div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 70px;">By SimpleDescriptionUnit Unit Class (WIP - only working for "orkg material entity simpleDescriptionUnit" when simpleDescriptionUnit units of this type present in the graph):</div>
+<div class="data_row" style="font-size: 20px; margin: 20px 0px 20px 70px;">By ItemUnit Unit Class (WIP - only working for "orkg material entity itemUnit" when itemUnit units of this type present in the graph):</div>
   <div class="list_header" style="margin-top: 0px;">
     <table id="header_table">
       <tr>
@@ -22,14 +22,14 @@
     </table>
   </div>
   <div class="list_container">
-    {% for simpleDescriptionUnit_class in simpleDescriptionUnit_class_list  %}
+    {% for itemUnit_class in itemUnit_class_list  %}
       <div class="list_item">
         <form action="/search" method="POST">
-          <input class="entry_row" type="submit" name="simpleDescriptionUnit_class_uri" value="{{ simpleDescriptionUnit_class.get('URI') }}">
+          <input class="entry_row" type="submit" name="itemUnit_class_uri" value="{{ itemUnit_class.get('URI') }}">
           <table id="entry_table" cellpadding="0" cellspacing="0" >
             <tr>
-              <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ simpleDescriptionUnit_class.get('name') }}</th>
-              <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ simpleDescriptionUnit_class.get('description') }}</th>
+              <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ itemUnit_class.get('name') }}</th>
+              <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ itemUnit_class.get('description') }}</th>
             </tr>
           </table>
         </form>
@@ -66,7 +66,7 @@
 
 
 
-  <div class="data_row" style="color: red; font-size: 20px; margin: 20px 0px 20px 70px;">WIP - currently not functional<span style="color: #B9BCCB">  By BasicUnit Unit Class</span></div>
+  <div class="data_row" style="color: red; font-size: 20px; margin: 20px 0px 20px 70px;">WIP - currently not functional<span style="color: #B9BCCB">  By StatementUnit Unit Class</span></div>
     <div class="list_header" style="margin-top: 0px;">
       <table id="header_table">
         <tr>
@@ -76,14 +76,14 @@
       </table>
     </div>
     <div class="list_container">
-      {% for basicUnit_class in basicUnit_class_list  %}
+      {% for statementUnit_class in statementUnit_class_list  %}
         <div class="list_item">
           <form action="/search" method="POST">
-            <input class="entry_row" type="submit" name="basicUnit_class_uri" value="{{ basicUnit_class.get('URI') }}">
+            <input class="entry_row" type="submit" name="statementUnit_class_uri" value="{{ statementUnit_class.get('URI') }}">
             <table id="entry_table" cellpadding="0" cellspacing="0" >
               <tr>
-                <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ basicUnit_class.get('name') }}</th>
-                <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ basicUnit_class.get('description') }}</th>
+                <th width="200" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ statementUnit_class.get('name') }}</th>
+                <th width="auto" height="auto" style="font-size: 13px; padding: 3px 0px 3px 0px; ">{{ statementUnit_class.get('description') }}</th>
               </tr>
             </table>
           </form>
@@ -106,7 +106,7 @@
           </table>
         </div>
         <div class="list_container">
-          {% for entry_class in simpleDescriptionUnit_class_list  %}
+          {% for entry_class in itemUnit_class_list  %}
             <div class="list_item">
               <form action="/search" method="POST">
                 <input class="entry_row" type="submit" name="entry_class_uri" value="{{ entry_class.get('URI') }}">

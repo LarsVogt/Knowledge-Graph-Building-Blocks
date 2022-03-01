@@ -1,0 +1,46 @@
+<script src="{{url_for('static', filename='form_complete.js')}}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+<script type=text/javascript>
+  $(function() {
+      $('button#{{statementUnit.get('id')  | replace('-', '_')}}{{end_component}}_2').bind('click', function() {
+          $.ajax({
+              url: $SCRIPT_ROOT + '/user_input',
+              type: "post",
+              data: {
+                input_name: $('input[id="input_name{{end_component}}"]').val()
+        }
+          });
+      });
+  });
+</script>
+
+
+
+<div class="data_row" style="margin-left: 0px; margin-top: 4px; position: fixed"><span style="margin-left: 6px; margin-top: 10px; ">{{ end_label }}</span>
+  {% for statementUnit_child in entry_dict if statementUnit_child.get('component') == end_component and statementUnit_child.get('parent') == statementUnit_uri %}
+    {% include end_resource_html ignore missing  %}
+  {% else %}
+    <div class="datum" style="margin-left: 6px; margin-top: -6px; position: inherit;">
+      <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px; margin-top: 4px;" method="POST">
+        <input name="utf8" type="hidden" value="&#x2713;" />
+        <input type="text" style="height: 30px; margin-right: 4px;" name="{{end_component}}_value" size="5" placeholder="{{ end_container_node.get('placeholder_text_1') }}" />
+        <input type="text" style="height: 30px; " name="{{end_component}}" id="query" data-bp_include_definitions="true" data-bp_search_branch="{{ end_container_node.get('input_restricted_to_subclasses_of') }}" class="bp_form_complete-{{ end_container_node.get('ontology_ID') }}-name" size="40" placeholder="{{ end_container_node.get('placeholder_text_2') }}" />
+        <div class='input-group-append'>
+          <input type="hidden" name="{{end_component}}_parent_uri" value="{{ statementUnit.get('id') }}">
+          <input type="hidden" name="{{end_component}}_parent_item_type" value="{{ statementUnit.get('node_type') }}">
+          <input type="hidden" name="{{end_component}}_entry_uri" value="{{ entry_dict[0].get('id') }}">
+          <input type="hidden" name="{{end_component}}_itemUnit_uri" value="{{ itemUnit_uri }}">
+          <input type="hidden" name="{{end_component}}_statementUnit_uri" value=None>
+          <input type="hidden" name="{{end_component}}_kgbb_uri" value="{{ end_container_node.get('target_KGBB_URI') }}">
+          <input type="hidden" name="{{end_component}}_input_result" value="{{ end_container_node.get('input_results_in') }}">
+          <input type="hidden" name="{{end_component}}_query_key" value="{{ end_container_node.get('query_key') }}">
+          <input type="hidden" name="{{end_component}}_deleted_item_uri" value=None>
+          <button name="button" style="height: 30px; padding-top: 3px" id="{{statementUnit.get('id')  | replace('-', '_')}}{{end_component}}_2" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> add
+          </button>
+          <input type="hidden" name="input_name" id="input_name{{end_component}}" value="{{end_component}}"/>
+        </div>
+      </form>
+    </div>
+  {% endfor %}
+</div>

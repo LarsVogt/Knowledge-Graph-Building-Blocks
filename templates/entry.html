@@ -16,10 +16,10 @@
         server_user:"python",
         server_password:"useCaseKGBB",
         labels: {
-            "orkg_BasicUnit_IND": {
-                "caption": "basicUnit_label",
+            "orkg_StatementUnit_IND": {
+                "caption": "statementUnit_label",
                 "color":"#84FF5C",
-                "image": "{{url_for('static', filename='BasicUnit_ICON_small.png')}}",
+                "image": "{{url_for('static', filename='StatementUnit_ICON_small.png')}}",
             },
             "Literal_IND": {
                 "caption": "value",
@@ -89,7 +89,7 @@ $(function() {
 
 
 
-  <div class="simpleDescriptionUnit_container" style="border: 1px solid #eee; border-radius: 7px; width: auto; padding: 5px 5px 5px 5px; width:auto; height:auto; margin: 20px; box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.05), 0 1px 1px 0 rgba(0, 0, 0, 0.19); ">
+  <div class="itemUnit_container" style="border: 1px solid #eee; border-radius: 7px; width: auto; padding: 5px 5px 5px 5px; width:auto; height:auto; margin: 20px; box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.05), 0 1px 1px 0 rgba(0, 0, 0, 0.19); ">
     <img class="item_icon" src="{{url_for('static', filename='Entry_ICON_medium.png')}}" alt="entry icon" style="height:auto; max-width: 100%; margin-top: -12px; margin-left: -12px; float: left;">
     {% if not entry_dict[0].get('version') %}
       <form action="/version_safe" method="POST">
@@ -180,42 +180,42 @@ $(function() {
 
 
 
-    {% set simpleDescriptionUnit_uri = entry_dict[0].get('id') %}
+    {% set itemUnit_uri = entry_dict[0].get('id') %}
 
 
     {% for child in entry_dict %}
 
-      {% if child.get('component') == "research_topic_basicUnit" and child.get('parent') == simpleDescriptionUnit_uri %}
-        {% set component = "research_topic_basicUnit" %}
+      {% if child.get('component') == "research_topic_statementUnit" and child.get('parent') == itemUnit_uri %}
+        {% set component = "research_topic_statementUnit" %}
         {% set label = "has research topic:" %}
         {% set statement = "Paper has research topic:" %}
         {% set id = child.get('id') %}
         {% set parent_id = entry_dict[0].get('id') %}
         {% set parent_type = entry_dict[0].get('node_type') %}
         {% set entry_id = entry_dict[0].get('id') %}
-        {% set SIMPLE_DESCRIPTION_UNIT_uri = None %}
+        {% set ITEM_UNIT_uri = None %}
         {% set input_representation = "single_resource.html" %}
-        {% set basicUnit_uri = child.get('id') %}
+        {% set statementUnit_uri = child.get('id') %}
         {% set parent_uri = entry_dict[0].get('id') %}
         {% set parent_uri_label = "entry_uri" %}
-        {% set resource_input_info = entry_dict[0].get('research_topic_basicUnit_input_info') %}
+        {% set resource_input_info = entry_dict[0].get('research_topic_statementUnit_input_info') %}
         {% set node = child.get('node') %}
         {% set instance_label_edit =  False %}
         {% set resource_node = child.get('research_topic_input').get('input_nodes')[0] %}
-        {% include  "single_resource_input_basicUnit.html" %}
+        {% include  "single_resource_input_statementUnit.html" %}
       {% endif %}
 
     {% endfor %}
 
     {% if not entry_dict[0].get('version') %}
-      {% set component = "research_topic_basicUnit" %}
+      {% set component = "research_topic_statementUnit" %}
       {% set resource_label = "has research topic:" %}
-      {% set SIMPLE_DESCRIPTION_UNIT_uri = None %}
-      {% set basicUnit_uri = None %}
+      {% set ITEM_UNIT_uri = None %}
+      {% set statementUnit_uri = None %}
       {% set parent_id = entry_dict[0].get('id') %}
       {% set parent_type = entry_dict[0].get('node_type') %}
       {% set entry_id = entry_dict[0].get('id') %}
-      {% set resource_input_info = entry_dict[0].get('research_topic_basicUnit_input_info') %}
+      {% set resource_input_info = entry_dict[0].get('research_topic_statementUnit_input_info') %}
       {% include  "single_resource_input_container.html" %}
     {% endif %}
 

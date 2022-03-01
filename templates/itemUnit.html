@@ -1,0 +1,91 @@
+{% extends "entry_form.html" %}
+
+  {% block content %}
+
+
+    {% for child in entry_dict %}
+      {% if child.get('state').get('selected') == True %}
+
+      <div class="itemUnit_container" style="border: 1px solid #eee; border-radius: 7px; width: auto; padding: 5px 5px 5px 5px; width:auto; height:auto; margin: 20px; box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.05), 0 1px 1px 0 rgba(0, 0, 0, 0.19); ">
+        <img class="item_icon" src="{{url_for('static', filename='ItemUnit_ICON_medium.png')}}"  style="height:auto; max-width: 100%; margin-top: -12px; margin-left: -12px; float: left;">
+
+        {% if entry_dict[0].get('version') %}
+          <div class="datum" style="font-size: 18px; margin-top: 12px; margin-left: 16px; float: left; color: #239096; ">This is a safed {{ version.get('version_type') }} Version (version number {{ version.get('version') }})</div>
+          <form action="/entry" method="POST">
+            <button style="float:right; border-radius: 4px; margin: -30px 15px 0px 0px; color: white; background-color: #239096; border: solid 1px #239096; cursor: pointer; font-size: 14px; font-weight:bold; z-index:6 ;">Return to live version</button>
+            <input type="hidden" name="entry_uri" value="{{ version.get('version_of') }}">
+          </form>
+        {% endif %}
+
+        {% set data_item = child.get('id') %}
+        {% set type = "ItemUnit" %}
+        {% include  "versions.html" ignore missing  %}
+
+          {% if not entry_dict[0].get('version') %}
+            <script>
+            function on{{data_item  | replace('-', '')}}_Meta() {
+              document.getElementById("{{data_item  | replace('-', '')}}overlayMeta").style.display = "block";
+            }
+
+            function off{{data_item  | replace('-', '')}}_Meta() {
+              document.getElementById("{{data_item  | replace('-', '')}}overlayMeta").style.display = "none";
+            }
+            </script>
+
+            <script>
+            function on{{data_item  | replace('-', '')}}_Version() {
+              document.getElementById("{{data_item  | replace('-', '')}}_overlayVersion").style.display = "block";
+            }
+
+            function off{{data_item  | replace('-', '')}}_Version() {
+              document.getElementById("{{data_item  | replace('-', '')}}_overlayVersion").style.display = "none";
+            }
+            </script>
+
+            <script type=text/javascript>
+            $(function() {
+                $('button#version_input').bind('click', function() {
+                    $.ajax({
+                        url: $SCRIPT_ROOT + '/_versioning',
+                        type: "get",
+                        data: {
+                            version_data_item_uri: $('input[name="version_data_item_uri"]').val()
+                        },
+                        success: function(data) {
+                            $("#versions_dict").html(data);
+                        }
+
+                    });
+                });
+            });
+            </script>
+            <button onclick="on{{data_item  | replace('-', '')}}_Version()" style="float:right; margin: -16px 70px 0px -110px; color: #239096;  background-color: white; font-weight: bold; padding-left: 3px; padding-right: 3px; z-index:6 ; border: none; cursor:pointer; display: inline-block; " id="version_input">versions</button>
+            <input type="hidden" name="version_data_item_uri" value="{{ data_item }}"/>
+
+            <button onclick="on{{data_item  | replace('-', '')}}_Meta()" style="float:right; margin: -13px 25px 0px -38px; z-index:6 ;" class='fas'>&#xf02b;</button>
+
+            <button onclick="onhist()" style="float: right; margin-right: 6px; margin-top: -13px; background-color: white; padding-left: 5px; padding-right: 5px; " class='fas' href="#" id=history_input>&#xf1da;</button>
+            <input type="hidden" name="data_item_uri" value="{{ data_item }}"/>
+
+            {% if not child.get('node').get('editable') == "false" %}
+              <form action="/delete_input"method="POST">
+                <input class="resource_input_delete_btn" type="submit" style="font-size: 15px; margin: -15px -28px 0px 0px; float: right; padding: 0px 5px 0px 0px; " name="delete_itemUnit" value="X"></input>
+                <input type="hidden" name="delete_itemUnit_uri" value="{{[child.get('parent'), child.get('id')] }}"></input>
+              </form>
+            {% endif %}
+          {% endif %}
+
+        {% set itemUnit_uri = child.get('id') %}
+        {% include  child.get('rep_node').get('itemUnit_html') ignore missing  %}
+      </div>
+
+      {% set id = child.get('id') %}
+      {% set node = child.get('node') %}
+      {% set data_item_type = "ItemUnit" %}
+      {% include 'metadata.html' %}
+
+      {% endif %}
+    {% endfor %}
+
+
+  {% endblock %}

@@ -10,7 +10,7 @@
 <div class="navigation">
   <form id="form1" action="/navi" method="POST" role="form">
     <div id="navi_tree" class="jstree_demo_div" role="tree" aria-multiselectable="true" tabindex="0" aria-activedescendant="j3_3" aria-busy="false"></div>
-    <input type="hidden" id="simpleDescriptionUnit_uri" name="node_data">
+    <input type="hidden" id="itemUnit_uri" name="node_data">
 
     <script type="text/JavaScript">
       $(function () {
@@ -23,7 +23,7 @@
             for(i = 0, j = data.selected.length; i < j; i++) {
               r.push(data.instance.get_node(data.selected[i]));
               console.log(r)
-              $('#simpleDescriptionUnit_uri').val(JSON.stringify({node_data: r}));
+              $('#itemUnit_uri').val(JSON.stringify({node_data: r}));
               document.getElementById("form1").submit();
           }
           }

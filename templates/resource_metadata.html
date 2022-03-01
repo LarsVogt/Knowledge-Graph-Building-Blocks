@@ -20,11 +20,11 @@
 
       </div>
       <input type="hidden" name="{{id}}_entry_uri" value="{{ entry_id }}">
-      <input class="simpleDescriptionUnit_resource" type="hidden" name="{{ id }}_basicUnit_uri" value="{{ basicUnit_uri }}"></input>
+      <input class="itemUnit_resource" type="hidden" name="{{ id }}_statementUnit_uri" value="{{ statementUnit_uri }}"></input>
       <input type="hidden" name="{{id}}_kgbb_uri" value="{{ resource_input_info.get('target_KGBB_URI') }}">
       <input type="hidden" name="{{id}}_parent_uri" value="{{ parent_id }}">
       <input type="hidden" name="{{id}}_parent_item_type" value="{{ parent_type }}">
-      <input type="hidden" name="{{ id }}_simpleDescriptionUnit_uri" value="{{ SIMPLE_DESCRIPTION_UNIT_uri}}" />
+      <input type="hidden" name="{{ id }}_itemUnit_uri" value="{{ ITEM_UNIT_uri}}" />
       <input type="hidden" name="{{ id }}_entry_uri" value="{{ entry_id }}"/>
       <input type="hidden" name="input_name" id="input_name{{ id }}" value="{{ id }}"/>
     </form>

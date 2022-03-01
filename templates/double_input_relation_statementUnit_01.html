@@ -1,0 +1,44 @@
+{% for n in range (0, itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree_length')) %}
+
+  <div class="datum" style="margin-top:-5px; margin-bottom:16px; margin-right:234px; position: inherit;">
+    <form action="/itemUnit" method="POST">
+      <div class="resource_input" style="position: relative;">
+        <input class="itemUnit_resource" type="submit" name="itemUnit_uri" value="{{ itemUnit_view_tree.get('URI') }}"></input>
+        <img class="item_icon" src="{{url_for('static', filename='StatementUnit_ICON_small.png')}}" alt="entry icon" style="padding-right: 4px;">
+        <span class="tooltip_statementUnit" style="color: black; font-style: normal;">{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[n].get(0).get('statementUnit_value1') }} {{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[n].get(1).get('statementUnit_value1') }} <span class="tooltip-text_statementUnit">{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[n].get(1).get('statementUnit_value_tooltip1') }}</span></span>
+        <span class="resource_statementUnit_ontology_id">{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[n].get(1).get('statementUnit_value2') }}</span>
+      </div>
+    </form>
+    <form action="/delete_input"method="POST">
+      <input class="resource_input_delete_btn" type="submit" name="delete_statementUnit" value="X"></input>
+      <input type="hidden" name="delete_statementUnit_uri" value="{{[itemUnit_view_tree.get('URI'), itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[n].get('URI')] }}"></input>
+    </form>
+    <button onclick="on2()" class='fas'>&#xf044;</button>
+  </div>
+
+  <div id="overlay2">
+    <div class="datum" style="margin-top: 300px; margin-left: 450px; float:left">
+      <form action="/user_input" accept-charset="UTF-8" style="margin-top:-4px; display:flex; width:600px;" method="POST">
+        <input name="utf8" type="hidden" value="&#x2713;" />
+        <input type="text" style="height: 30px; " name="double_resource_input_edit_value" size="5" placeholder="value" />
+        <input type="text" style="height: 30px; margin-right: 4px; " name="double_resource_input_edit" id="query" data-bp_include_definitions="true" data-bp_search_branch="http://purl.obolibrary.org/obo/UO_1000021" class="bp_form_complete-UO-name" size="20" placeholder="select a gram-based unit" />
+        <div class='input-group-append'>
+          <input type="hidden" name="double_resource_input_edit_parent_uri" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get('URI') }}">
+          <input type="hidden" name="double_resource_input_edit_parent_item_type" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get('data_item_type') }}">
+          <input type="hidden" name="double_resource_input_edit_entry_uri" value="{{ entry_view_tree.get('URI') }}">
+          <input type="hidden" name="double_resource_input_edit_itemUnit_uri" value="{{ itemUnit_view_tree.get('URI') }}">
+          <input type="hidden" name="double_resource_input_edit_statementUnit_uri" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get('URI') }}">
+          <input type="hidden" name="double_resource_input_edit_kgbb_uri" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('target_KGBB_URI') }}">
+          <input type="hidden" name="double_resource_input_edit_input_result" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('input_results_in') }}">
+          <input type="hidden" name="double_resource_input_edit_query_key" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('query_key') }}">
+          <input type="hidden" name="double_resource_input_edit_deleted_item_uri" value="{{ itemUnit_view_tree.get(2).get('sub_view_tree')[m].get(1).get('sub_view_tree')[n].get('URI') }}">
+          <button onclick="off2()" name="button" style="height: 30px; padding-top: 3px;" type="submit" class="btn btn-primary" aria-label="Search for a class"><i aria-hidden='true' style="font-size: 12px;" class='fas fa-lg'></i> edit
+          </button>
+        </div>
+      </form>
+    </div>
+    <button onclick="off2()" style="height: 20px; font-size: 12px; padding-left: 3px; font-style: bold; color: white; width: 20px; border-radius: 4px 4px 4px 4px; border-color: #7F869B;  background: #7F869B; margin-left: 776px; margin-top: -60px; float: left; font-weight: bold; " type="submit" class="btn btn-primary">X</button>
+  </div>
+
+
+{% endfor %}
