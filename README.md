@@ -8,7 +8,7 @@ If you want to run this application on your local machine, you must copy all fil
 
 The basis of the concept of Knowledge Graph Building Blocks is the organization and structuring of the overall data graph of a knowledge graph into semantically meaningful subgraphs, i.e. semantic units, each of which is represented in the graph by its own resource (i.e. node). Currently, the following basic types of semantic unit are distinguished (of which only a view are used in the prototype):
 
-![Fig5](https://user-images.githubusercontent.com/32734975/169994190-2396b83e-05a6-462c-a141-45fbe6fad362.jpg)
+![Fig6](https://user-images.githubusercontent.com/32734975/203352709-7334772d-dc95-44ca-8f25-0768aa2d1dfa.jpg)
 
 Basic taxonomy of different types of semantic units
 
