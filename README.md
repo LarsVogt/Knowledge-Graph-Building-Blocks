@@ -9,7 +9,7 @@ If you want to run this application on your local machine, you must copy all fil
 The basis of the concept of Knowledge Graph Building Blocks is the organization and structuring of the overall data graph of a knowledge graph into semantically meaningful subgraphs, i.e. semantic units, each of which is represented in the graph by its own resource (i.e. node). Currently, the following basic types of semantic unit are distinguished (of which only a view are used in the prototype):
 
 
-<img src="https://user-images.githubusercontent.com/32734975/203352709-7334772d-dc95-44ca-8f25-0768aa2d1dfa.jpg" width=35% height=35%>
+<img src="https://user-images.githubusercontent.com/32734975/203352709-7334772d-dc95-44ca-8f25-0768aa2d1dfa.jpg" width=35% height=35%></img>
 
 
 
@@ -52,5 +52,10 @@ By relating different KGBBs to one another, the structure of the overall data gr
 Each KGBB contains information about how the data graphs of its semantic units are instantiated by providing a generic predefined SPARQL/cypher query that allows the application to create a data graph according to a defined graph pattern. The query refers to a set of parameters that the application must provide for the query. In the same way, the corresponding statement unit, item unit, item group unit, dataset unit, or granularity tree unit class provides a predefined SPARAL/cypher query for identifying the data graph belonging to a semantic unit of that type and, especially in case of statement unit KGBBs, one editing query for each node or relation in the data graph that can be edited by a user. Furthermore, KGBBs specify input-control information for possible user input.  
 
 Each KGBB also provides information on how to translate the machine-actionable subgraphs that instantiate the KGBB into a data representation that is human-readable. A given KGBB can provide more than one such data representation (e.g., one for a smartphone app and one for an internet browser). 
+
+**In this video I give a short demo for the prototype:**
+
+[![Demo Video](https://img.youtube.com/vi/NPqwyKx4TG4/0.jpg)](https://www.youtube.com/watch?v=NPqwyKx4TG4)
+
 
 
